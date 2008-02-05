@@ -64,6 +64,7 @@ import cs569.misc.OBJLoaderException;
 import cs569.misc.Parser;
 import cs569.misc.RotationGizmo;
 import cs569.object.DefaultScene;
+import cs569.object.CustomScene;
 import cs569.object.HierarchicalObject;
 import cs569.object.MeshObject;
 import cs569.object.ParameterizedObjectMaker;
@@ -112,7 +113,8 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 	private static Viewer mainView;
 
 	// The default scene assembler
-	private ParameterizedObjectMaker defaultSceneMaker = new DefaultScene();
+	//private ParameterizedObjectMaker defaultSceneMaker = new DefaultScene();
+	private ParameterizedObjectMaker defaultSceneMaker = new CustomScene();
 
 	// the current size of GL viewport
 	protected int viewWidth = DEFAULT_VIEWPORT_SIZE;
