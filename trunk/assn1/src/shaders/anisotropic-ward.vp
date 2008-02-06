@@ -4,9 +4,9 @@
 uniform vec4 lightPosition, eyePosition;
 
 /* Outputs -> fragment program */
-varying vec3 lightVector, normal, eyeVector;
+varying vec3 lightVector, normal, eyeVector, tan, binorm;
 
-//attribute tangent, binormal;
+attribute vec3 tangent, binormal;
 
 void main() {
 	/* The following statement is almost equivalent to writing
@@ -18,12 +18,15 @@ void main() {
 	*/
 	gl_Position = ftransform();
 	
-	/* Normal in object coordinates (no gl_NormalMatrix mult.) */
-	normal = gl_Normal;
+	 /* Normal in world coordinates */
+    normal = normalize(gl_NormalMatrix * gl_Normal);
 
-	/* Vertex->Light in object coordinates */
-	lightVector = (gl_ModelViewMatrixInverse * lightPosition - gl_Vertex).xyz;
+    /* Vertex->Light in world coordinates */
+    vec4 worldSpacePos = gl_ModelViewMatrix * gl_Vertex;
+    lightVector = (lightPosition - worldSpacePos).xyz;
 	
-	/* Vertex->Eye in object coordinates */
-	eyeVector = (gl_ModelViewMatrixInverse * eyePosition - gl_Vertex).xyz;
+	eyeVector = (eyePosition - worldSpacePos).xyz;
+	
+	tan = tangent;
+	binorm = binormal;
 }
