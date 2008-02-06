@@ -125,7 +125,7 @@ public class PrimitiveFactory {
 			pos++;
 
 		}
-		System.out.println("Verts: "+ pos);
+
 		// Create the triangles
 
 		int tris = 0;
@@ -309,7 +309,7 @@ public class PrimitiveFactory {
 
 			}
 		}
-		
+/*	
 		for(int i = 0; i<size; i++)
 		{
 			System.out.println(triangles[i] + " " + triangles[i+1] + " " +triangles[i+2]);
@@ -317,7 +317,7 @@ public class PrimitiveFactory {
 			System.out.println(triangles[i+1] + ": "+vertices[triangles[i+1]] + " " + vertices[triangles[i+1]+1] + " " +  vertices[triangles[i+1]+2]);
 			System.out.println(triangles[i+2] + ": "+vertices[triangles[i+2]] + " " + vertices[triangles[i+2]+1] + " " +  vertices[triangles[i+2]+2]);
 		}
-
+*/
 		return new TangentSpaceMeshObject(vertices, triangles, normals, texCoords, name);
 
 	}
