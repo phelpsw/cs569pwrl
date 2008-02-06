@@ -16,12 +16,12 @@ void main() {
 	*/
 	gl_Position = ftransform();
 	
-	/* Normal in object coordinates (no gl_NormalMatrix mult.) */
-	normal = gl_Normal;
+	 /* Normal in world coordinates */
+    normal = normalize(gl_NormalMatrix * gl_Normal);
 
-	/* Vertex->Light in object coordinates */
-	lightVector = (gl_ModelViewMatrixInverse * lightPosition - gl_Vertex).xyz;
+    /* Vertex->Light in world coordinates */
+    vec4 worldSpacePos = gl_ModelViewMatrix * gl_Vertex;
+    lightVector = (lightPosition - worldSpacePos).xyz;
 	
-	/* Vertex->Eye in object coordinates */
-	eyeVector = (gl_ModelViewMatrixInverse * eyePosition - gl_Vertex).xyz;
+	eyeVector = (eyePosition - worldSpacePos).xyz;
 }

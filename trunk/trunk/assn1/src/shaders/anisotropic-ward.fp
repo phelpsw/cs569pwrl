@@ -5,7 +5,7 @@ uniform vec4 diffuseColor, specularColor;
 uniform float alphaX, alphaY;
 
 /* Inputs <- Vertex program */
-varying vec3 lightVector, normal, eyeVector;
+varying vec3 lightVector, normal, eyeVector, X, Y;
 
 void main() {
 
@@ -16,11 +16,10 @@ void main() {
 	
 	vec3 nHalf = normalize(nLightVector + nEyeVector);
 	float nDotH = dot(nNormal, nHalf);    	
-    
-    //TODO: change to anisotropic!	
-	float expTerm = exp( -(1.0-nDotH*nDotH)/(alphaX*alphaY*nDotH*nDotH) );
-	
-	
+        
+	float expTerm = exp( (pow(dot(nHalf, X)/alphaX, 2)+pow(dot(nHalf, Y)/alphaY, 2))/(-nDotH*nDotH) );
+//	float expTerm = exp( -(1.0-nDotH*nDotH)/(alphaX*alphaY*nDotH*nDotH) );
+		
 	float coeff = sqrt(dot(nNormal, nLightVector)) / ( sqrt(dot(nNormal, nEyeVector)) * 4.0*3.14159*alphaX*alphaY); 
 	
 	/* Diffuse color */
