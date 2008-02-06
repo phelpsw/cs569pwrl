@@ -73,7 +73,7 @@ public class CookTorranceShader extends GLSLShader {
 		Color3f diffuseColorValue = (Color3f) params[1];
 		Color3f specularColorValue = (Color3f) params[2];
 		float n = ((Float) params[3]).floatValue();
-		float m = ((Float) params[3]).floatValue();
+		float m = ((Float) params[4]).floatValue();
 
 		gl.glUniform4f(eyePosition, eye.x, eye.y, eye.z, 1.0f);
 		gl.glUniform4f(lightPosition, (float) Viewer.LIGHT_POSITION.x,
