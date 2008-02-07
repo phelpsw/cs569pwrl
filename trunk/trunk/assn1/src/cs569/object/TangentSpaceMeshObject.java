@@ -168,6 +168,10 @@ public class TangentSpaceMeshObject extends MeshObject {
 			
 			Norm.cross(Tang, Binorm);
 			
+			Tang.normalize();
+			Binorm.normalize();
+			Norm.normalize();
+			
 			tangents.put(Tang.x);
 			tangents.put(Tang.y);
 			tangents.put(Tang.z);
