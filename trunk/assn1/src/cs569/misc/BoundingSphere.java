@@ -118,8 +118,16 @@ public class BoundingSphere {
 	 * (disregarding radius)
 	 */
 	public float findClosest(Point3f orig, Vector3f dir) {
-		/* To be implemented */
-		return 0.0f;
+		Vector3f w = new Vector3f();
+		w.sub(center, orig);
+		
+		float vsq = dir.dot(dir);
+		float proj = w.dot(dir);
+		
+		Vector3f projw = new Vector3f(dir);
+		projw.scale(proj/vsq);
+		
+		return projw.length() / dir.length();
 	}
 
 	public Point3f getCenter() {
