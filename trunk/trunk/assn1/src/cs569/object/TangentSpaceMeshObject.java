@@ -6,6 +6,10 @@ import java.nio.FloatBuffer;
 import javax.media.opengl.GL;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
+import javax.vecmath.Point3f;
+import javax.vecmath.Point2f;
+import javax.vecmath.GMatrix;
+import javax.vecmath.GVector;
 
 import com.sun.opengl.util.BufferUtil;
 
@@ -70,11 +74,108 @@ public class TangentSpaceMeshObject extends MeshObject {
 		super(verts, tris, normals, texcoords, inName);
 	}
 
+	private void extractPoint(int index, Point3f p)
+	{
+		int tri = triangles.get(index);
+		p.set(verts.get(3*tri),verts.get(3*tri+1),verts.get(3*tri+2));
+	}
+	
+	private void extractTexCoord(int index, Point2f p)
+	{
+		int tri = triangles.get(index);
+		p.set(texcoords.get(2*tri),texcoords.get(2*tri+1));
+	}
+	
+	private void solveTex2PointMatrix(Vector3f Pa, Vector3f Pb, Vector2f Ta, Vector2f Tb, GMatrix M)
+	{
+		M.setElement(0, 0, (Pb.x*Ta.y - Tb.y*Pa.x) / (Tb.x*Ta.y - Ta.x*Tb.y)); // a
+		M.setElement(0, 1, (Pa.x - M.getElement(0, 0)*Ta.x)/Ta.y); // b
+		
+		M.setElement(1, 0, (Pa.y*Tb.y - Ta.y*Pb.y) / (Ta.x*Tb.y - Tb.x*Ta.y)); // c
+		M.setElement(1, 1, (Pa.y - M.getElement(1, 0)*Ta.x)/Ta.y); // d
+		
+		M.setElement(2, 0, (Tb.y*Pa.z - Pb.z*Ta.y) / (Ta.x*Tb.y - Tb.x*Ta.y)); // e
+		M.setElement(2, 1, (Pa.z - M.getElement(2, 0)*Ta.x)/Ta.y); // f
+	}
+	
+	private void convertTex2Point(Vector2f T, GMatrix M, Vector3f P)
+	{
+		GVector Tex = new GVector(T);
+		GVector Pt = new GVector(3);
+		Pt.mul(M, Tex);
+		P.set((float)Pt.getElement(0), (float)Pt.getElement(1), (float)Pt.getElement(2));
+	}
+	
+	private void convertPoint2Tex(Vector3f P, GMatrix M, Vector2f T)
+	{
+		GVector Tex = new GVector(2);
+		GVector Pt = new GVector(P);
+		GMatrix Minv = new GMatrix(M);
+		Minv.invert();
+		Tex.mul(Minv, Pt);
+		T.set((float)Pt.getElement(0), (float)Pt.getElement(1));
+	}
+	
 	/**
 	 * Calculate the tangent space vectors
 	 */
 	public void calculateTangentSpace() {
-		/// to be implemented
+		
+		tangents = BufferUtil.newFloatBuffer(triangles.capacity());
+		binormals = BufferUtil.newFloatBuffer(triangles.capacity());
+		
+		Point3f P0 = new Point3f();
+		Point3f P1 = new Point3f();
+		Point3f P2 = new Point3f();
+		
+		Point2f uv0 = new Point2f();
+		Point2f uv1 = new Point2f();
+		Point2f uv2 = new Point2f();
+		
+		Vector3f Pa = new Vector3f();
+		Vector3f Pb = new Vector3f();
+		
+		Vector2f Ta = new Vector2f();
+		Vector2f Tb = new Vector2f();
+		
+		GMatrix M = new GMatrix(3,2); // 3x2 Matrix
+		
+		Vector3f Norm = new Vector3f();
+		Vector3f Tang = new Vector3f();
+		Vector3f Binorm = new Vector3f();
+
+		for(int i=0; i<triangles.capacity()/3; i++)
+		{
+			extractPoint(i, P0);
+			extractPoint(i+1, P1);
+			extractPoint(i+2, P2);
+			
+			extractTexCoord(i, uv0);
+			extractTexCoord(i+1, uv1);
+			extractTexCoord(i+2, uv2);
+			
+			Pa.sub(P1, P0);
+			Pb.sub(P2, P0);
+			
+			Ta.sub(uv1, uv0);
+			Tb.sub(uv2, uv0);
+			
+			solveTex2PointMatrix(Pa, Pb, Ta, Tb, M);
+			
+			convertTex2Point(new Vector2f(1.0f, 0.0f), M, Tang);
+			
+			convertTex2Point(new Vector2f(0.0f, 1.0f), M, Binorm);
+			
+			Norm.cross(Tang, Binorm);
+			
+			tangents.put(Tang.x);
+			tangents.put(Tang.y);
+			tangents.put(Tang.z);
+			
+			binormals.put(Binorm.x);
+			binormals.put(Binorm.y);
+			binormals.put(Binorm.z);
+		}
 	}
 
 	
