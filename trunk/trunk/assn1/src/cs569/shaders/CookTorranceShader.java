@@ -71,9 +71,9 @@ public class CookTorranceShader extends GLSLShader {
 		// Unpack the parameters
 		Vector3f eye = (Vector3f) params[0];
 		Color3f diffuseColorValue = (Color3f) params[1];
-		Color3f specularColorValue = (Color3f) params[2];
-		float n = ((Float) params[3]).floatValue();
-		float m = ((Float) params[4]).floatValue();
+		Color3f specularColorValue = (Color3f) params[2];		
+		float m = ((Float) params[3]).floatValue();
+		float n = ((Float) params[4]).floatValue();
 
 		gl.glUniform4f(eyePosition, eye.x, eye.y, eye.z, 1.0f);
 		gl.glUniform4f(lightPosition, (float) Viewer.LIGHT_POSITION.x,
@@ -87,9 +87,9 @@ public class CookTorranceShader extends GLSLShader {
 		// Set the material properties
 		gl.glUniform4f(specularColor, specularColorValue.x, specularColorValue.y,
 				specularColorValue.z, 1.0f);
-		
-		gl.glUniform1f(nHandle, n);
+				
 		gl.glUniform1f(mHandle, m);
+		gl.glUniform1f(nHandle, n);
 		
 	}
 }
