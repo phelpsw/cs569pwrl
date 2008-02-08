@@ -124,7 +124,7 @@ public class TangentSpaceMeshObject extends MeshObject {
 		tangents = BufferUtil.newFloatBuffer(triangles.capacity());
 		binormals = BufferUtil.newFloatBuffer(triangles.capacity());
 		
-		Point3f P0 = new Point3f();
+		Point3f P0 = new Point3f(); // assign TBN vals to P0, normals don't match up though :(
 		Point3f P1 = new Point3f();
 		Point3f P2 = new Point3f();
 		
@@ -221,9 +221,13 @@ public class TangentSpaceMeshObject extends MeshObject {
 			System.out.println("Tang: "+Tang);
 			System.out.println("Binorm: "+Binorm);
 			System.out.println("Norm: "+Norm);
-			System.out.println("MeshNorm: "+n0+" "+n1+" "+n2);
+			System.out.println("MeshNorm: "+n0);
 			System.out.println("----");
 			
+			putBTNvalues(3*i, Binorm, Tang, Norm);
+			putBTNvalues(3*i+1, Binorm, Tang, Norm);
+			putBTNvalues(3*i+2, Binorm, Tang, Norm);
+			/*
 			tangents.put(Tang.x);
 			tangents.put(Tang.y);
 			tangents.put(Tang.z);
@@ -231,7 +235,27 @@ public class TangentSpaceMeshObject extends MeshObject {
 			binormals.put(Binorm.x);
 			binormals.put(Binorm.y);
 			binormals.put(Binorm.z);
+			*/
 		}
+	}
+	
+	void putBTNvalues(int i, Vector3f B, Vector3f T, Vector3f N)
+	{
+		int tri = triangles.get(i);
+		
+		tangents.put(3*tri, T.x);
+		tangents.put(3*tri+1, T.y);
+		tangents.put(3*tri+2, T.z);
+		
+		binormals.put(3*tri, B.x);
+		binormals.put(3*tri+1, B.y);
+		binormals.put(3*tri+2, B.z);
+		
+		/* This does something really interesting, I believe this hints at the final problem
+		normals.put(3*tri, N.x);
+		normals.put(3*tri+1, N.y);
+		normals.put(3*tri+2, N.z);
+		*/
 	}
 
 	public static void computeFaceTBNBasis(Vector3f Pa, Vector3f Pb, Vector2f Ta, Vector2f Tb, 
