@@ -155,13 +155,12 @@ public class TangentSpaceMeshObject extends MeshObject {
 			// special circumstances
 			if(Float.isNaN(Tang.x) || Float.isNaN(Norm.x) || Float.isNaN(Binorm.x))
 			{ // handles top
-				Tang.cross(Binorm, n0);
+				Tang.cross(Binorm, n0); // be sensitive to cases when binorm might be NaN
 				Norm.set(n0);
 				if((Binorm.dot(n0) < 0)) { // handles triangle at top at seam
 					Binorm.scale(-1.0f);
 					Tang.scale(-1.0f);
 				}
-
 			} else if (Norm.dot(n0) < 0) { // handles textures boundary
 				Binorm.scale(-1.0f);
 				Norm.scale(-1.0f);
