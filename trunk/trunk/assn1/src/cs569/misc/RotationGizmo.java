@@ -107,10 +107,8 @@ public class RotationGizmo {
 		Point2f mouseloc = new Point2f(e.getPoint().x,e.getPoint().y);
 		viewer.windowToViewport(mouseloc);
 		
-		System.out.println("Mouse: "+mouseloc);
-		
-		Vector4f dir = new Vector4f(0.0f, 0.0f, 1.0f, 0.0f);
-		Point4f origin = new Point4f(mouseloc.x, mouseloc.y, 0.0f, 1.0f);
+		Point4f dir = new Point4f(0.0f, 0.0f, -1.0f, 1.0f);
+		Point4f origin = new Point4f(mouseloc.x, mouseloc.y, 1.0f, 1.0f);
 		
 		// transform ray into worldspace
 		Matrix4f Mpi = camera.getInverseProjectionMatrix();
@@ -123,24 +121,28 @@ public class RotationGizmo {
 		Mvi.transform(origin);
 		// transformation complete
 		
+		origin.x /= origin.w;
+		origin.y /= origin.w;
+		origin.z /= origin.w;
+		origin.w /= origin.w;
 		
-		System.out.println("Origin "+ origin);
-		System.out.println("Dir "+dir);
+		dir.x /= dir.w;
+		dir.y /= dir.w;
+		dir.z /= dir.w;
+		dir.w /= dir.w;
 		
-		// because of w term in origin and dir, I don't think they
-		// can be inserted into findClosest as follows
 		float tclosest = object.getBoundingSphere().findClosest(
 				new Point3f(origin.x, origin.y, origin.z), 
-				new Vector3f(dir.x, dir.y, dir.z));
+				new Vector3f(dir.x-origin.x, dir.y-origin.y, dir.z-origin.z));
 		
 		System.out.println("T "+tclosest);
 		
-		Point3f rayClosest = new Point3f(dir.x,dir.y,dir.z);
+		Point3f rayClosest = new Point3f(dir.x-origin.x, dir.y-origin.y, dir.z-origin.z);
 		rayClosest.scaleAdd(tclosest, new Point3f(origin.x,origin.y,origin.z));
 		
-		System.out.println("RayPt "+rayClosest);
+		//System.out.println("RayPt "+rayClosest);
 		
-		System.out.println("SpherePt "+getPointOnBSphere(rayClosest, object.getBoundingSphere()));
+		//System.out.println("SpherePt "+getPointOnBSphere(rayClosest, object.getBoundingSphere()));
 		
 		boundingSphere = object.getBoundingSphere().transform(object.getWorldTransform());
 		circleVisible = true;
