@@ -113,8 +113,8 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 	private static Viewer mainView;
 
 	// The default scene assembler
-	private ParameterizedObjectMaker defaultSceneMaker = new DefaultScene();
-	//private ParameterizedObjectMaker defaultSceneMaker = new CustomScene();
+	//private ParameterizedObjectMaker defaultSceneMaker = new DefaultScene();
+	private ParameterizedObjectMaker defaultSceneMaker = new CustomScene();
 
 	// the current size of GL viewport
 	protected int viewWidth = DEFAULT_VIEWPORT_SIZE;
