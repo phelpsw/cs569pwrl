@@ -73,7 +73,12 @@ public class TangentSpaceMeshObject extends MeshObject {
 			float[] texcoords, String inName) {
 		super(verts, tris, normals, texcoords, inName);
 	}
-
+	private void extractNormal(int index, Vector3f v)
+	{
+		int tri = triangles.get(index);
+		v.set(normals.get(3*tri),normals.get(3*tri+1),normals.get(3*tri+2));
+	}
+	
 	private void extractPoint(int index, Point3f p)
 	{
 		int tri = triangles.get(index);
@@ -88,13 +93,13 @@ public class TangentSpaceMeshObject extends MeshObject {
 	
 	private void solveTex2PointMatrix(Vector3f Pa, Vector3f Pb, Vector2f Ta, Vector2f Tb, GMatrix M)
 	{
-		M.setElement(0, 0, (Pb.x*Ta.y - Tb.y*Pa.x) / (Tb.x*Ta.y - Ta.x*Tb.y)); // a
+		M.setElement(0, 0, (Pa.x*Tb.y - Pb.x*Tb.y) / (-Tb.x*Ta.y + Ta.x*Tb.y)); // a
 		M.setElement(0, 1, (Pa.x - M.getElement(0, 0)*Ta.x)/Ta.y); // b
 		
-		M.setElement(1, 0, (Pa.y*Tb.y - Ta.y*Pb.y) / (Ta.x*Tb.y - Tb.x*Ta.y)); // c
+		M.setElement(1, 0, (Pa.y*Tb.y - Pb.y*Tb.y) / (-Tb.x*Ta.y + Ta.x*Tb.y)); // c
 		M.setElement(1, 1, (Pa.y - M.getElement(1, 0)*Ta.x)/Ta.y); // d
 		
-		M.setElement(2, 0, (Tb.y*Pa.z - Pb.z*Ta.y) / (Ta.x*Tb.y - Tb.x*Ta.y)); // e
+		M.setElement(2, 0, (Pa.z*Tb.y - Pb.z*Tb.y) / (-Tb.x*Ta.y + Ta.x*Tb.y)); // e
 		M.setElement(2, 1, (Pa.z - M.getElement(2, 0)*Ta.x)/Ta.y); // f
 	}
 	
@@ -106,20 +111,15 @@ public class TangentSpaceMeshObject extends MeshObject {
 		P.set((float)Pt.getElement(0), (float)Pt.getElement(1), (float)Pt.getElement(2));
 	}
 	
-	private void convertPoint2Tex(Vector3f P, GMatrix M, Vector2f T)
-	{
-		GVector Tex = new GVector(2);
-		GVector Pt = new GVector(P);
-		GMatrix Minv = new GMatrix(M);
-		Minv.invert();
-		Tex.mul(Minv, Pt);
-		T.set((float)Pt.getElement(0), (float)Pt.getElement(1));
-	}
-	
 	/**
 	 * Calculate the tangent space vectors
 	 */
 	public void calculateTangentSpace() {
+		
+		triangles.rewind();
+		verts.rewind();
+		texcoords.rewind();
+		normals.rewind();
 		
 		tangents = BufferUtil.newFloatBuffer(triangles.capacity());
 		binormals = BufferUtil.newFloatBuffer(triangles.capacity());
@@ -131,6 +131,10 @@ public class TangentSpaceMeshObject extends MeshObject {
 		Point2f uv0 = new Point2f();
 		Point2f uv1 = new Point2f();
 		Point2f uv2 = new Point2f();
+
+		Vector3f n0 = new Vector3f();
+		Vector3f n1 = new Vector3f();
+		Vector3f n2 = new Vector3f();
 		
 		Vector3f Pa = new Vector3f();
 		Vector3f Pb = new Vector3f();
@@ -144,15 +148,21 @@ public class TangentSpaceMeshObject extends MeshObject {
 		Vector3f Tang = new Vector3f();
 		Vector3f Binorm = new Vector3f();
 
-		for(int i=0; i<triangles.capacity()/3; i++)
+		
+		//for(int i=0; i<this.numTriangles*3; i+=3)
+		for (int i=0; i<triangles.capacity()/3; i++)
 		{
-			extractPoint(i, P0);
-			extractPoint(i+1, P1);
-			extractPoint(i+2, P2);
+			extractPoint(3*i, P0);
+			extractPoint(3*i+1, P1);
+			extractPoint(3*i+2, P2);
 			
-			extractTexCoord(i, uv0);
-			extractTexCoord(i+1, uv1);
-			extractTexCoord(i+2, uv2);
+			extractTexCoord(3*i, uv0);
+			extractTexCoord(3*i+1, uv1);
+			extractTexCoord(3*i+2, uv2);
+			
+			extractNormal(3*i, n0);
+			extractNormal(3*i+1, n1);
+			extractNormal(3*i+2, n2);
 			
 			Pa.sub(P1, P0);
 			Pb.sub(P2, P0);
@@ -160,17 +170,59 @@ public class TangentSpaceMeshObject extends MeshObject {
 			Ta.sub(uv1, uv0);
 			Tb.sub(uv2, uv0);
 			
-			solveTex2PointMatrix(Pa, Pb, Ta, Tb, M);
 			
-			convertTex2Point(new Vector2f(1.0f, 0.0f), M, Tang);
+			//solveTex2PointMatrix(Pa, Pb, Ta, Tb, M);
 			
-			convertTex2Point(new Vector2f(0.0f, 1.0f), M, Binorm);
+			System.out.println("P0=" + P0 + ", P1="+P1+", P2="+P2);
+			System.out.println("uv0=" + uv0 + ", uv1="+uv1+", uv2="+uv2);
+			/*
+			System.out.println("Ta:"+Ta);
+			System.out.println("Tb:"+Tb);
+			System.out.println("M:"+M);
+			System.out.println("Pa:"+Pa);
+			System.out.println("Pb:"+Pb);
+			
+			convertTex2Point(new Vector2f(1.0f, 0.00001f), M, Tang);
+			
+			convertTex2Point(new Vector2f(0.00001f, 1.0f), M, Binorm);
 			
 			Norm.cross(Tang, Binorm);
+			*/
+			
+			
+			computeFaceTBNBasis(Pa, Pb, Ta, Tb, Tang, Binorm, Norm);
+			/*
+			//Gram-Schmitt orthogonalization
+			Vector3f gsNorm = new Vector3f(Norm);
+			gsNorm.scale(gsNorm.dot(Tang));
+			Tang.sub(gsNorm);
+			Tang.normalize();
+			*/
+			/*
+			//Right handed TBN space ?
+			Vector3f tbCross = new Vector3f();
+			tbCross.cross(Tang, Binorm);
+			boolean rightHanded = tbCross.dot(Norm) >= 0;
+		    Binorm.cross(Norm, Tang);
+			if(!rightHanded)
+				Binorm.scale(-1.0f);
+		    */
+		    //boolean rightHanded = dotProduct(crossProduct(tangent, binormal), normal) >= 0;
+		    //binormal = crossProduct(normal, tangent);
+		    //if(!rigthHanded)
+		    //    binormal.multiply(-1);
+			
+			//Tang.subtract(multiply(normal, dotProduct(normal, tangent))).normalize();
 			
 			Tang.normalize();
 			Binorm.normalize();
 			Norm.normalize();
+			
+			System.out.println("Tang: "+Tang);
+			System.out.println("Binorm: "+Binorm);
+			System.out.println("Norm: "+Norm);
+			System.out.println("MeshNorm: "+n0+" "+n1+" "+n2);
+			System.out.println("----");
 			
 			tangents.put(Tang.x);
 			tangents.put(Tang.y);
@@ -182,6 +234,51 @@ public class TangentSpaceMeshObject extends MeshObject {
 		}
 	}
 
+	public static void computeFaceTBNBasis(Vector3f Pa, Vector3f Pb, Vector2f Ta, Vector2f Tb, 
+			Vector3f tangent, Vector3f binormal, Vector3f normal)
+	{
+	    Vector3f p21  = Pa;  //p2-p1
+	    Vector3f p31  = Pb;  //p3-p1
+	    Vector2f uv21 = Ta;       //uv2-uv1
+	    Vector2f uv31 = Tb;       //uv3-uv1
+
+	    /*float f = uv21.getX()*uv31.getY() - uv21.getY()*uv31.getX();
+	    f = (f == 0) ? 1 : 1 / f;*/
+
+	    //Note: As vectors are normalized, we can skip the 1/f division and the normalization of the normal
+	    //      Feel free to keep/enable the commented code.
+	    if(tangent != null || normal != null)
+	    {
+	    	Vector3f vec1 = new Vector3f(p31);
+	    	vec1.scale(uv21.getY());
+	    	Vector3f vec2 = new Vector3f(p21);
+	    	vec2.scale(uv31.getY());
+	    	vec2.sub(vec1);
+	    	vec2.normalize();
+	    	tangent.set(vec2);
+	    	
+	        //tangent.copyFrom( normalize(/*multiply(*/multiply(p21, uv31.getY()).subtract(multiply(p31, uv21.getY()))/*, f)*/));
+	    
+	    }
+	    if(binormal != null || normal != null)
+	    {
+	    	Vector3f vec1 = new Vector3f(p21);
+	    	vec1.scale(uv31.getX());
+	    	Vector3f vec2 = new Vector3f(p31);
+	    	vec2.scale(uv21.getX());
+	    	vec2.sub(vec1);
+	    	vec2.normalize();
+	    	binormal.set(vec2);
+	    	
+	        //binormal.copyFrom(normalize(/*multiply(*/multiply(p31, uv21.getX()).subtract(multiply(p21, uv31.getX()))/*, f)*/));
+	    }
+	    if(normal != null)
+	    {    
+	    	normal.cross(tangent, binormal);
+	    	//normal.copyFrom( /*normalize(*/crossProduct(tangent, binormal)/*)*/);
+	    
+	    }
+	}
 	
 	/**
 	 * Verify that the currently running shader is hooked up to
