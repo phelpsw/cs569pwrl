@@ -120,12 +120,17 @@ public class BoundingSphere {
 	public float findClosest(Point3f orig, Vector3f dir) {
 		Vector3f w = new Vector3f();
 		w.sub(center, orig);
-		
+				
 		float vsq = dir.dot(dir);
 		float proj = w.dot(dir);
 		
 		Vector3f projw = new Vector3f(dir);
 		projw.scale(proj/vsq);
+		
+		Point3f pClose = new Point3f(projw);
+		pClose.add(orig);
+				
+		System.out.println("closest point (in findClosest(): " + pClose);
 		
 		return projw.length() / dir.length();
 	}
