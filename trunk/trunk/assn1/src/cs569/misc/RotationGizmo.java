@@ -97,27 +97,42 @@ public class RotationGizmo {
 	// //////////////////////////////////////////////////////////////////////////////////////////////////
 	// Algorithm implementation
 	// //////////////////////////////////////////////////////////////////////////////////////////////////
+
+//	 Calculates closest point on surface of bounding sphere based on radius
+	// of the bounding sphere and the direction vector between the closest point
+	// on the ray and the center of the bounding sphere
+	private void getPointOnBSphere(Point3f rayClosest, BoundingSphere bs, Point3f outPoint3f)
+	{
+		Vector3f sdir = new Vector3f();
+		sdir.sub(rayClosest, bs.getCenter());
+		
+		float t = bs.getRadius() / sdir.length();
+		sdir.scaleAdd(t, bs.getCenter());
+		outPoint3f.set(sdir.x,sdir.y,sdir.z);
+	}
 	
-	public void startDrag(MouseEvent e) {
-		/* To be implemented */
+	private void mouseToSpherePoint(int mouseX, int mouseY, Point3f outPoint)
+	{
+		System.out.println("\n--Begin mouseToSpherePoint--");
 		
-		if (object == null)
-			return;
-		
-		Point2f mouseloc = new Point2f(e.getPoint().x,e.getPoint().y);
+		//Point2f mouseloc = new Point2f(e.getPoint().x,e.getPoint().y);
+		Point2f mouseloc = new Point2f(mouseX,mouseY);
+		System.out.println("mouse point: " + mouseloc);
 		viewer.windowToViewport(mouseloc);
+		System.out.println("viewport mouse: " + mouseloc);
 		
-		Point4f dir = new Point4f(0.0f, 0.0f, -1.0f, 1.0f);
+//		 Given near plane is 0, far is 1?
+		Point4f dirPoint = new Point4f(0.0f, 0.0f, 0.5f, 0.0f);		 	
 		Point4f origin = new Point4f(mouseloc.x, mouseloc.y, 1.0f, 1.0f);
 		
 		// transform ray into worldspace
 		Matrix4f Mpi = camera.getInverseProjectionMatrix();
 		Matrix4f Mvi = camera.getInverseViewMatrix();
 		
-		Mpi.transform(dir);
+		Mpi.transform(dirPoint);
 		Mpi.transform(origin);
 		
-		Mvi.transform(dir);
+		Mvi.transform(dirPoint);
 		Mvi.transform(origin);
 		// transformation complete
 		
@@ -126,28 +141,62 @@ public class RotationGizmo {
 		origin.z /= origin.w;
 		origin.w /= origin.w;
 		
-		dir.x /= dir.w;
-		dir.y /= dir.w;
-		dir.z /= dir.w;
-		dir.w /= dir.w;
+		dirPoint.x /= dirPoint.w;
+		dirPoint.y /= dirPoint.w;
+		dirPoint.z /= dirPoint.w;
+		dirPoint.w /= dirPoint.w;
 		
-		float tclosest = object.getBoundingSphere().findClosest(
-				new Point3f(origin.x, origin.y, origin.z), 
-				new Vector3f(dir.x-origin.x, dir.y-origin.y, dir.z-origin.z));
+		System.out.println("dirPoint: " + dirPoint);
 		
-		System.out.println("T "+tclosest);
-		
-		Point3f rayClosest = new Point3f(dir.x-origin.x, dir.y-origin.y, dir.z-origin.z);
-		rayClosest.scaleAdd(tclosest, new Point3f(origin.x,origin.y,origin.z));
-		
-		//System.out.println("RayPt "+rayClosest);
-		
-		//System.out.println("SpherePt "+getPointOnBSphere(rayClosest, object.getBoundingSphere()));
-		
+		Point3f origin3f = new Point3f(origin.x, origin.y, origin.z);				
+		Vector3f dir3f = new Vector3f(dirPoint.x-origin.x, dirPoint.y-origin.y, dirPoint.z-origin.z);
+		dir3f.normalize();
+		System.out.println("dir3f:" + dir3f);
+		System.out.println("origin: " + origin);
+
+			
 		boundingSphere = object.getBoundingSphere().transform(object.getWorldTransform());
+		System.out.println("bounding sphere center in world coors: " + boundingSphere.getCenter() + ", rad=" + boundingSphere.getRadius());
+				
+		Vector2f rayHit = boundingSphere.rayIntersect(origin3f, dir3f);
+				
+		if (rayHit == null)
+		{
+			System.out.println("RAY DID NOT HIT BOUNDING SPHERE");
+			//operate in world coords
+			float tclosest = boundingSphere.findClosest(origin3f, dir3f);
+			//float tclosest = object.getBoundingSphere().findClosest(origin3f, dir3f);
+					
+			Point3f closestToCenter = new Point3f(dir3f);
+			closestToCenter.scaleAdd(tclosest, origin3f);
+			
+			getPointOnBSphere(closestToCenter, boundingSphere, outPoint);
+			
+		} else
+		{
+			System.out.println("Ray hit bounding sphere at distances " + rayHit.x + " and " + rayHit.y);
+			outPoint.set(dir3f);
+			outPoint.scale(rayHit.x); // scale by the near distance
+			outPoint.add(origin3f);
+		}
+
+
+		System.out.println("startPoint=" + outPoint);
+		System.out.println("--End mouseToSpherePoint--");
+	}
+	
+	public void startDrag(MouseEvent e) {
+		
+		if (object == null)
+			return;
+		
+		Point3f point = new Point3f();
+		mouseToSpherePoint(e.getX(), e.getY(), point);
+		
 		circleVisible = true;
 		handleVisible = true;
-
+				
+		
 		// dummy values
 		dragStart = new Vector3f(1, 0, 0);
 		dragStart.normalize();
@@ -156,22 +205,11 @@ public class RotationGizmo {
 
 		update();
 	}
-
-	// Calculates closest point on surface of bounding sphere based on radius
-	// of the bounding sphere and the direction vector between the closest point
-	// on the ray and the center of the bounding sphere
-	private Point3f getPointOnBSphere(Point3f rayClosest, BoundingSphere bs)
-	{
-		Vector3f sdir = new Vector3f();
-		sdir.sub(rayClosest, bs.getCenter());
-		
-		float t = bs.getRadius() / sdir.length();
-		sdir.scaleAdd(t, bs.getCenter());
-		return new Point3f(sdir.x,sdir.y,sdir.z);
-	}
 	
 	public void drag(MouseEvent e) {
 		/* To be implemented */
+		
+		
 		update();
 	}
 
@@ -179,6 +217,13 @@ public class RotationGizmo {
 		/* To be implemented */
 		handleVisible = false;
 		circleVisible = false;
+		
+		if (e== null)
+			return;
+		
+		Point3f point = new Point3f();			
+		mouseToSpherePoint(e.getX(), e.getY(), point);
+		
 	}
 
 	
