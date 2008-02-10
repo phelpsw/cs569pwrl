@@ -122,8 +122,10 @@ public class RotationGizmo {
 		System.out.println("viewport mouse: " + mouseloc);
 		
 //		 Given near plane is 0, far is 1?
-		Point4f dirPoint = new Point4f(0.0f, 0.0f, 0.5f, 0.0f);		 	
-		Point4f origin = new Point4f(mouseloc.x, mouseloc.y, 1.0f, 1.0f);
+		//Point4f dirPoint = new Point4f(0.0f, 0.0f, 0.5f, 0.0f);		 	
+		//Point4f origin = new Point4f(mouseloc.x, mouseloc.y, 1.0f, 1.0f);	
+		Point4f dirPoint = new Point4f(0.0f, 0.0f, 1.0f, 0.0f);		 	
+		Point4f origin = new Point4f(mouseloc.x, mouseloc.y, 0.0f, 1.0f);
 		
 		// transform ray into worldspace
 		Matrix4f Mpi = camera.getInverseProjectionMatrix();
@@ -149,7 +151,8 @@ public class RotationGizmo {
 		System.out.println("dirPoint: " + dirPoint);
 		
 		Point3f origin3f = new Point3f(origin.x, origin.y, origin.z);				
-		Vector3f dir3f = new Vector3f(dirPoint.x-origin.x, dirPoint.y-origin.y, dirPoint.z-origin.z);
+		//Vector3f dir3f = new Vector3f(dirPoint.x-origin.x, dirPoint.y-origin.y, dirPoint.z-origin.z);
+		Vector3f dir3f = new Vector3f(origin.x-dirPoint.x, origin.y-dirPoint.y, origin.z-dirPoint.z);
 		dir3f.normalize();
 		System.out.println("dir3f:" + dir3f);
 		System.out.println("origin: " + origin);
