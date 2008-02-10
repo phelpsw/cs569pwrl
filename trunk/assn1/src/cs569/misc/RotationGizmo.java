@@ -76,6 +76,7 @@ public class RotationGizmo {
 	protected BoundingSphere boundingSphere;
 	/** Drag start+end direction in world-space coordinates */
 	protected Vector3f dragStart, dragEnd;
+	protected Quat4f prevRotation;
 
 	/**
 	 * Create a new invisible rotation gizmo
@@ -111,8 +112,13 @@ public class RotationGizmo {
 		outPoint3f.set(sdir.x,sdir.y,sdir.z);
 	}
 	
-	private void mouseToSpherePoint(int mouseX, int mouseY, Point3f outPoint)
-	{
+	/*
+	 * Given screen mouse coords, calculate the best intersection point on the
+	 * bounding sphere in world coords, and stores the result in outPoint.  Additionally,
+	 * it stores a vector of the point from the sphere's origin.
+	 */
+	private void mouseToSpherePoint(int mouseX, int mouseY, Point3f outPoint, Vector3f outVector)
+	{		
 		System.out.println("\n--Begin mouseToSpherePoint--");
 		
 		//Point2f mouseloc = new Point2f(e.getPoint().x,e.getPoint().y);
@@ -182,7 +188,12 @@ public class RotationGizmo {
 			outPoint.scale(rayHit.x); // scale by the near distance
 			outPoint.add(origin3f);
 		}
-
+		
+		if (outVector != null)
+		{
+			outVector.sub(outPoint, boundingSphere.getCenter());
+			outVector.normalize();
+		}
 
 		System.out.println("startPoint=" + outPoint);
 		System.out.println("--End mouseToSpherePoint--");
@@ -193,42 +204,65 @@ public class RotationGizmo {
 		if (object == null)
 			return;
 		
+		prevRotation = new Quat4f();
+		prevRotation.set(object.getRotation());
+		
 		Point3f point = new Point3f();
-		mouseToSpherePoint(e.getX(), e.getY(), point);
+		dragStart = new Vector3f();
+		mouseToSpherePoint(e.getX(), e.getY(), point, dragStart); // fill dragsStart
 		
 		circleVisible = true;
-		handleVisible = true;
-				
+		handleVisible = true;				
 		
-		// dummy values
-		dragStart = new Vector3f(1, 0, 0);
-		dragStart.normalize();
-		dragEnd = new Vector3f(1, .5f, 0);
+		dragEnd = new Vector3f(dragStart);
+		dragEnd.x+=.001; // just slightly different so that crosshairs are where mouse clicked
 		dragEnd.normalize();
 
 		update();
 	}
 	
 	public void drag(MouseEvent e) {
-		/* To be implemented */
+				
+		if (object == null)
+			return;
 		
+		Point3f point = new Point3f();
+		mouseToSpherePoint(e.getX(), e.getY(), point, dragEnd); // fill dragEnd
 		
-		update();
+		rotateWithDragVectors();
+				
+		update();		
 	}
 
 	public void endDrag(MouseEvent e) {
-		/* To be implemented */
+		
 		handleVisible = false;
 		circleVisible = false;
 		
-		if (e== null)
-			return;
-		
-		Point3f point = new Point3f();			
-		mouseToSpherePoint(e.getX(), e.getY(), point);
-		
 	}
-
+	
+	private void rotateWithDragVectors()
+	{
+		
+		if (dragEnd.dot(dragStart) == 1)		
+			return;
+				
+		Vector3f axis = new Vector3f();
+		axis.cross(dragStart, dragEnd);
+		axis.normalize();		
+		float angle = (float) Math.toDegrees(Math.acos(dragStart.dot(dragEnd))); //TODO avoid using acos()
+		
+		System.out.println("Rotation: angle="+angle+", axis="+ axis);
+		System.out.println("prevRotation=" + prevRotation);
+		
+		//object.setRotationAxisAngle(angle, axis.x, axis.y, axis.z);				
+		
+		Quat4f rot = new Quat4f();
+		rot.set(new AxisAngle4f(axis.x, axis.y, axis.z, (float) Math.toRadians(angle)));
+		
+		rot.mul(prevRotation);
+		object.setRotation(rot);
+	}
 	
 	// //////////////////////////////////////////////////////////////////////////////////////////////////
 	// Access methods
