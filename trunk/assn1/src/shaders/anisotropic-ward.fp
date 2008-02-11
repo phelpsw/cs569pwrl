@@ -24,14 +24,14 @@ void main() {
 	//float expTerm = exp( -(1.0-nDotH*nDotH)/(alphaX*alphaY*nDotH*nDotH) ); // ~isotropic
 
  	//Bruce Walter's formula for Ward
-    float coeff = 1.0/( sqrt(dot(nNormal, nLightVector)*dot(nNormal, nEyeVector)) * 4.0*3.14159*alphaX*alphaY);		
-	//float coeff = sqrt(dot(nNormal, nLightVector)) / ( sqrt(dot(nNormal, nEyeVector)) * 4.0*3.14159*alphaX*alphaY); 
+    //float coeff = 1.0/( sqrt(dot(nNormal, nLightVector)*dot(nNormal, nEyeVector)) * 4.0*3.14159*alphaX*alphaY);		
+	float coeff = sqrt(dot(nNormal, nLightVector)) / ( sqrt(dot(nNormal, nEyeVector)) * 4.0*3.14159*alphaX*alphaY); 
 	
 	
 	/* Diffuse color */
 	vec4 diffuse = diffuseColor * max(0.0, dot(nNormal, nLightVector));
 		
-	vec4 specular = specularColor * max(0.0, coeff * expTerm); // is it necessary to cutoff at 0?   
-	
-	gl_FragColor = diffuse + specular + 0.05;	
+	vec4 specular = specularColor * coeff * expTerm; // is it necessary to cutoff at 0?   
+		
+	gl_FragColor = diffuse + specular + 0.05;
 }

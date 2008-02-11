@@ -147,14 +147,14 @@ public class TangentSpaceMeshObject extends MeshObject {
 			Tb.sub(uv2, uv0);
 		
 			computeFaceTBNBasis(Pa, Pb, Ta, Tb, Tang, Binorm, Norm);
-		
-			Tang.normalize();
-			Binorm.normalize();
-			Norm.normalize();
+			
+			if( isZeroVector(Binorm) || isZeroVector(Tang)|| isZeroVector(Norm))
+				System.out.println("ahh");
 			
 			// special circumstances
-			if(Float.isNaN(Tang.x) || Float.isNaN(Norm.x) || Float.isNaN(Binorm.x))
+			if(hasNaN(Tang) || hasNaN(Norm) || hasNaN(Binorm))
 			{ // handles top
+				
 				Tang.cross(Binorm, n0); // be sensitive to cases when binorm might be NaN
 				Norm.set(n0);
 				if((Binorm.dot(n0) < 0)) { // handles triangle at top at seam
@@ -166,12 +166,24 @@ public class TangentSpaceMeshObject extends MeshObject {
 				Norm.scale(-1.0f);
 			}
 			
+			
+			
 			Tang.normalize();
 			Binorm.normalize();
 			Norm.normalize();
 			
 			putBTNvalues(3*i, Binorm, Tang, Norm);
 		}
+	}
+	
+	boolean hasNaN(Vector3f v)
+	{
+		return Float.isNaN(v.x) || Float.isNaN(v.y) || Float.isNaN(v.z);
+	}
+	
+	boolean isZeroVector(Vector3f v)
+	{
+		return (v.x == 0.0f) && (v.y == 0.0f) && (v.z == 0.0f);
 	}
 	
 	void putBTNvalues(int i, Vector3f B, Vector3f T, Vector3f N)
