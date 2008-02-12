@@ -148,13 +148,25 @@ public class TangentSpaceMeshObject extends MeshObject {
 		
 			computeFaceTBNBasis(Pa, Pb, Ta, Tb, Tang, Binorm, Norm);
 			
-			if( isZeroVector(Binorm) || isZeroVector(Tang)|| isZeroVector(Norm))
-				System.out.println("ahh");
+			// Gram-Schmidt orthogonalization
+			Vector3f gsNorm = new Vector3f(Norm);
+			gsNorm.scale(Norm.dot(Tang));
+			Tang.sub(gsNorm);
+			Tang.normalize();
+			
+			/* Possibly useful from french site, looks like it does similar process
+			 * as that handled below in special circumstances.
+			 * //Right handed TBN space ?
+				boolean rigthHanded = dotProduct(crossProduct(tangent, binormal), normal) >= 0;
+				binormal = crossProduct(normal, tangent);
+				if(!rigthHanded)
+				    binormal.multiply(-1);
+			 * 
+			 */
 			
 			// special circumstances
 			if(hasNaN(Tang) || hasNaN(Norm) || hasNaN(Binorm))
 			{ // handles top
-				
 				Tang.cross(Binorm, n0); // be sensitive to cases when binorm might be NaN
 				Norm.set(n0);
 				if((Binorm.dot(n0) < 0)) { // handles triangle at top at seam
@@ -165,8 +177,6 @@ public class TangentSpaceMeshObject extends MeshObject {
 				Binorm.scale(-1.0f);
 				Norm.scale(-1.0f);
 			}
-			
-			
 			
 			Tang.normalize();
 			Binorm.normalize();
