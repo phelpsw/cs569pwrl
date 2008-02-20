@@ -21,6 +21,8 @@ import javax.media.opengl.GL;
 
 import com.sun.opengl.util.BufferUtil;
 
+import cs569.misc.GLUtils;
+
 /**
  * A class for loading and managing textures
  *
@@ -159,9 +161,30 @@ public class Texture {
 	/**
 	 * Renders a screen filling quadrilateral with this texture applied.
 	 */
-	public void blit(GL gl) {
+	public void blit(GL gl) {		
+		float fSize = 1;
+				
+		gl.glMatrixMode(GL.GL_PROJECTION);
+		//void glOrtho(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble near, GLdouble far)
+		gl.glLoadIdentity();
+		gl.glOrtho(-1, 1, -1, 1, 0, 10); 
+		
+		bindTexture(gl, 0);	
+		 
+		gl.glBegin(GL.GL_QUADS);
+		 gl.glTexCoord2f(0.0f, 0.0f);
+		 gl.glVertex3f(-fSize, -fSize, -fSize);
+		 gl.glTexCoord2f(0.0f, 1.0f);
+		 gl.glVertex3f(-fSize, fSize, -fSize);		 
+		 gl.glTexCoord2f(1.0f, 1.0f);
+		 gl.glVertex3f(fSize,fSize, -fSize);		 
+		 gl.glTexCoord2f(1.0f, 0.0f);
+		 gl.glVertex3f(fSize,-fSize, -fSize);
+		gl.glEnd();
+		 
+		 unbindTexture(gl);
 	}
-
+	
 	/**
 	 * Bind this texture as the currently used texture. Also
 	 * enables texturing with this specific type of texture (1d/2d/3d/cubemap).
