@@ -561,6 +561,11 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 				"/textures/cubemap/grace_", ".png");
 		grace.initializeTexture(gl);
 
+		/* Load the test environment map */
+		Texture textCubeMap = Texture.createCubeMapFromFile("Test CubeMap", 
+				"/textures/cubemap/debug_", ".png");
+		textCubeMap.initializeTexture(gl);
+		
 		/* Load some normalmap/diffuse textures */
 		Texture.getTexture("/textures/stoneBrickDiffuse.jpg").initializeTexture(gl);
 		Texture.getTexture("/textures/stoneBrickNormal.jpg").initializeTexture(gl);
