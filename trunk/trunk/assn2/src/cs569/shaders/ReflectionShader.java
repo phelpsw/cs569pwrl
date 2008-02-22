@@ -32,7 +32,7 @@ public class ReflectionShader extends GLSLShader {
 
 	@Override
 	public void setGLSLParams(GL gl, Object... params) {
-		if (params.length < 1) {
+		if (params.length < 2) {
 			throw new Error(this.getClass().getName()
 					+ ": Invalid number of parameters.");
 		}
