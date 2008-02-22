@@ -17,7 +17,7 @@ void main() {
 
 	vec3 nEyeVector = normalize(eyeVector);
 	vec3 nLightVector = normalize(lightVector); 
-	vec4 colorValue = vec4(0.05*base); /* Some ambient */
+	vec4 colorValue = vec4(0.05); /* Some ambient */
 	vec4 texDiffuseColor = diffuseColor * texture2D(diffuseMap, texCoord);
 	
 	float nDotL = dot(nNormal, nLightVector);
