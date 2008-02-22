@@ -14,5 +14,6 @@ public class ShadowMap extends FrameBufferObject {
 
 	@Override
 	public void renderImpl(GL gl, GLU glu, HierarchicalObject object) throws GLSLErrorException {
+		
 	}
 }

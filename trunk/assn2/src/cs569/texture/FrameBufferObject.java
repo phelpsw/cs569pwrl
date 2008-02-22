@@ -82,6 +82,7 @@ public abstract class FrameBufferObject extends Texture {
 		}
 
 		/* Just allocate texture memory, their contents are dynamic. */
+		// is this a TODO?
 		data = null;
 		
 		width = resolution;
@@ -94,6 +95,52 @@ public abstract class FrameBufferObject extends Texture {
 	 * Called by cs569.apps.Viewer.init()
 	 */
 	public void initializeFBO(GL gl) {
+		
+		// Create Objects
+		
+		int[] fboPointer = new int[1];
+		// glGenFramebuffersEXT(int num, int[] ids, int ids_offset)
+		gl.glGenFramebuffersEXT(1, fboPointer, 0); 		 		 
+		fboId = fboPointer[0];
+
+		gl.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, fboId);
+		
+		if (fboType == CUBEMAP_TEXTURE_FBO)
+		{	
+			/*
+			int[] renderPointer = new int[1];
+			gl.glGenRenderbuffersEXT(1, renderPointer, 0);
+			
+			// init render buffer
+			gl.glBindRenderbufferEXT(GL.GL_RENDERBUFFER_EXT, renderPointer[0]);
+			gl.glRenderbufferStorageEXT(GL.GL_RENDERBUFFER_EXT, GL.GL_DEPTH_COMPONENT24, width, height);
+			
+			//attach render buffer to frame buffer
+			gl.glFramebufferRenderbufferEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_DEPTH_ATTACHMENT_EXT, GL.GL_RENDERBUFFER_EXT, renderPointer[0]);
+
+			
+			//init textures
+			initializeTexture(gl);
+			bindTexture(gl, 0);
+			gl.glGenerateMipmapEXT(GL.GL_TEXTURE_2D);
+			
+			gl.glFramebufferTexture2DEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_COLOR_ATTACHMENT0_EXT, GL.GL_TEXTURE_2D, textureID, 0);
+			*/
+		} else if (fboType == DEPTH_TEXTURE_FBO)
+		{
+			//init textures
+			initializeTexture(gl);
+			bindTexture(gl, 0);
+			
+			gl.glDrawBuffer(GL.GL_NONE);
+			
+		  //attach texture to FBO
+		  gl.glFramebufferTexture2DEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_DEPTH_ATTACHMENT_EXT, GL.GL_TEXTURE_2D, textureID, 0);
+
+		}
+		
+		
+		checkForErrors(gl);
 	}
 
 	/**
