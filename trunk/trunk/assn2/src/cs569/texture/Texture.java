@@ -317,7 +317,7 @@ public class Texture {
 		}
 
 		return createTexture(identifier, imageSize, imageSize, GL.GL_TEXTURE_CUBE_MAP, GL.GL_UNSIGNED_BYTE,
-				GL.GL_RGBA8, GL.GL_RGBA, GL.GL_LINEAR, GL.GL_CLAMP, true, buffers);
+				GL.GL_RGBA8, GL.GL_RGBA, GL.GL_LINEAR, GL.GL_CLAMP_TO_EDGE, true, buffers);
 	}
 	
 	/**

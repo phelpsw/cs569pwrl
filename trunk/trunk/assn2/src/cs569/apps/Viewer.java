@@ -582,9 +582,9 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 
 		/* Create a dynamic cube-map generator and place it at the center of the sphere 
 		   in the test scene */
-		DynamicCubeMap dynamicCubeMap = new DynamicCubeMap("Dynamic cube-map", 
-				new Vector3f(-0.6f, 0.3f, -0.6f), 512);
-		frameBufferObjects.add(dynamicCubeMap);
+		//DynamicCubeMap dynamicCubeMap = new DynamicCubeMap("Dynamic cube-map", 
+				//new Vector3f(-0.6f, 0.3f, -0.6f), 512);
+		//frameBufferObjects.add(dynamicCubeMap);
 	}
 	
 	// //////////////////////////////////////////////////////////////////////////////////////////////////
