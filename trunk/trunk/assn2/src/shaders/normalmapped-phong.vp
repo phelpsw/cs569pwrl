@@ -5,7 +5,7 @@ uniform vec4 lightPosition;
 uniform vec4 eyePosition;
 
 /* Outputs -> fragment program */
-varying vec3 lightVector, eyeVector, normal;
+varying vec3 lightVector, eyeVector;
 varying vec2 texCoord;
 
 void main() {
@@ -18,15 +18,34 @@ void main() {
 	*/
 	gl_Position = ftransform();
 
-	/* Normal in world coordinates */
-	normal = normalize(gl_NormalMatrix * gl_Normal);
+	/* Normal, tangent and binormal in world coordinates */
+	vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
+	vec3 tangent = gl_NormalMatrix * gl_Color.rgb;
+
+	/* Gram-schmidt orthogonalization (needed for
+	   normal maps on objects with non-uniform scaling) */
+	tangent = normalize(tangent - normal * dot(tangent, normal));
+
+	vec3 binormal = cross(normal, tangent);
 
 	texCoord = gl_MultiTexCoord0.xy;
 
-	/* Vertex->Light in world coordinates */
-	vec4 worldSpacePos = gl_ModelViewMatrix * gl_Vertex;
-	lightVector = (lightPosition - worldSpacePos).xyz;
+	vec3 vVertex = vec3(gl_ModelViewMatrix * gl_Vertex);
+	vec3 tmpVec = lightPosition.xyz - vVertex;
 
+	lightVector.x = dot(tmpVec, tangent);
+	lightVector.y = dot(tmpVec, binormal);
+	lightVector.z = dot(tmpVec, normal);
+	
+	/* Vertex->Light in world coordinates */
+	//vec4 worldSpacePos = gl_ModelViewMatrix * gl_Vertex;
+	//lightVector = (lightPosition - worldSpacePos).xyz;
+	
+	tmpVec = eyePosition.xyz - vVertex;
+	eyeVector.x = dot(tmpVec, tangent);
+	eyeVector.y = dot(tmpVec, binormal);
+	eyeVector.z = dot(tmpVec, normal);
+	
 	/* Vertex->Eye in world coordinates */
-	eyeVector = (eyePosition - worldSpacePos).xyz;
+	//eyeVector = (eyePosition - worldSpacePos).xyz;
 }

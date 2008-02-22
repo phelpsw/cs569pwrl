@@ -43,7 +43,7 @@ public class TexturedPhongShader extends PhongShader {
 		specularColor = getNamedParameter(gl, "specularColor");
 		eyePosition = getNamedParameter(gl, "eyePosition");
 		exponent = getNamedParameter(gl, "exponent");
-		textureHandle = getNamedParameter(gl, "textureHandle");
+		textureHandle = getNamedParameter(gl, "diffuseMap");
 	}
 
 	@Override

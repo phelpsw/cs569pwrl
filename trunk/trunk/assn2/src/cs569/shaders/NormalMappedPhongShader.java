@@ -37,8 +37,8 @@ public class NormalMappedPhongShader extends TexturedPhongShader {
 		specularColor = getNamedParameter(gl, "specularColor");
 		eyePosition = getNamedParameter(gl, "eyePosition");
 		exponent = getNamedParameter(gl, "exponent");
-		textureHandle = getNamedParameter(gl, "textureHandle");
-		normalMapHandle = getNamedParameter(gl, "normalMapHandle");
+		textureHandle = getNamedParameter(gl, "diffuseMap");
+		normalMapHandle = getNamedParameter(gl, "normalMap");
 	}
 
 	@Override
