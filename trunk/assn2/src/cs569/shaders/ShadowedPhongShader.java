@@ -61,8 +61,16 @@ public class ShadowedPhongShader extends PhongShader {
 
 		Texture t = ((Texture)params[4]);
 		t.bindTexture(gl, 0);
-		gl.glTexParameterf(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_COMPARE_MODE, GL.GL_COMPARE_R_TO_TEXTURE);
 		gl.glUniform1i(shadowHandle, 0);
+		
+	    //Enable shadow comparison
+		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_COMPARE_MODE, GL.GL_COMPARE_R_TO_TEXTURE);
+
+	    //Shadow comparison should be true (ie not in shadow) if r<=texture
+		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_COMPARE_FUNC, GL.GL_LEQUAL);
+
+	    //Shadow comparison should generate an INTENSITY result
+		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_DEPTH_TEXTURE_MODE, GL.GL_INTENSITY);
 		
 		gl.glUniform4f(eyePosition, eye.x, eye.y, eye.z, 1.0f);
 		Vector3f light = Viewer.getMainViewer().getLightPosition();
