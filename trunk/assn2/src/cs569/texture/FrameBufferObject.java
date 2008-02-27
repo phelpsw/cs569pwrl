@@ -97,6 +97,7 @@ public abstract class FrameBufferObject extends Texture {
 	public void initializeFBO(GL gl) {
 		
 		// Create Objects
+		initializeTexture(gl);
 		
 		int[] fboPointer = new int[1];
 		// glGenFramebuffersEXT(int num, int[] ids, int ids_offset)
@@ -105,8 +106,8 @@ public abstract class FrameBufferObject extends Texture {
 
 		gl.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, fboId);
 		
-		if (fboType == CUBEMAP_TEXTURE_FBO)
-		{	
+		//if (fboType == CUBEMAP_TEXTURE_FBO)
+		//{	
 			/*
 			int[] renderPointer = new int[1];
 			gl.glGenRenderbuffersEXT(1, renderPointer, 0);
@@ -126,18 +127,17 @@ public abstract class FrameBufferObject extends Texture {
 			
 			gl.glFramebufferTexture2DEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_COLOR_ATTACHMENT0_EXT, GL.GL_TEXTURE_2D, textureID, 0);
 			*/
-		} else if (fboType == DEPTH_TEXTURE_FBO)
-		{
+		//} else if (fboType == DEPTH_TEXTURE_FBO)
+		//{
 			//init textures
-			initializeTexture(gl);
-			bindTexture(gl, 0);
 			
-			gl.glDrawBuffer(GL.GL_NONE);
+			//bindTexture(gl, 0);
 			
-		  //attach texture to FBO
-		  gl.glFramebufferTexture2DEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_DEPTH_ATTACHMENT_EXT, GL.GL_TEXTURE_2D, textureID, 0);
-
-		}
+			//attach texture to FBO
+			gl.glFramebufferTexture2DEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_DEPTH_ATTACHMENT_EXT, mode, textureID, 0);
+			gl.glDrawBuffer(GL.GL_FALSE);
+			gl.glReadBuffer(GL.GL_FALSE);
+		//}
 		
 		
 		checkForErrors(gl);
