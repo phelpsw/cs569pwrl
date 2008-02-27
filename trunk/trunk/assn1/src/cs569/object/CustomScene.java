@@ -32,15 +32,8 @@ public class CustomScene implements ParameterizedObjectMaker {
 	public final HierarchicalObject make(Object... inputs) {
 
 		Scene out = new Scene();
-		//RocketObject rocket = new RocketObject();
-		//out.addObject(rocket.getGroup());
-		
-		MeshObject sphere = PrimitiveFactory.makeSphere(30, 30, "Sphere");
-		//sphere.setTranslate(-0.6f, 0.3f, -0.6f);
-		sphere.setScale(0.3f, 0.3f, 0.3f);
-		sphere.setMaterial(new AnisotropicWard(new Color3f(0.2f, 0.3f, 0.1f),
-				new Color3f(0.6f, 0.8f, 0.6f), 0.4f, 0.2f));
-		out.addObject(sphere);
+		RocketObject rocket = new RocketObject();
+		out.addObject(rocket.getGroup());
 		
 		return out;
 
