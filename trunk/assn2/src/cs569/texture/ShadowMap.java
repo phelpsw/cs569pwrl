@@ -35,10 +35,9 @@ public class ShadowMap extends FrameBufferObject {
 		gl.glMatrixMode(GL.GL_MODELVIEW);
 		gl.glLoadIdentity();
 		
-		gl.glUseProgram(0);
+		//gl.glUseProgram(0);
 
 		object.glRender(gl, glu, eye);
-		//gl.glRectf(0.0f, 0.0f, 0.75f, 0.75f);
 	}
 	
 	
