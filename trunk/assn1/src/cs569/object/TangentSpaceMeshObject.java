@@ -31,6 +31,9 @@ public class TangentSpaceMeshObject extends MeshObject {
 
 	/** The binormal coordinate array */
 	protected FloatBuffer binormals;
+	
+	/** The normalTmp coordinate array */
+	protected FloatBuffer normalsTmp;
 
 	/** Shader attribute handle for tangent vectors */
 	protected int tangentHandle = -1;
@@ -101,8 +104,9 @@ public class TangentSpaceMeshObject extends MeshObject {
 		texcoords.rewind();
 		normals.rewind();
 		
-		tangents = BufferUtil.newFloatBuffer(triangles.capacity());
-		binormals = BufferUtil.newFloatBuffer(triangles.capacity());
+		tangents = BufferUtil.newFloatBuffer(verts.capacity());
+		binormals = BufferUtil.newFloatBuffer(verts.capacity());
+		normalsTmp = BufferUtil.newFloatBuffer(verts.capacity());
 		
 		Point3f P0 = new Point3f(); // assign TBN vals to P0, normals don't match up though :(
 		Point3f P1 = new Point3f();
@@ -154,15 +158,7 @@ public class TangentSpaceMeshObject extends MeshObject {
 			Tang.sub(gsNorm);
 			Tang.normalize();
 			
-			/* Possibly useful from french site, looks like it does similar process
-			 * as that handled below in special circumstances.
-			 * //Right handed TBN space ?
-				boolean rigthHanded = dotProduct(crossProduct(tangent, binormal), normal) >= 0;
-				binormal = crossProduct(normal, tangent);
-				if(!rigthHanded)
-				    binormal.multiply(-1);
-			 * 
-			 */
+			
 			
 			// special circumstances
 			if(hasNaN(Tang) || hasNaN(Norm) || hasNaN(Binorm))
@@ -178,12 +174,64 @@ public class TangentSpaceMeshObject extends MeshObject {
 				Norm.scale(-1.0f);
 			}
 			
+			/* Possibly useful from french site, looks like it does similar process
+			 * as that handled below in special circumstances.
+			 * //Right handed TBN space ?*/
+			Vector3f tmp = new Vector3f();
+			tmp.cross(Tang, Binorm);
+			boolean rightHanded = tmp.dot(Norm) >= 0;
+			Binorm.cross(Norm, Tang);
+			if(!rightHanded)
+			    Binorm.scale(-1.0f);
+			
 			Tang.normalize();
 			Binorm.normalize();
 			Norm.normalize();
 			
 			putBTNvalues(3*i, Binorm, Tang, Norm);
+			putBTNvalues(3*i+1, Binorm, Tang, Norm);
+			putBTNvalues(3*i+2, Binorm, Tang, Norm);
 		}
+		
+		normalizeBTNSpaceVectors();
+		normalsTmp.rewind();
+		for(int i=0; i<normals.capacity(); i++)
+		{
+			normals.put(i, normalsTmp.get(i));
+		}
+	}
+	
+	void normalizeBTNSpaceVectors()
+	{
+		Vector3f tmp = new Vector3f();
+		for(int i=0; i<tangents.capacity()/3; i++)
+		{
+			tmp.x = tangents.get(3*i);
+			tmp.y = tangents.get(3*i+1);
+			tmp.z = tangents.get(3*i+2);
+			tmp.normalize();
+			tangents.put(3*i, tmp.x);
+			tangents.put(3*i+1, tmp.y);
+			tangents.put(3*i+2, tmp.z);
+			
+			tmp.x = binormals.get(3*i);
+			tmp.y = binormals.get(3*i+1);
+			tmp.z = binormals.get(3*i+2);
+			tmp.normalize();
+			binormals.put(3*i, tmp.x);
+			binormals.put(3*i+1, tmp.y);
+			binormals.put(3*i+2, tmp.z);
+			
+			tmp.x = normalsTmp.get(3*i);
+			tmp.y = normalsTmp.get(3*i+1);
+			tmp.z = normalsTmp.get(3*i+2);
+			tmp.normalize();
+			normalsTmp.put(3*i, tmp.x);
+			normalsTmp.put(3*i+1, tmp.y);
+			normalsTmp.put(3*i+2, tmp.z);
+			
+		}
+	
 	}
 	
 	boolean hasNaN(Vector3f v)
@@ -200,17 +248,17 @@ public class TangentSpaceMeshObject extends MeshObject {
 	{
 		int tri = triangles.get(i);
 		
-		tangents.put(3*tri, T.x);
-		tangents.put(3*tri+1, T.y);
-		tangents.put(3*tri+2, T.z);
+		tangents.put(3*tri, tangents.get(3*tri)+T.x);
+		tangents.put(3*tri+1, tangents.get(3*tri+1)+T.y);
+		tangents.put(3*tri+2, tangents.get(3*tri+2)+T.z);
 		
-		binormals.put(3*tri, B.x);
-		binormals.put(3*tri+1, B.y);
-		binormals.put(3*tri+2, B.z);
+		binormals.put(3*tri, binormals.get(3*tri)+B.x);
+		binormals.put(3*tri+1, binormals.get(3*tri+1)+B.y);
+		binormals.put(3*tri+2, binormals.get(3*tri+2)+B.z);
 		
-		normals.put(3*tri, N.x);
-		normals.put(3*tri+1, N.y);
-		normals.put(3*tri+2, N.z);
+		normalsTmp.put(3*tri, normalsTmp.get(3*tri)+N.x);
+		normalsTmp.put(3*tri+1,normalsTmp.get(3*tri+1)+N.y);
+		normalsTmp.put(3*tri+2, normalsTmp.get(3*tri+2)+N.z);
 		
 	}
 

@@ -31,7 +31,8 @@ void main() {
 	/* Diffuse color */
 	vec4 diffuse = diffuseColor * max(0.0, dot(nNormal, nLightVector));
 		
-	vec4 specular = specularColor * coeff * expTerm; // is it necessary to cutoff at 0?   
+	vec4 specular = specularColor * max(0.0, coeff * expTerm);  
 		
+		  
 	gl_FragColor = diffuse + specular + 0.05;
 }
