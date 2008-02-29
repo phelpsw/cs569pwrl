@@ -20,7 +20,7 @@ public class ShadowMap extends FrameBufferObject {
 	@Override
 	public void renderImpl(GL gl, GLU glu, HierarchicalObject object) throws GLSLErrorException {
 		
-		System.out.println(lightCamera.getEye());
+		//System.out.println(lightCamera.getEye());
 		Vector3f eye = new Vector3f();
 		
 		lightCamera.updateMatrices();
@@ -36,8 +36,14 @@ public class ShadowMap extends FrameBufferObject {
 		gl.glLoadIdentity();
 		
 		gl.glUseProgram(0);
+		
+		gl.glEnable(GL.GL_POLYGON_OFFSET_FILL);
+		//factor*DZ + r*units, DZ=delta depth, r=smallest value to produce resolvable offset
+		gl.glPolygonOffset(2, 2); // factor, units:  
 
 		object.glRender(gl, glu, eye);
+		
+		gl.glDisable(GL.GL_POLYGON_OFFSET_FILL);
 	}
 	
 	

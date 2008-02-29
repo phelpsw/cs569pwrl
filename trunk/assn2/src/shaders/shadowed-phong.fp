@@ -8,7 +8,7 @@ uniform sampler2DShadow shMap;
 
 /* Inputs <- Vertex program */
 varying vec3 lightVector, eyeVector, normal;
-varying vec3 shCoord;
+varying vec4 shCoord;
 
 void main() {
 	/* Interpolated directions need to be re-normalized */
@@ -17,9 +17,12 @@ void main() {
 	vec3 nLightVector = normalize(lightVector);
 	vec4 colorValue = vec4(0.05); /* Some ambient */
 	
-	vec3 nShCoord = normalize(shCoord);
+	vec4 newShCoord = shCoord/shCoord.w;  
+	// note: clip coords are -1 to 1, and texture coords is 0 to 1
+	newShCoord = newShCoord * .5 +.5;
 	
-	float shDepth = shadow2D(shMap, nShCoord).r;
+ 
+	float shDepth = shadow2D(shMap, newShCoord.xyz).r;
 	
 	float nDotL = dot(nNormal, nLightVector);
 

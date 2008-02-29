@@ -7,7 +7,7 @@ uniform mat4 cameraToLightT;
 
 /* Outputs -> fragment program */
 varying vec3 lightVector, eyeVector, normal;
-varying vec3 shCoord;
+varying vec4 shCoord;
 
 void main() {
 	/* The following statement is almost equivalent to writing
@@ -22,11 +22,10 @@ void main() {
 	/* Normal in world coordinates */
 	normal = normalize(gl_NormalMatrix * gl_Normal);
 
-	/* texCoord = gl_MultiTexCoord0.xy; */
-	vec4 temp = cameraToLightT * gl_Position;
-	temp = temp/temp.w;
-	shCoord = temp.xyz;
+	 //shCoord = cameraToLightT * gl_Vertex;
+	 shCoord = cameraToLightT * gl_Position; //assuming transform is world->light eye
 
+	
 	/* Vertex->Light in world coordinates */
 	vec4 worldSpacePos = gl_ModelViewMatrix * gl_Vertex;
 	lightVector = (lightPosition - worldSpacePos).xyz;

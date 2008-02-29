@@ -7,6 +7,7 @@ import javax.vecmath.Matrix4f;
 
 import cs569.apps.Viewer;
 import cs569.misc.GLSLErrorException;
+import cs569.misc.GLUtils;
 import cs569.texture.Texture;
 
 /**
@@ -63,16 +64,7 @@ public class ShadowedPhongShader extends PhongShader {
 		t.bindTexture(gl, 0);
 		gl.glUniform1i(shadowHandle, 0);
 		
-	    //Enable shadow comparison
-		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_COMPARE_MODE, GL.GL_COMPARE_R_TO_TEXTURE);
-
-	    //Shadow comparison should be true (ie not in shadow) if r<=texture
-		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_COMPARE_FUNC, GL.GL_LEQUAL);
-
-	    //Shadow comparison should generate an INTENSITY result
-		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_DEPTH_TEXTURE_MODE, GL.GL_INTENSITY);
-		
-		gl.glUniform4f(eyePosition, eye.x, eye.y, eye.z, 1.0f);
+	    gl.glUniform4f(eyePosition, eye.x, eye.y, eye.z, 1.0f);
 		Vector3f light = Viewer.getMainViewer().getLightPosition();
 		gl.glUniform4f(lightPosition, light.x, light.y, light.z, 1.0f);
 
@@ -87,21 +79,18 @@ public class ShadowedPhongShader extends PhongShader {
 		// params: location, count (num of elements), transpose boolean, array, offset
 		Matrix4f cam2Light = new Matrix4f();
 		cam2Light.setIdentity();
-		
-		cam2Light.mul(Viewer.getMainViewer().getViewCamera().getInverseProjectionMatrix());
-		cam2Light.mul(Viewer.getMainViewer().getViewCamera().getInverseViewMatrix()); // now in world coord
-		cam2Light.mul(Viewer.getMainViewer().getLightCamera().getViewMatrix());
-		cam2Light.mul(Viewer.getMainViewer().getLightCamera().getProjectionMatrix());
-
-		float[] matrix= new float[16];
-		for (int r=0; r<4; r++)
+				
+		Viewer v = Viewer.getMainViewer();
+		if (v.getCurrentCamera().equals(v.getViewCamera()))
 		{
-			for (int c=0;c<4;c++)
-			{
-				matrix[r*4+c] = cam2Light.getElement(r, c);
-			}
+		  cam2Light.mul(cam2Light, v.getLightCamera().getProjectionMatrix());
+		  cam2Light.mul(cam2Light, v.getLightCamera().getViewMatrix());
+		  cam2Light.mul(cam2Light, v.getViewCamera().getInverseViewMatrix()); // now in world coord
+		  cam2Light.mul(cam2Light, v.getViewCamera().getInverseProjectionMatrix());
 		}
-		gl.glUniformMatrix4fv(cameraToLightT, 1, false, matrix, 0);
+					
+
+		gl.glUniformMatrix4fv(cameraToLightT, 1, false, GLUtils.fromMatrix4f(cam2Light), 0);
 		
 	}
 }

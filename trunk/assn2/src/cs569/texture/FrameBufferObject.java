@@ -99,6 +99,20 @@ public abstract class FrameBufferObject extends Texture {
 		// Create Objects
 		initializeTexture(gl);
 		
+		// setting the following texture parameters will prevent previewing it
+		
+		//Enable shadow comparison
+		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_COMPARE_MODE, GL.GL_COMPARE_R_TO_TEXTURE);
+
+	    //Shadow comparison should be true (ie not in shadow) if r<=texture
+		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_COMPARE_FUNC, GL.GL_LEQUAL);
+
+	    //Shadow comparison should generate an INTENSITY result
+		// (not needed)
+		//gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_DEPTH_TEXTURE_MODE, GL.GL_INTENSITY);
+		
+
+		
 		int[] fboPointer = new int[1];
 		// glGenFramebuffersEXT(int num, int[] ids, int ids_offset)
 		gl.glGenFramebuffersEXT(1, fboPointer, 0); 		 		 
