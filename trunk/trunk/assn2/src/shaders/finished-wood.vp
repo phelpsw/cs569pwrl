@@ -5,8 +5,9 @@ uniform vec4 lightPosition;
 uniform vec4 eyePosition;
 
 /* Outputs -> fragment program */
-varying vec3 lightVector, eyeVector, normal;
+varying vec3 lightVector, eyeVector;
 varying vec2 texCoord;
+varying vec3 vNormal, vTangent, vBinormal;
 
 void main() {
 	/* The following statement is almost equivalent to writing
@@ -18,8 +19,17 @@ void main() {
 	*/
 	gl_Position = ftransform();
 
-	/* Normal in world coordinates */
-	normal = normalize(gl_NormalMatrix * gl_Normal);
+	/* Normal, tangent and binormal in world coordinates */
+	vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
+	vec3 tangent = gl_NormalMatrix * gl_Color.rgb;
+
+	/* Gram-schmidt orthogonalization (needed for
+	   normal maps on objects with non-uniform scaling) */
+	tangent = normalize(tangent - normal * dot(tangent, normal));
+
+	vec3 binormal = cross(normal, tangent);
+
+	vNormal = normal; vTangent = tangent; vBinormal = binormal;
 
 	texCoord = gl_MultiTexCoord0.xy;
 
