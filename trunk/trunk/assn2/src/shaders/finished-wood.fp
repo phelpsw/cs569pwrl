@@ -34,11 +34,11 @@ void fresnel(in vec3 incom,
 		out vec3 reflection, out vec3 refraction) 
 {
 	//float eta = index_external/index_internal;
-	float cos_theta1 = dot(incom, normal);
+	float cos_theta1 = -1.0*dot(incom, normal);
 	float cos_theta2 = sqrt(1.0 - ((eta_val * eta_val) * ( 1.0 - (cos_theta1 * cos_theta1))));
 	
-	reflection = incom - 2.0 * cos_theta1 * normal; 
-	refraction = (eta_val * incom) + (cos_theta2 - eta_val * cos_theta1) * normal;
+	reflection = incom + 2.0 * cos_theta1 * normal; 
+	refraction = (eta_val * incom) + (eta_val * cos_theta1 - cos_theta2) * normal;
 	
 	/*
 	float fresnel_rs = (index_external * cos_theta1 - 
@@ -50,7 +50,7 @@ void fresnel(in vec3 incom,
 						index_external * cos_theta2 ) / 
 						(index_internal * cos_theta1 + 
 						index_external * cos_theta2);
-	*/				
+	*/	
 	float fresnel_rs = (eta_val * cos_theta1 - 
 						1.0 * cos_theta2 ) / 
 						(eta_val * cos_theta1 + 
@@ -97,7 +97,7 @@ void main() {
 	vec3 local_z = Nf;
   
 	/* Get unit vector in "u" parameter direction */
-	vec3 local_x = normalize (dFdx(vTangent));
+	vec3 local_x = normalize (vTangent);
 	/* Get final local basis vector y perpendicular to x and z. */
 	vec3 local_y = cross(local_z, local_x);
 
