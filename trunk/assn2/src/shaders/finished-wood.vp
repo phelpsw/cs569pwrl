@@ -7,7 +7,7 @@ uniform vec4 eyePosition;
 /* Outputs -> fragment program */
 varying vec3 lightVector, eyeVector;
 varying vec2 texCoord;
-varying vec3 vNormal, vTangent, vBinormal;
+varying vec3 vNormal, vTangent;
 
 void main() {
 	/* The following statement is almost equivalent to writing
@@ -27,9 +27,7 @@ void main() {
 	   normal maps on objects with non-uniform scaling) */
 	tangent = normalize(tangent - normal * dot(tangent, normal));
 
-	vec3 binormal = cross(normal, tangent);
-
-	vNormal = normal; vTangent = tangent; vBinormal = binormal;
+	vNormal = normal; vTangent = tangent;
 
 	texCoord = gl_MultiTexCoord0.xy;
 

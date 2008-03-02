@@ -20,10 +20,10 @@ public class FinishedWood extends ShaderMaterial {
 		specularColor = new Color3f(1.0f, 1.0f, 1.0f);
 		eta = 1.2f;
 		roughness = 0.1f;
-		axisTexture = Texture.getTexture("/textures/wood/cmaple-axis.png");
-		betaTexture = Texture.getTexture("/textures/wood/cmaple-beta.png");
-		fiberTexture = Texture.getTexture("/textures/wood/cmaple-fiber.png");
-		diffuseTexture = Texture.getTexture("/textures/wood/cmaple-diffuse.png");
+		axisTexture = Texture.getTexture("/textures/wood/walnut1-axis.png");
+		betaTexture = Texture.getTexture("/textures/wood/walnut1-beta.png");
+		fiberTexture = Texture.getTexture("/textures/wood/walnut1-fiber.png");
+		diffuseTexture = Texture.getTexture("/textures/wood/walnut1-diffuse.png");
 	}
 
 	public FinishedWood(Color3f specular, float eta, float roughness, Texture diffuse,

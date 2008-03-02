@@ -13,7 +13,7 @@ uniform sampler2D fiberTexture;
 /* Inputs <- Vertex program */
 varying vec3 lightVector, eyeVector;
 varying vec2 texCoord;
-varying vec3 vNormal, vTangent, vBinormal;
+varying vec3 vNormal, vTangent;
 
 float sqrt2pi = 2.5066283;
 
@@ -137,8 +137,9 @@ void main() {
 	
 	// This is almost certainly wrong, I dont think we want a Proj lookup although
 	// a normal texture1D takes a float as its param
-	float tx_beta = texture1D(betaTexture, texCoord.y).x;
-	tx_beta = 0.175;
+	float tx_beta = texture1D(betaTexture, texCoord.x).x;
+	tx_beta = roughness;
+	
 	thOutPrime = asin(dot(ssOutDir,axis));
 	
 	float nDotL = dot(nNormal, nLightVector);
