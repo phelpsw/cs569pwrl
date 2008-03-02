@@ -18,6 +18,8 @@ varying vec3 vNormal, vTangent, vBinormal;
 float sqrt2pi = 2.5066283;
 
 // this is overwriting an existing glsl function, find out what the diff is!!
+// assumes I vector is pointing toward the surface (renderman convention)
+// faceForward returns a vector that points opposite to I
 vec3 faceForward(vec3 N, vec3 I) {
 	if(dot(N, I) <= 0.0)
 	{
@@ -27,6 +29,7 @@ vec3 faceForward(vec3 N, vec3 I) {
 	}
 }
 
+// incom is the eye vector pointing to surface
 void fresnel(in vec3 incom, 
 		in vec3 normal, 
 		in float eta_val, /* global named eta */
@@ -40,17 +43,7 @@ void fresnel(in vec3 incom,
 	reflection = incom + 2.0 * cos_theta1 * normal; 
 	refraction = (eta_val * incom) + (eta_val * cos_theta1 - cos_theta2) * normal;
 	
-	/*
-	float fresnel_rs = (index_external * cos_theta1 - 
-						index_internal * cos_theta2 ) / 
-						(index_external * cos_theta1 + 
-						index_internal * cos_theta2);
-	
-	float fresnel_rp = (index_internal * cos_theta1 - 
-						index_external * cos_theta2 ) / 
-						(index_internal * cos_theta1 + 
-						index_external * cos_theta2);
-	*/	
+		
 	float fresnel_rs = (eta_val * cos_theta1 - 
 						1.0 * cos_theta2 ) / 
 						(eta_val * cos_theta1 + 
@@ -73,9 +66,10 @@ void main() {
 	vec3 nNormal = normalize(vNormal);
 	vec3 nLightVector = normalize(lightVector);
 	vec3 nEyeVector = normalize(eyeVector);
+	vec3 I = -nEyeVector; // Renderman I vector points towards the surface
 	vec4 colorValue = vec4(0.05); /* Some ambient */
 
-	vec3 Nf = faceForward(nNormal, nEyeVector);
+	vec3 Nf = faceForward(nNormal, I);
 	
 	vec3 ssInDir, ssOutDir; /* Light and eye vector, possibly refracted */
 	float thInPrime, thOutPrime;
@@ -103,13 +97,13 @@ void main() {
 
 	if ( eta != 1.0 ) {
 		vec3 Rdir;                     /* Dummy */
-		fresnel(nEyeVector, Nf, 1.0/eta, Kr, Kt, Rdir, ssOutDir);
+		fresnel(I, Nf, 1.0/eta, Kr, Kt, Rdir, ssOutDir);
 		ssOutDir = -1.0 * ssOutDir;
 		// Use (1-Kr) rather than Kt, because we are dealing with power,
 	    // not radiance.
 	    ssAtten = 1.0 - Kr;
 	} else {
-		ssOutDir = -1.0 * nEyeVector;
+		ssOutDir = -1.0 * I; // back to nEyeVector
 		ssAtten = 1.0;
 	}
 	normalize(ssOutDir);
@@ -166,13 +160,13 @@ void main() {
 		// Add in diffuse term, attenuated by surface term.
 		colorValue += specularColor * diffuseColor * ssFactor;
 		// Add in fiber highlight, also attenuated.
-		colorValue += specularColor * fiberFactor * highlight * ssFactor;
+		//colorValue += specularColor * fiberFactor * highlight * ssFactor;
 		/* Second Fresnel call is for strength of surface highlight */
-		vec3 H = normalize ( -nEyeVector + nLightVector );
-		vec3 dumy1, dumy2;
-		fresnel ( nEyeVector, H, 1.0/eta, Kr, Kt,dumy1,dumy2);
+		//vec3 H = normalize ( -nEyeVector + nLightVector );
+		//vec3 dumy1, dumy2;
+		//fresnel ( nEyeVector, H, 1.0/eta, Kr, Kt,dumy1,dumy2);
 		// Blinn/Phong highlight with Fresnel attenuation
-		colorValue += specularColor * Kr * pow ( max ( 0.0, dot(H,local_z)), 1.0/roughness );
+		//colorValue += specularColor * Kr * pow ( max ( 0.0, dot(H,local_z)), 1.0/roughness );
 	}
 	
 	
