@@ -575,7 +575,25 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 		Texture.getTexture("/textures/wood/cmaple-beta.png").initializeTexture(gl);
 		Texture.getTexture("/textures/wood/cmaple-diffuse.png").initializeTexture(gl);
 		Texture.getTexture("/textures/wood/cmaple-fiber.png").initializeTexture(gl);
-
+		
+		/* Load one sample of the 'Finished wood' data set */
+		Texture.getTexture("/textures/wood/walnut1-axis.png").initializeTexture(gl);
+		Texture.getTexture("/textures/wood/walnut1-beta.png").initializeTexture(gl);
+		Texture.getTexture("/textures/wood/walnut1-diffuse.png").initializeTexture(gl);
+		Texture.getTexture("/textures/wood/walnut1-fiber.png").initializeTexture(gl);
+		
+		/* Load one sample of the 'Finished wood' data set */
+		Texture.getTexture("/textures/wood/walnut2-axis.png").initializeTexture(gl);
+		Texture.getTexture("/textures/wood/walnut2-beta.png").initializeTexture(gl);
+		Texture.getTexture("/textures/wood/walnut2-diffuse.png").initializeTexture(gl);
+		Texture.getTexture("/textures/wood/walnut2-fiber.png").initializeTexture(gl);
+		
+		/* Load one sample of the 'Finished wood' data set */
+		Texture.getTexture("/textures/wood/padauk-axis.png").initializeTexture(gl);
+		Texture.getTexture("/textures/wood/padauk-beta.png").initializeTexture(gl);
+		Texture.getTexture("/textures/wood/padauk-diffuse.png").initializeTexture(gl);
+		Texture.getTexture("/textures/wood/padauk-fiber.png").initializeTexture(gl);
+		
 		/* Create some frame buffer objects and attach them to the scene */
 		ShadowMap shadowMap = new ShadowMap("Shadow map", lightCamera, 1024);
 		frameBufferObjects.add(shadowMap);
