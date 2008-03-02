@@ -32,11 +32,12 @@ vec3 faceForward(vec3 N, vec3 I) {
 // incom is the eye vector pointing to surface
 void fresnel(in vec3 incom, 
 		in vec3 normal, 
-		in float eta_val, /* global named eta */
+		in float index_external, in float index_internal,
+		/* in float eta_val,  global named eta */
 		out float reflectance, out float transmittance, 
 		out vec3 reflection, out vec3 refraction) 
 {
-	//float eta = index_external/index_internal;
+	float eta_val = index_external/index_internal;
 	float cos_theta1 = -1.0*dot(incom, normal);
 	float cos_theta2 = sqrt(1.0 - ((eta_val * eta_val) * ( 1.0 - (cos_theta1 * cos_theta1))));
 	
@@ -44,34 +45,33 @@ void fresnel(in vec3 incom,
 	refraction = (eta_val * incom) + (eta_val * cos_theta1 - cos_theta2) * normal; // (T vector)
 	
 	
-	/*	
-	float fresnel_rs = (eta_val * cos_theta1 - 
-						1.0 * cos_theta2 ) / 
-						(eta_val * cos_theta1 + 
-						1.0 * cos_theta2);
+		
+	float fresnel_rs = (index_external * cos_theta1 - 
+						index_internal * cos_theta2 ) / 
+						(index_external * cos_theta1 + 
+						index_internal * cos_theta2);
 	
-	float fresnel_rp = (1.0 * cos_theta1 - 
+	float fresnel_rp = (index_internal * cos_theta1 - 
+						index_external * cos_theta2 ) / 
+						(index_internal * cos_theta1 + 
+						index_external * cos_theta2);
+	
+	/*					
+	float fresnel_rs = ((1.0/eta_val) * cos_theta1 - 
 						eta_val * cos_theta2 ) / 
-						(1.0 * cos_theta1 + 
-						eta_val * cos_theta2);
-						*/
-						
-	float fresnel_rs = (cos_theta1 - 
-						eta_val * cos_theta2 ) / 
-						(cos_theta1 + 
+						((1.0/eta_val) * cos_theta1 + 
 						eta_val * cos_theta2);
 	
-	float fresnel_rp = (cos_theta2 - 
+	float fresnel_rp = ((1.0/eta_val) * cos_theta2 - 
 						eta_val * cos_theta1 ) / 
-						(cos_theta2 + 
+						((1.0/eta_val) * cos_theta2 + 
 						eta_val * cos_theta2);
-	
+	*/
 	reflectance = (fresnel_rs * fresnel_rs + fresnel_rp * fresnel_rp) / 2.0;
 	//reflectance = 0.3;
 	
 	transmittance =((1.0-fresnel_rs) * (1.0-fresnel_rs) + 
 					(1.0-fresnel_rp) * (1.0-fresnel_rp)) / 2.0;
-	
 	
 }
 
@@ -111,7 +111,7 @@ void main() {
 
 	if ( eta != 1.0 ) {
 		vec3 Rdir;                     /* Dummy */
-		fresnel(I, Nf, 1.0/eta, Kr, Kt, Rdir, ssOutDir);
+		fresnel(I, Nf, 1.0, eta, Kr, Kt, Rdir, ssOutDir);
 		ssOutDir = -1.0 * ssOutDir;
 		// Use (1-Kr) rather than Kt, because we are dealing with power,
 	    // not radiance.
@@ -137,8 +137,8 @@ void main() {
 	
 	// This is almost certainly wrong, I dont think we want a Proj lookup although
 	// a normal texture1D takes a float as its param
-	float tx_beta = texture1D(betaTexture, texCoord.x).x;
-	
+	float tx_beta = texture1D(betaTexture, texCoord.y).x;
+	tx_beta = 0.175;
 	thOutPrime = asin(dot(ssOutDir,axis));
 	
 	float nDotL = dot(nNormal, nLightVector);
@@ -151,7 +151,7 @@ void main() {
 		/* Refract at smooth surface */
    		if ( eta != 1.0 ) {
 			vec3 Rdir;				/* dummy */
-			fresnel ( -1.0*nLightVector, local_z, 1.0/eta, Kr, Kt, Rdir, ssInDir );
+			fresnel ( -1.0*nLightVector, local_z, 1.0, eta, Kr, Kt, Rdir, ssInDir );
 			// Use (1-Kr) rather than Kt, because we are dealing with power,
 			// not radiance.
 			ssAttenOut = 1.0 - Kr;
@@ -178,7 +178,7 @@ void main() {
 		/* Second Fresnel call is for strength of surface highlight */
 		vec3 H = normalize ( nEyeVector + nLightVector ); //half vector
 		vec3 dumy1, dumy2;
-		fresnel ( I, H, 1.0/eta, Kr, Kt,dumy1,dumy2);
+		fresnel ( I, H, 1.0, eta, Kr, Kt,dumy1,dumy2);
 		// Blinn/Phong highlight with Fresnel attenuation		
 		colorValue += specularColor * Kr * pow ( max ( 0.0, dot(H,local_z)), 1.0/roughness );
 	}
