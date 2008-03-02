@@ -2,7 +2,7 @@
 
 /* Uniform inputs */
 uniform vec4 specularColor;
-uniform float eta;
+uniform float eta;   // n2/n1
 uniform float roughness;
 uniform sampler2D diffuseTexture;
 uniform sampler2D axisTexture;
@@ -41,9 +41,10 @@ void fresnel(in vec3 incom,
 	float cos_theta2 = sqrt(1.0 - ((eta_val * eta_val) * ( 1.0 - (cos_theta1 * cos_theta1))));
 	
 	reflection = incom + 2.0 * cos_theta1 * normal; 
-	refraction = (eta_val * incom) + (eta_val * cos_theta1 - cos_theta2) * normal;
+	refraction = (eta_val * incom) + (eta_val * cos_theta1 - cos_theta2) * normal; // (T vector)
 	
-		
+	
+	/*	
 	float fresnel_rs = (eta_val * cos_theta1 - 
 						1.0 * cos_theta2 ) / 
 						(eta_val * cos_theta1 + 
@@ -53,8 +54,21 @@ void fresnel(in vec3 incom,
 						eta_val * cos_theta2 ) / 
 						(1.0 * cos_theta1 + 
 						eta_val * cos_theta2);
+						*/
+						
+	float fresnel_rs = (cos_theta1 - 
+						eta_val * cos_theta2 ) / 
+						(cos_theta1 + 
+						eta_val * cos_theta2);
+	
+	float fresnel_rp = (cos_theta2 - 
+						eta_val * cos_theta1 ) / 
+						(cos_theta2 + 
+						eta_val * cos_theta2);
 	
 	reflectance = (fresnel_rs * fresnel_rs + fresnel_rp * fresnel_rp) / 2.0;
+	//reflectance = 0.3;
+	
 	transmittance =((1.0-fresnel_rs) * (1.0-fresnel_rs) + 
 					(1.0-fresnel_rp) * (1.0-fresnel_rp)) / 2.0;
 	
@@ -160,13 +174,13 @@ void main() {
 		// Add in diffuse term, attenuated by surface term.
 		colorValue += specularColor * diffuseColor * ssFactor;
 		// Add in fiber highlight, also attenuated.
-		//colorValue += specularColor * fiberFactor * highlight * ssFactor;
+		colorValue += specularColor * fiberFactor * highlight * ssFactor;
 		/* Second Fresnel call is for strength of surface highlight */
-		//vec3 H = normalize ( -nEyeVector + nLightVector );
-		//vec3 dumy1, dumy2;
-		//fresnel ( nEyeVector, H, 1.0/eta, Kr, Kt,dumy1,dumy2);
-		// Blinn/Phong highlight with Fresnel attenuation
-		//colorValue += specularColor * Kr * pow ( max ( 0.0, dot(H,local_z)), 1.0/roughness );
+		vec3 H = normalize ( nEyeVector + nLightVector ); //half vector
+		vec3 dumy1, dumy2;
+		fresnel ( I, H, 1.0/eta, Kr, Kt,dumy1,dumy2);
+		// Blinn/Phong highlight with Fresnel attenuation		
+		colorValue += specularColor * Kr * pow ( max ( 0.0, dot(H,local_z)), 1.0/roughness );
 	}
 	
 	
