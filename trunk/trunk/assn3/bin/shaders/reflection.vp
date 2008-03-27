@@ -1,0 +1,20 @@
+#version 110
+
+/* Uniform Inputs */
+uniform vec4 eyePosition;
+
+/* Outputs -> fragment program */
+varying vec3 eyeVector, normal;
+
+void main() {
+	gl_Position = ftransform();
+
+	/* Normal in world coordinates */
+	normal = normalize(gl_NormalMatrix * gl_Normal);
+
+	/* Vertex->Light in world coordinates */
+	vec4 worldSpacePos = gl_ModelViewMatrix * gl_Vertex;
+
+	/* Vertex->Eye in world coordinates */
+	eyeVector = (eyePosition - worldSpacePos).xyz;
+}
