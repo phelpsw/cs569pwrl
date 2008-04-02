@@ -8,6 +8,22 @@
 uniform vec4 lightPosition;
 uniform vec4 eyePosition;
 
+uniform mat4 boneMatrix[NUM_BONES];
+
+attribute float w1;
+attribute float w2;
+attribute float w3;
+attribute float w4;
+attribute float w5;
+attribute float w6;
+
+attribute float bIndex1;
+attribute float bIndex2;
+attribute float bIndex3;
+attribute float bIndex4;
+attribute float bIndex5;
+attribute float bIndex6;
+
 /* Outputs -> fragment program */
 varying vec3 lightVector, eyeVector, normal;
 
@@ -19,13 +35,36 @@ void main() {
 	   values that are numerically identical to the fixed-function
 	   pipeline results.
 	*/
-	gl_Position = ftransform();
-
+	
+	//gl_Position = ftransform();
+	
+	vec4 pos;	
+	pos = w1 * boneMatrix[int(bIndex1)] * gl_Vertex; 		
+	pos += w2 * boneMatrix[int(bIndex2)] * gl_Vertex;
+	pos += w3 * boneMatrix[int(bIndex3)] * gl_Vertex;
+	pos += w4 * boneMatrix[int(bIndex4)] * gl_Vertex;
+	pos += w5 * boneMatrix[int(bIndex5)] * gl_Vertex;
+	pos += w6 * boneMatrix[int(bIndex6)] * gl_Vertex;
+	
+	gl_Position = gl_ModelViewProjectionMatrix * pos; 
+	 	 
+	
 	/* Normal in world coordinates */
-	normal = normalize(gl_NormalMatrix * gl_Normal);
+	vec4 oNorm = vec4(gl_Normal, 0); // original normal
+	vec4 norm; // temporary normal for summing
+	
+	norm = w1 * boneMatrix[int(bIndex1)] * oNorm; 		
+	norm += w2 * boneMatrix[int(bIndex2)] * oNorm;
+	norm += w3 * boneMatrix[int(bIndex3)] * oNorm;
+	norm += w4 * boneMatrix[int(bIndex4)] * oNorm;
+	norm += w5 * boneMatrix[int(bIndex5)] * oNorm;
+	norm += w6 * boneMatrix[int(bIndex6)] * oNorm;
+	
+	normal = normalize(gl_NormalMatrix * norm.xyz);	
+	//normal = normalize(gl_NormalMatrix * gl_Normal);
 
 	/* Vertex->Light in world coordinates */
-	vec4 worldSpacePos = gl_ModelViewMatrix * gl_Vertex;
+	vec4 worldSpacePos = gl_ModelViewMatrix * pos;
 	lightVector = (lightPosition - worldSpacePos).xyz;
 
 	/* Vertex->Eye in world coordinates */

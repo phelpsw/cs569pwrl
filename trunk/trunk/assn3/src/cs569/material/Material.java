@@ -48,6 +48,10 @@ public abstract class Material {
 		return false;
 	}
 	
+	public boolean needsSkin() {
+		return false;		
+	}
+	
 	/**
 	 * Called whenever a material is just about to be used for rendering.
 	 * Sub-classes should implement this method to set all of the input
