@@ -597,6 +597,7 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 	 * Find a child node by name
 	 */
 	public HierarchicalObject findByName(String name) {
+		//System.out.println(" findByName(): checking " + getName());
 		if (name.equals(getName()))
 			return this;
 		for (int i=0; i<getChildCount(); i++) {

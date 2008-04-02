@@ -23,6 +23,10 @@ public class SkinnedPhong extends Phong {
 		specularColor.set(specular);
 		P = in_P;
 	}
+	
+	public boolean needsSkin() {
+		return true;		
+	}
 
 	/**
 	 * @see cs569.material.Material#copy()
