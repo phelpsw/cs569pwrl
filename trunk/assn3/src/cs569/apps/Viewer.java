@@ -51,6 +51,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.vecmath.Point2f;
 import javax.vecmath.Tuple2f;
 import javax.vecmath.Vector3f;
+import javax.vecmath.Matrix4f;
 
 import com.sun.opengl.util.Animator;
 
@@ -222,7 +223,7 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 		
 		Vector3f eppos = new Vector3f((float)0.0,(float)0.0,(float)0.0);
 		Vector3f epvelo = new Vector3f((float)1.0,(float)1.0,(float)1.0);
-		EmitterPoint ep = new EmitterPoint(100, eppos, epvelo, 0.2f);
+		EmitterPoint ep = new EmitterPoint(10, eppos, epvelo, 0.4f);
 		emitterObjects.add(ep);
 		
 		/* Refresh the display */
@@ -537,20 +538,10 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 				Texture.getTexture("Bloom mask_combine").blit(gl);
 			}
 			
-			/* Particles!
-		    gl.glPointSize(4.0f);
-		    gl.glBegin(GL.GL_POINTS);
-		    for (Emitter e: emitterObjects)
-			{
-				e.refresh((System.currentTimeMillis() - startTime) / 1000.0f);
-				for(Particle p: e.getParticles())
-				{
-				    gl.glColor3f(p.getColor().x,p.getColor().y,p.getColor().z);   
-					gl.glVertex3f(p.getPos().x,p.getPos().y,p.getPos().z);
-				}
-			}
-		    gl.glEnd();
-			*/
+			renderParticleSystem(gl);
+			
+			
+			
 
 		} catch (GLSLErrorException e) {
 			e.printStackTrace();
@@ -567,6 +558,147 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 		}
 	}
 
+	private void renderParticleSystem(GL gl)
+	{
+		/* Particles! */
+	    //gl.glPointSize(4.0f);
+	    //gl.glBegin(GL.GL_POINTS);
+	    Texture smoket = Texture.getTexture("src/textures/smoke.png");
+	    gl.glBlendFunc(GL.GL_SRC_ALPHA,GL.GL_DST_ALPHA);
+		gl.glAlphaFunc(GL.GL_GREATER,0.4f);
+		for (Emitter e: emitterObjects)
+		{
+			/*
+			gl.glMatrixMode(GL.GL_PROJECTION);
+			gl.glLoadIdentity();
+			gl.glMatrixMode(GL.GL_MODELVIEW);
+			gl.glLoadIdentity();
+			*/
+			/* Bind the texture to texture unit 0 */
+			smoket.bindTexture(gl, 0);
+			
+			e.refresh((System.currentTimeMillis() - startTime) / 1000.0f);
+			for(Particle p: e.getParticles())
+			{
+				billboardSphericalBegin(gl, mainCamera.getEye(), p.getPos());
+				
+				gl.glEnable(GL.GL_BLEND);
+				
+				float scale = 0.2f;
+				Vector3f pt1 = new Vector3f(-scale,-scale,0);
+				Vector3f pt2 = new Vector3f(scale,-scale,0);
+				Vector3f pt3 = new Vector3f(scale,scale,0);
+				Vector3f pt4 = new Vector3f(-scale,scale,0);
+				/*
+				mainCamera.getInverseOrientationMatrix().transform(pt1);
+				mainCamera.getInverseOrientationMatrix().transform(pt2);
+				mainCamera.getInverseOrientationMatrix().transform(pt3);
+				mainCamera.getInverseOrientationMatrix().transform(pt4);
+				*/
+				/* Draw a texture-mapped quad */
+				gl.glBegin(GL.GL_QUADS);
+				gl.glTexCoord2f(0, 0);
+				gl.glVertex3f(p.getPos().x+pt1.x, p.getPos().y+pt1.y, p.getPos().z);
+				gl.glTexCoord2f(1, 0);
+				gl.glVertex3f(p.getPos().x+pt2.x, p.getPos().y+pt2.y, p.getPos().z);
+				gl.glTexCoord2f(1, 1);
+				gl.glVertex3f(p.getPos().x+pt3.x, p.getPos().y+pt3.y, p.getPos().z);
+				gl.glTexCoord2f(0, 1);
+				gl.glVertex3f(p.getPos().x+pt4.x, p.getPos().y+pt4.y, p.getPos().z);
+				gl.glEnd();
+				gl.glDisable(GL.GL_BLEND);
+				
+				billboardSphericalEnd(gl);
+			    //gl.glColor3f(p.getColor().x,p.getColor().y,p.getColor().z);   
+				//gl.glVertex3f(p.getPos().x,p.getPos().y,p.getPos().z);
+			}
+			/* Deactivate texturing */
+			smoket.unbindTexture(gl);
+		}
+	    //gl.glEnd();
+	}
+	
+	private void billboardSphericalEnd(GL gl)
+	{
+		// restore the previously stored modelview matrix
+		gl.glPopMatrix();
+	}
+	
+	private void billboardSphericalBegin(GL gl, Vector3f camera, Vector3f object) 
+	{
+		Vector3f lookAt;
+		Vector3f objToCamProj = new Vector3f();
+		Vector3f upAux = new Vector3f();
+		Vector3f objToCam = new Vector3f();
+
+		float angleCosine;
+	
+		gl.glPushMatrix();
+	
+		// objToCamProj is the vector in world coordinates from the 
+		// local origin to the camera projected in the XZ plane
+			objToCamProj.x = camera.x - object.x;
+			objToCamProj.y = 0;
+			objToCamProj.z = camera.z - object.z;
+		
+		// This is the original lookAt vector for the object 
+		// in world coordinates
+			lookAt = new Vector3f(0,0,1);
+		
+		
+		// normalize both vectors to get the cosine directly afterwards
+			objToCamProj.normalize();
+			//mathsNormalize(objToCamProj);
+		
+		// easy fix to determine wether the angle is negative or positive
+		// for positive angles upAux will be a vector pointing in the 
+		// positive y direction, otherwise upAux will point downwards
+		// effectively reversing the rotation.
+			upAux.cross(objToCamProj,lookAt);
+			//mathsCrossProduct(upAux,lookAt,objToCamProj);
+		
+		// compute the angle
+			angleCosine = lookAt.dot(objToCamProj);
+			//angleCosine = mathsInnerProduct(lookAt,objToCamProj);
+		
+		// perform the rotation. The if statement is used for stability reasons
+		// if the lookAt and objToCamProj vectors are too close together then 
+		// |angleCosine| could be bigger than 1 due to lack of precision
+		   if ((angleCosine < 0.99990) && (angleCosine > -0.9999))
+		      gl.glRotatef((float)(-Math.acos(angleCosine)*180/Math.PI),upAux.x, upAux.y, upAux.z);	
+
+		// so far it is just like the cylindrical billboard. The code for the 
+		// second rotation comes now
+		// The second part tilts the object so that it faces the camera
+		
+		// objToCam is the vector in world coordinates from 
+		// the local origin to the camera
+		   objToCam.sub(camera, object);
+		
+		// Normalize to get the cosine afterwards
+		   objToCam.normalize();
+			//mathsNormalize(objToCam);
+		
+		// Compute the angle between objToCamProj and objToCam, 
+		//i.e. compute the required angle for the lookup vector
+		
+			angleCosine = objToCamProj.dot(objToCam);
+		
+		
+		// Tilt the object. The test is done to prevent instability 
+		// when objToCam and objToCamProj have a very small
+		// angle between them
+		
+			if ((angleCosine < 0.99990) && (angleCosine > -0.9999))
+				if (objToCam.y < 0.0f)
+					gl.glRotatef((float)(Math.acos(angleCosine)*180/Math.PI),1,0,0);	
+				else
+					gl.glRotatef((float)(Math.acos(angleCosine)*180/Math.PI),-1,0,0);	
+
+	}
+
+	
+	
 	/**
 	 * Setup the camera
 	 */
