@@ -53,6 +53,7 @@ public abstract class GLSLShader {
 		registerShader(TexturedPhongShader.class, new TexturedPhongShader());
 		registerShader(NormalMappedPhongShader.class, new NormalMappedPhongShader());
 		registerShader(FinishedWoodShader.class, new FinishedWoodShader());
+		registerShader(BloomShader.class, new BloomShader());
 	}
 
 	/**

@@ -1,0 +1,24 @@
+#version 110
+
+/* Uniform Inputs */
+uniform sampler2D bloomTexture;
+uniform sampler2D origBloomTexture;
+uniform float mode;
+uniform float w_texel;
+uniform float h_texel;
+
+/* Outputs -> fragment program */
+
+void main() {
+	/* The following statement is almost equivalent to writing
+		"gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;".
+	   Reasons for preferring ftransform() over the above are 
+	   that this may a) be faster and b) is guaranteed to return 
+	   values that are numerically identical to the fixed-function
+	   pipeline results.
+	*/
+	gl_Position = ftransform();
+
+	/* Forward the texture coordinates */
+	gl_TexCoord[0] = gl_MultiTexCoord0;
+}
