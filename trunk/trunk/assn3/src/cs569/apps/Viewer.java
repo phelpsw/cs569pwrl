@@ -54,6 +54,7 @@ import javax.vecmath.Vector3f;
 
 import com.sun.opengl.util.Animator;
 
+import cs569.particle.*;
 import cs569.animation.Animated;
 import cs569.camera.Camera;
 import cs569.material.AnisotropicWard;
@@ -72,16 +73,20 @@ import cs569.misc.GLUtils;
 import cs569.misc.OBJLoaderException;
 import cs569.misc.Parser;
 import cs569.misc.RotationGizmo;
+import cs569.object.BlankScene;
 import cs569.object.DefaultScene;
 import cs569.object.HierarchicalObject;
 import cs569.object.MeshObject;
 import cs569.object.ParameterizedObjectMaker;
 import cs569.object.Scene;
 import cs569.panel.MaterialPanel;
+import cs569.shaders.BloomShader;
 import cs569.shaders.GLSLShader;
 import cs569.texture.DynamicCubeMap;
 import cs569.texture.FrameBufferObject;
 import cs569.texture.ShadowMap;
+import cs569.texture.BloomMap;
+import cs569.texture.BloomMask;
 import cs569.texture.Texture;
 import cs569.texture.TextureGUI;
 
@@ -128,12 +133,15 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 	private static Viewer mainView;
 	// The default scene assembler
 	private ParameterizedObjectMaker defaultSceneMaker = new DefaultScene();
+	//private ParameterizedObjectMaker defaultSceneMaker = new BlankScene();
+	
 	// List of all active frame buffer objecs
 	private List<FrameBufferObject> frameBufferObjects = new ArrayList<FrameBufferObject>();
 	// List of all frame buffer objects needed only for HDR
 	private List<FrameBufferObject> hdrFrameBufferObjects = new ArrayList<FrameBufferObject>();
 	// List of all active animations
 	private List<Animated> animatedObjects = new ArrayList<Animated>();
+	private List<Emitter> emitterObjects = new ArrayList<Emitter>();
 
 	// the current size of GL viewport
 	protected int viewWidth = DEFAULT_VIEWPORT_SIZE;
@@ -147,7 +155,7 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 	
 	// Screen filling texture
 	protected Texture sfqTexture = null;
-
+	
 	// UI elements
 	private DefaultTreeModel modelTree;
 	private JTree modelTreeView;
@@ -181,7 +189,6 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 
 	public Viewer() {
 		super("CS 569 Viewer");
-
 		JPanel main = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
@@ -203,19 +210,26 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		/* Create the default scene */
-		//object = defaultSceneMaker.make();
-		String filename = getClass().getResource("/scenes/mr_droopy.xml").getFile();
+		object = defaultSceneMaker.make();
+// this adds in mr droopy
+/*		String filename = getClass().getResource("/scenes/mr_droopy.xml").getFile();
 		Parser parser = new Parser();
 		object = (HierarchicalObject) parser.parse(filename, Scene.class);
-		object.recursiveUpdateBoundingSpheres();
+*/		object.recursiveUpdateBoundingSpheres();
 		modelTree.setRoot(object);
 
 		pack();
 		setVisible(true);
-
+		
+		Vector3f eppos = new Vector3f((float)0.0,(float)0.0,(float)0.0);
+		Vector3f epvelo = new Vector3f((float)1.0,(float)1.0,(float)1.0);
+		EmitterPoint ep = new EmitterPoint(100, eppos, epvelo, 0.2f);
+		emitterObjects.add(ep);
+		
 		/* Refresh the display */
 		animator = new Animator(canvas);
 		animator.start();
+		
 	}
 
 	/**
@@ -516,7 +530,28 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 				rotationGizmo.glRender(gl, glu, eye);
 			} else {
 				/// XXX TODO
+				//gl.glUseProgram(0);
+				// seems like we need to stop using programs, the texture should be written by the fbo (and shader) by now??
+				gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+				
+				//Texture.getTexture("Bloom mask_combine").initializeTexture(gl);
+				Texture.getTexture("Bloom mask_combine").blit(gl);
 			}
+			
+			/* Particles!
+		    gl.glPointSize(4.0f);
+		    gl.glBegin(GL.GL_POINTS);
+		    for (Emitter e: emitterObjects)
+			{
+				e.refresh((System.currentTimeMillis() - startTime) / 1000.0f);
+				for(Particle p: e.getParticles())
+				{
+				    gl.glColor3f(p.getColor().x,p.getColor().y,p.getColor().z);   
+					gl.glVertex3f(p.getPos().x,p.getPos().y,p.getPos().z);
+				}
+			}
+		    gl.glEnd();
+			*/
 
 		} catch (GLSLErrorException e) {
 			e.printStackTrace();
@@ -645,6 +680,21 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 		/* A vague-looking particle from the student game 'Alpha Strain' */
 		Texture.getTexture("src/textures/smoke.png").initializeTexture(gl);
 		
+		BloomMap bloomMap = new BloomMap("Bloom map", mainCamera, 1024, 1024);
+		hdrFrameBufferObjects.add(bloomMap);
+	
+		BloomMask bloomMask = new BloomMask("Bloom mask", bloomMap, BloomMask.BLOOM_BRIGHT_MASK, 2048, 2048);
+		hdrFrameBufferObjects.add(bloomMask);
+
+		BloomMask bloomMask_ch = new BloomMask("Bloom mask_conv_h", bloomMask, bloomMap, BloomMask.BLOOM_CONV_H, 1024, 1024);
+		hdrFrameBufferObjects.add(bloomMask_ch);
+
+		BloomMask bloomMask_cv = new BloomMask("Bloom mask_conv_v", bloomMask_ch, bloomMap, BloomMask.BLOOM_CONV_V, 1024, 1024);
+		hdrFrameBufferObjects.add(bloomMask_cv);
+
+		BloomMask bloomMask_combine = new BloomMask("Bloom mask_combine", bloomMask_cv, bloomMap, BloomMask.BLOOM_COMBINE, 1024, 1024);
+		hdrFrameBufferObjects.add(bloomMask_combine);
+
 		/* Create some frame buffer objects and attach them to the scene */
 		ShadowMap shadowMap = new ShadowMap("Shadow map", lightCamera, 1024, 1024);
 		frameBufferObjects.add(shadowMap);
@@ -897,9 +947,20 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 	}
 
 	public void keyPressed(KeyEvent e) {
+		if(hdrEnabled)
+		{
+			if(e.getKeyChar() == 'a' || e.getKeyChar() == 'A')
+			{
+				((BloomShader)GLSLShader.getShader(BloomShader.class)).incExp();
+			} else if (e.getKeyChar() == 's' || e.getKeyChar() == 'S')
+			{
+				((BloomShader)GLSLShader.getShader(BloomShader.class)).decExp();
+			}
+		}
 	}
 
 	public void keyReleased(KeyEvent e) {
+		
 	}
 
 	// //////////////////////////////////////////////////////////////////////////////////////////////////
