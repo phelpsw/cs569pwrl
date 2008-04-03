@@ -1,5 +1,7 @@
 package cs569.animation;
 
+import cs569.object.HierarchicalObject;
+
 /**
  * This interface should be implemented by all animated
  * objects. When registered with the Viewer class, the
@@ -20,4 +22,5 @@ public interface Animated {
 	 * when the program is launched)
 	 */
 	public void update(float time);
+	public void setObject(HierarchicalObject object);
 }
