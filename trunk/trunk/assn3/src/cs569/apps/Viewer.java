@@ -73,7 +73,6 @@ import cs569.misc.GLUtils;
 import cs569.misc.OBJLoaderException;
 import cs569.misc.Parser;
 import cs569.misc.RotationGizmo;
-import cs569.object.BlankScene;
 import cs569.object.DefaultScene;
 import cs569.object.HierarchicalObject;
 import cs569.object.MeshObject;
