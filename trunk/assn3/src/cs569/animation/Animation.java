@@ -5,8 +5,6 @@ import java.util.ArrayList;
 
 import cs569.object.HierarchicalObject;
 
-import sun.text.CompactShortArray.Iterator;
-
 public class Animation implements Animated {
 
 	ArrayList<Track> trackList = new ArrayList<Track>();
