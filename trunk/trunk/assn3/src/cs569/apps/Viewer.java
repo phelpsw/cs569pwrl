@@ -821,8 +821,9 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 				String filename = chooser.getSelectedFile().getPath();
 				Parser parse = new Parser();
 				Animated animation = (Animated) parse.parse(filename, Animated.class);
-				// TODO If needed, add some code here which associates the animations
-				// to the referenced objects inside the scene
+				
+				animation.setObject(object);
+				
 				animatedObjects.add(animation);
 			}
 		} else if (ac.equals("ClearAll")) {
