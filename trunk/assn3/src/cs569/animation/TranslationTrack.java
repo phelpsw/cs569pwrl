@@ -40,4 +40,24 @@ public class TranslationTrack extends Track {
 		}
 		
 	}
+	
+	public float[] interpolate(float time, float[] key1, float[] key2)
+	{
+		if (key2[0] < key1[0])
+			System.out.println("error: expecting key2 to be bigger");
+		
+		float alpha = (time - key1[0]) / (key2[0] - key1[0]); // 0 is key1, 1 is key2
+		
+		if (alpha < 0 || alpha > 1)
+		 System.out.println("alpha is " + alpha + ", key2[0]=" + key2[0] + ", key1[0]=" + key1[0]);
+		
+		float[] result = new float[key1.length];
+		for (int i=0; i<key1.length; i++)
+		{
+		  result[i] = key1[i] + alpha * (key2[i] - key1[i]);
+		}
+				
+		return result;
+		
+	}
 }

@@ -13,6 +13,8 @@ public abstract class Track {
 	String name;
 	protected float maxTime = 0;
 	
+	protected int lastKeyframeIndex = -1;	
+	
 	public abstract void setObjectTransform(HierarchicalObject object, float time);
 	
 	public void setObjectName(String name)
@@ -32,4 +34,7 @@ public abstract class Track {
 		time = time - count * maxTime;
 		return time;
 	}
+	
+	//public abstract float[] interpolate(float time, float[] key1, float[] key2);
+
 }
