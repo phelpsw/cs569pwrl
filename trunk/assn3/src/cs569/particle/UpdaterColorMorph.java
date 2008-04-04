@@ -27,8 +27,8 @@ public class UpdaterColorMorph extends Updater {
 		float r = startR + x*(endR - startR);
 		float g = startG + x*(endG - startG);
 		float b = startB + x*(endB - startB);
-		
-		return new Particle(p.pos, p.velo, p.mass, new Vector3f(r,g,b), p.timeBorn);
+		p.set(p.pos, p.velo, p.mass, new Vector3f(r,g,b), p.timeBorn, p.scale);
+		return p;
 	}
 
 }

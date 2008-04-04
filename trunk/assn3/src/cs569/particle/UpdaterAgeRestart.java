@@ -24,7 +24,8 @@ public class UpdaterAgeRestart extends Updater {
 	
 	public Particle update(Particle p, float currentTime)
 	{
-		if(currentTime - p.timeBorn > max_age)
+		float randomAmt = age_variance*(float)generator.nextGaussian();
+		if(currentTime - p.timeBorn + randomAmt > max_age)
 		{
 			float rx = (float)generator.nextGaussian();//*2.0f - 1.0f;
 			float ry = (float)generator.nextGaussian();//*2.0f - 1.0f;
@@ -37,7 +38,7 @@ public class UpdaterAgeRestart extends Updater {
 			
 			//float age = (int)((Math.max(Math.min(generator.nextGaussian(), 1.0f),-1.0f) / 2.0f + 1.0f)*(age_variance*max_age));
 			
-			p.set(pos, nVelo, p.mass, p.color, currentTime);
+			p.set(pos, nVelo, p.mass, p.color, currentTime,p.scale);
 			return p;
 		} else {			
 			return p;

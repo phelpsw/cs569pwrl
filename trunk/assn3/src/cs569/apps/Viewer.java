@@ -22,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.media.opengl.GL;
@@ -156,6 +157,8 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 	// Screen filling texture
 	protected Texture sfqTexture = null;
 	
+	private boolean particlesEnabled = true;
+	
 	// UI elements
 	private DefaultTreeModel modelTree;
 	private JTree modelTreeView;
@@ -222,17 +225,37 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 		setVisible(true);
 		
 		// set up the particle emitter
-		Vector3f eppos = new Vector3f((float)0.0,(float)0.0,(float)0.0);
-		Vector3f epvelo = new Vector3f((float)1.0,(float)1.0,(float)1.0);
-		float variance = .4f;
-		
-		Texture smoket = Texture.getTexture("src/textures/smoke.png");
-		EmitterPoint ep = new EmitterPoint(10, eppos, epvelo, variance, smoket);
-		ep.addUpdater(new UpdaterAgeRestart(eppos, epvelo, variance, 1.0f, .5f));
-		ep.addUpdater(new UpdaterColorMorph(1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, .5f));
-		ep.addForce(new ForceWind(new Vector3f(0.0f,0.0f,-1.0f),1.0f,3.0f,0.1f));
-		ep.addForce(new ForceGravity());
-		emitterObjects.add(ep);
+		Vector3f eppos = new Vector3f((float)-0.8,(float)0.9,(float)0.0);
+		Vector3f epvelo = new Vector3f((float)0.0,(float)1.0,0.0f);
+		float variance = 0.05f;
+		Texture tex = Texture.getTexture("src/textures/smoke3.png");
+		EmitterPoint smoke = new EmitterPoint(200, eppos, epvelo, variance, tex, 0.2f);
+		smoke.addUpdater(new UpdaterAgeRestart(eppos, epvelo, variance, 0.75f, 2.5f));
+		smoke.addUpdater(new UpdaterColorMorph(0.4f, 0.3f, 0.4f, 0.3f, 0.4f, 0.3f, 1.0f));
+		smoke.addForce(new ForceWind(new Vector3f(0.3f,1.0f,0.0f),0.5f,2.0f,0.1f));
+		emitterObjects.add(smoke);
+		/*
+		eppos = new Vector3f((float)0.0,(float)0.0,(float)0.0);
+		epvelo = new Vector3f((float)1.0,(float)1.0,(float)1.0);
+		variance = .4f;
+		tex = Texture.getTexture("src/textures/sparks1.png");
+		EmitterPoint sparks = new EmitterPoint(10, eppos, epvelo, variance, tex, 0.2f);
+		sparks.addUpdater(new UpdaterAgeRestart(eppos, epvelo, variance, 1.0f, .5f));
+		sparks.addUpdater(new UpdaterColorMorph(1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, .5f));
+		sparks.addForce(new ForceWind(new Vector3f(0.0f,0.0f,-1.0f),1.0f,3.0f,0.1f));
+		sparks.addForce(new ForceGravity());
+		emitterObjects.add(sparks);
+		*/
+		eppos = new Vector3f((float)0.0,(float)0.0,(float)1.5);
+		epvelo = new Vector3f((float)0.0,(float)0.5,(float)0.0);
+		variance = 0.05f;
+		tex = Texture.getTexture("src/textures/expTxt.png");
+		EmitterPoint explosion = new EmitterPoint(20, eppos, epvelo, variance, tex, 0.0f);
+		//explosion.addUpdater(new UpdaterAgeRestart(eppos, epvelo, variance, 0.00f, 6.0f));
+		explosion.addUpdater(new UpdaterColorMorph(1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 4.5f));
+		explosion.addUpdater(new UpdaterParticleScale(0.0f, 1.0f, 4.0f, 0.1f));
+		explosion.addForce(new ForceWind(new Vector3f(0.0f,1.0f,0.0f),1.0f,0.5f,0.1f));
+		emitterObjects.add(explosion);
 		
 		/* Refresh the display */
 		animator = new Animator(canvas);
@@ -546,7 +569,8 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 				Texture.getTexture("Bloom mask_combine").blit(gl);
 			}
 			
-			renderParticleSystem(gl);
+			if(particlesEnabled)
+				renderParticleSystem(gl);
 			
 			
 			
@@ -671,15 +695,17 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 		{
 			// Bind the texture to texture unit 0 
 			e.getTexture().bindTexture(gl, 0);
-			
+			e.cameraPos = mainCamera.getEye();
 			e.refresh((System.currentTimeMillis() - startTime) / 1000.0f);
+			Collections.sort(e.getParticles());
+			
 			for(Particle p: e.getParticles())
 			{
 				billboardSphericalBegin(gl, mainCamera.getEye(), p.getPos());
 				
 				gl.glEnable(GL.GL_BLEND);
 				
-				float scale = 0.2f;
+				float scale = p.getScale();
 				Vector3f pt1 = new Vector3f(-scale,-scale,0);
 				Vector3f pt2 = new Vector3f(scale,-scale,0);
 				Vector3f pt3 = new Vector3f(scale,scale,0);
@@ -897,8 +923,14 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 						+ textureType + ".png").initializeTexture(gl);
 		}
 
+		/// TODO: Add more textures!
 		/* A vague-looking particle from the student game 'Alpha Strain' */
 		Texture.getTexture("src/textures/smoke.png").initializeTexture(gl);
+		Texture.getTexture("src/textures/smoke2.png").initializeTexture(gl);
+		Texture.getTexture("src/textures/smoke3.png").initializeTexture(gl);
+		Texture.getTexture("src/textures/sparks1.png").initializeTexture(gl);
+		Texture.getTexture("src/textures/expTxt.png").initializeTexture(gl);
+		Texture.getTexture("src/textures/blueFire.png").initializeTexture(gl);
 		
 		BloomMap bloomMap = new BloomMap("Bloom map", mainCamera, 1024, 1024);
 		hdrFrameBufferObjects.add(bloomMap);
@@ -1181,7 +1213,10 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 	}
 
 	public void keyReleased(KeyEvent e) {
-		
+		if(e.getKeyChar() == 'p' || e.getKeyChar() == 'P')
+		{
+			particlesEnabled = !particlesEnabled;
+		}
 	}
 
 	// //////////////////////////////////////////////////////////////////////////////////////////////////
