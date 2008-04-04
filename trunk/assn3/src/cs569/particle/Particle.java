@@ -8,15 +8,16 @@ public class Particle {
 	protected float mass;
 	
 	protected Vector3f color;
-	protected int age;
+	//protected int age;
+	protected float timeBorn; // stored in seconds 
 	
-	public Particle(Vector3f pos, Vector3f velo, float mass, Vector3f color, int age)
+	public Particle(Vector3f pos, Vector3f velo, float mass, Vector3f color, float age)
 	{
 		this.pos = pos;
 		this.velo = velo;
 		this.mass = mass;
 		this.color = color;
-		this.age = age;
+		this.timeBorn = age;
 	}
 	
 	public Vector3f getPos()
@@ -35,13 +36,22 @@ public class Particle {
 		this.velo = velo;
 	}
 	
+	public void set(Vector3f pos, Vector3f velo, float mass, Vector3f color, float age)
+	{
+		this.pos = pos;
+		this.velo = velo;
+		this.mass = mass;
+		this.color = color;
+		this.timeBorn = age;
+	}
+	
 	public void set(Particle p)
 	{
 		this.pos = p.pos;
 		this.velo = p.velo;
 		this.mass = p.mass;
 		this.color = p.color;
-		this.age = p.age;
+		this.timeBorn = p.timeBorn;
 	}
 	
 	public Vector3f getColor()

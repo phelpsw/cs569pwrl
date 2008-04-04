@@ -2,21 +2,22 @@ package cs569.particle;
 
 import java.util.ArrayList;
 import javax.vecmath.Vector3f;
+
+import cs569.texture.Texture;
+
 import java.util.Random;
 
 public class EmitterPoint extends Emitter {
-
-	public EmitterPoint(int count, Vector3f pos, Vector3f velo, float velo_variance)
+	private Texture texture;
+	
+	public EmitterPoint(int count, Vector3f pos, Vector3f velo, float velo_variance, Texture t)
 	{
 		Random generator = new Random();
+	
+		texture = t;
 		
 		ps = new ParticleSystem();
 		updaters = new ArrayList<Updater>();
-		
-		UpdaterAgeRestart agr = new UpdaterAgeRestart(pos, velo, velo_variance, 1.0f, 30);
-		UpdaterColorMorph cm = new UpdaterColorMorph(1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 30);
-		updaters.add(agr);
-		updaters.add(cm);
 		
 		for(int i=0; i<count; i++)
 		{
@@ -31,11 +32,7 @@ public class EmitterPoint extends Emitter {
 			
 			Particle p = new Particle(pos, nVelo, 0.1f, new Vector3f(1.0f,0.0f,0.0f),0);
 			ps.particles.add(p);
-		}
-		ForceWind fwind = new ForceWind(new Vector3f(0.0f,0.0f,-1.0f),1.0f,3.0f,0.1f);
-		ForceGravity fgrav = new ForceGravity();
-		ps.forces.add(fgrav);
-		ps.forces.add(fwind);
+		}		
 	}
 	
 	@Override
@@ -46,7 +43,7 @@ public class EmitterPoint extends Emitter {
 		{
 			for(Updater u:updaters)
 			{
-				p.set(u.update(p));
+				p.set(u.update(p, time));
 			}
 		}
 		
@@ -55,6 +52,22 @@ public class EmitterPoint extends Emitter {
 	@Override
 	public ArrayList<Particle> getParticles() {
 		return ps.particles;
+	}
+
+	@Override
+	public void addForce(Force f) {
+		ps.forces.add(f);
+	}
+
+	@Override
+	public void addUpdater(Updater u) {
+		updaters.add(u);
+		
+	}
+
+	@Override
+	public Texture getTexture() {
+		return texture;
 	}
 
 }
