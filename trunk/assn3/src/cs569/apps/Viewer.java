@@ -221,17 +221,9 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 		pack();
 		setVisible(true);
 		
-		// set up the particle emitter
 		Vector3f eppos = new Vector3f((float)0.0,(float)0.0,(float)0.0);
 		Vector3f epvelo = new Vector3f((float)1.0,(float)1.0,(float)1.0);
-		float variance = .4f;
-		
-		Texture smoket = Texture.getTexture("src/textures/smoke.png");
-		EmitterPoint ep = new EmitterPoint(10, eppos, epvelo, variance, smoket);
-		ep.addUpdater(new UpdaterAgeRestart(eppos, epvelo, variance, 1.0f, .5f));
-		ep.addUpdater(new UpdaterColorMorph(1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 5));
-		ep.addForce(new ForceWind(new Vector3f(0.0f,0.0f,-1.0f),1.0f,3.0f,0.1f));
-		ep.addForce(new ForceGravity());
+		EmitterPoint ep = new EmitterPoint(10, eppos, epvelo, 0.4f);
 		emitterObjects.add(ep);
 		
 		/* Refresh the display */
@@ -565,24 +557,112 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 			System.exit(-1);
 		}
 	}
+/* This is a point sprite implementation that does not work.  This instead breaks 
+	private void renderParticleSystem(GL gl)
+	{
+		// Particles! 
+	    //gl.glPointSize(4.0f);
+	    //gl.glBegin(GL.GL_POINTS);
+		Texture smoket = Texture.getTexture("src/textures/smoke.png");
+		//gl.glBlendFunc(GL.GL_SRC_ALPHA,GL.GL_DST_ALPHA);
+		//gl.glAlphaFunc(GL.GL_GREATER,0.4f);
+		for (Emitter e: emitterObjects)
+		{
+			
+			//gl.glMatrixMode(GL.GL_PROJECTION);
+			//gl.glLoadIdentity();
+			//gl.glMatrixMode(GL.GL_MODELVIEW);
+			//gl.glLoadIdentity();
+			
+			// Bind the texture to texture unit 0 
+			smoket.bindTexture(gl, 0);
+			
+			e.refresh((System.currentTimeMillis() - startTime) / 1000.0f);
+
+			billboardSphericalBegin(gl, mainCamera.getEye(), new Vector3f(0.0f,0.0f,0.0f));
+			
+			renderPointSprites(gl, e.getParticles());
+			
+			billboardSphericalEnd(gl);
+			
+			// Deactivate texturing 
+			smoket.unbindTexture(gl);
+		}
+	    //gl.glEnd();
+	}
+
+	private void renderPointSprites(GL gl, ArrayList<Particle> particles)
+	{
+	    //
+	    // Set up for blending...
+	    //
+
+		gl.glEnable(GL.GL_BLEND);
+		gl.glBlendFunc(GL.GL_SRC_ALPHA,GL.GL_DST_ALPHA);
+		gl.glAlphaFunc(GL.GL_GREATER,0.4f);
+
+	    //
+		// Set up the OpenGL state machine for using point sprites...
+		//
+
+	    // This is how will our point sprite's size will be modified by 
+	    // distance from the viewer
+	    float quadratic[] =  { 1.0f, 0.0f, 0.01f };
+	    gl.glPointParameterfv(GL.GL_POINT_DISTANCE_ATTENUATION_ARB, quadratic, 0);
+
+	    // Query for the max point size supported by the hardware
+	    float maxSize[] =  { 0.0f };
+	    gl.glGetFloatv( GL.GL_POINT_SIZE_MAX, maxSize, 0 );
+
+	    // Clamp size to 100.0f or the sprites could get a little too big on some  
+	    // of the newer graphic cards. My ATI card at home supports a max point 
+	    // size of 1024.0f!
+	    if( maxSize[0] > 100.0f )
+	    	maxSize[0] = 100.0f;
+
+	    gl.glPointSize( maxSize[0] );
+
+	    // The alpha of a point is calculated to allow the fading of points 
+	    // instead of shrinking them past a defined threshold size. The threshold 
+	    // is defined by GL_POINT_FADE_THRESHOLD_SIZE_ARB and is not clamped to 
+	    // the minimum and maximum point sizes.
+	    gl.glPointParameterf(GL.GL_POINT_FADE_THRESHOLD_SIZE, 60.0f );
+
+	    gl.glPointParameterf(GL.GL_POINT_SIZE_MIN, 1.0f );
+	    gl.glPointParameterf(GL.GL_POINT_SIZE_MAX, maxSize[0]);
+
+	    // Specify point sprite texture coordinate replacement mode for each 
+	    // texture unit
+	    gl.glTexEnvf(GL.GL_POINT_SPRITE, GL.GL_COORD_REPLACE, GL.GL_TRUE);
+
+	    //
+		// Render point sprites...
+		//
+
+	    gl.glEnable(GL.GL_POINT_SPRITE);
+
+		gl.glBegin(GL.GL_POINTS);
+	    {
+	    	for(Particle p:particles)
+	    	{
+	    		gl.glColor4f(p.getColor().x, p.getColor().y, p.getColor().z, 1.0f);
+	    		gl.glVertex3f(p.getPos().x, p.getPos().y, p.getPos().z);
+	    	}
+	    }
+		gl.glEnd();
+
+		gl.glDisable(GL.GL_POINT_SPRITE);
+	}
+*/
 
 	private void renderParticleSystem(GL gl)
 	{
-		/* Particles! */
-	    //gl.glPointSize(4.0f);
-	    //gl.glBegin(GL.GL_POINTS);
 	    Texture smoket = Texture.getTexture("src/textures/smoke.png");
 	    gl.glBlendFunc(GL.GL_SRC_ALPHA,GL.GL_DST_ALPHA);
-		gl.glAlphaFunc(GL.GL_GREATER,0.4f);
+		gl.glAlphaFunc(GL.GL_GREATER,0.1f);
 		for (Emitter e: emitterObjects)
 		{
-			/*
-			gl.glMatrixMode(GL.GL_PROJECTION);
-			gl.glLoadIdentity();
-			gl.glMatrixMode(GL.GL_MODELVIEW);
-			gl.glLoadIdentity();
-			*/
-			/* Bind the texture to texture unit 0 */
+			// Bind the texture to texture unit 0 
 			smoket.bindTexture(gl, 0);
 			
 			e.refresh((System.currentTimeMillis() - startTime) / 1000.0f);
@@ -597,13 +677,10 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 				Vector3f pt2 = new Vector3f(scale,-scale,0);
 				Vector3f pt3 = new Vector3f(scale,scale,0);
 				Vector3f pt4 = new Vector3f(-scale,scale,0);
-				/*
-				mainCamera.getInverseOrientationMatrix().transform(pt1);
-				mainCamera.getInverseOrientationMatrix().transform(pt2);
-				mainCamera.getInverseOrientationMatrix().transform(pt3);
-				mainCamera.getInverseOrientationMatrix().transform(pt4);
-				*/
-				/* Draw a texture-mapped quad */
+				
+				gl.glColor4f(p.getColor().x, p.getColor().y, p.getColor().z, 1.0f);
+				
+				// Draw a texture-mapped quad 
 				gl.glBegin(GL.GL_QUADS);
 				gl.glTexCoord2f(0, 0);
 				gl.glVertex3f(p.getPos().x+pt1.x, p.getPos().y+pt1.y, p.getPos().z);
@@ -617,15 +694,12 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 				gl.glDisable(GL.GL_BLEND);
 				
 				billboardSphericalEnd(gl);
-			    //gl.glColor3f(p.getColor().x,p.getColor().y,p.getColor().z);   
-				//gl.glVertex3f(p.getPos().x,p.getPos().y,p.getPos().z);
 			}
-			/* Deactivate texturing */
+			// Deactivate texturing 
 			smoket.unbindTexture(gl);
 		}
-	    //gl.glEnd();
 	}
-	
+
 	private void billboardSphericalEnd(GL gl)
 	{
 		// restore the previously stored modelview matrix
