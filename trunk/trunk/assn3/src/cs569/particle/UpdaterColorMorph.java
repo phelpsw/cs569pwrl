@@ -6,9 +6,9 @@ public class UpdaterColorMorph extends Updater {
 	float startR, endR;
 	float startG, endG;
 	float startB, endB;
-	int life;
+	float life;
 	
-	public UpdaterColorMorph(float sR, float eR, float sG, float eG, float sB, float eB, int life )
+	public UpdaterColorMorph(float sR, float eR, float sG, float eG, float sB, float eB, float life )
 	{
 		this.startR = sR;
 		this.endR = eR;
@@ -19,14 +19,16 @@ public class UpdaterColorMorph extends Updater {
 		this.life = life;
 	}
 	
-	public Particle update(Particle p)
+	public Particle update(Particle p, float currentTime)
 	{
-		float x = Math.min((float)p.age / (float)life, 1.0f);
+		float age = currentTime - p.timeBorn;
+		float x = Math.min(age / life, 1.0f);
 		
 		float r = startR + x*(endR - startR);
 		float g = startG + x*(endG - startG);
 		float b = startB + x*(endB - startB);
 		
-		return new Particle(p.pos, p.velo, p.mass, new Vector3f(r,g,b), p.age);
+		return new Particle(p.pos, p.velo, p.mass, new Vector3f(r,g,b), p.timeBorn);
 	}
+
 }

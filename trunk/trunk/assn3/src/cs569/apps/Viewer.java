@@ -221,9 +221,17 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 		pack();
 		setVisible(true);
 		
+		// set up the particle emitter
 		Vector3f eppos = new Vector3f((float)0.0,(float)0.0,(float)0.0);
 		Vector3f epvelo = new Vector3f((float)1.0,(float)1.0,(float)1.0);
-		EmitterPoint ep = new EmitterPoint(10, eppos, epvelo, 0.4f);
+		float variance = .4f;
+		
+		Texture smoket = Texture.getTexture("src/textures/smoke.png");
+		EmitterPoint ep = new EmitterPoint(10, eppos, epvelo, variance, smoket);
+		ep.addUpdater(new UpdaterAgeRestart(eppos, epvelo, variance, 1.0f, .5f));
+		ep.addUpdater(new UpdaterColorMorph(1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 5));
+		ep.addForce(new ForceWind(new Vector3f(0.0f,0.0f,-1.0f),1.0f,3.0f,0.1f));
+		ep.addForce(new ForceGravity());
 		emitterObjects.add(ep);
 		
 		/* Refresh the display */

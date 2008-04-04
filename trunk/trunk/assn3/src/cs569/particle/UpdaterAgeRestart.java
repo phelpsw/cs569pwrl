@@ -5,14 +5,14 @@ import java.util.Random;
 import javax.vecmath.Vector3f;
 
 public class UpdaterAgeRestart extends Updater {
-	int max_age;
+	float max_age;  // in seconds
 	Random generator;
 	Vector3f pos;
 	Vector3f velo;
 	float velo_variance;
 	float age_variance;
 	
-	public UpdaterAgeRestart(Vector3f pos, Vector3f velo, float velo_variance, float age_variance, int max_age)
+	public UpdaterAgeRestart(Vector3f pos, Vector3f velo, float velo_variance, float age_variance, float max_age)
 	{
 		this.pos = pos;
 		this.velo = velo;
@@ -22,9 +22,9 @@ public class UpdaterAgeRestart extends Updater {
 		generator = new Random();
 	}
 	
-	public Particle update(Particle p)
+	public Particle update(Particle p, float currentTime)
 	{
-		if(p.age > max_age)
+		if(currentTime - p.timeBorn > max_age)
 		{
 			float rx = (float)generator.nextGaussian();//*2.0f - 1.0f;
 			float ry = (float)generator.nextGaussian();//*2.0f - 1.0f;
@@ -35,13 +35,14 @@ public class UpdaterAgeRestart extends Updater {
 			nVelo.y = ry*(velo_variance*velo.y);
 			nVelo.z = rz*(velo_variance*velo.z);
 			
-			int age = (int)((Math.max(Math.min(generator.nextGaussian(), 1.0f),-1.0f) / 2.0f + 1.0f)*(age_variance*max_age));
+			//float age = (int)((Math.max(Math.min(generator.nextGaussian(), 1.0f),-1.0f) / 2.0f + 1.0f)*(age_variance*max_age));
 			
-			return new Particle(pos, nVelo, p.mass, p.color,age);
-		} else {
-			p.age += 1;
+			p.set(pos, nVelo, p.mass, p.color, currentTime);
+			return p;
+		} else {			
 			return p;
 		}
 	}
+
 	
 }

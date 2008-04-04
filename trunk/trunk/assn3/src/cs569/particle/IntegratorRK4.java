@@ -53,7 +53,8 @@ public class IntegratorRK4 extends Integrator {
 		Vn1.scale(dt/6.0f);
 		Vn1.add(p.velo);
 		
-		return new Particle(Pn1,Vn1,p.mass,p.color,p.age);
+		p.set(Pn1,Vn1,p.mass,p.color,p.timeBorn);
+		return p;
 	}
 
 	private Vector3f calcA(ArrayList<Force> forces, Vector3f pos, Vector3f velo, float mass, float time)

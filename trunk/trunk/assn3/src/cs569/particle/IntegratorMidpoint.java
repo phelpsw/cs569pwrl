@@ -27,7 +27,8 @@ public class IntegratorMidpoint extends Integrator {
 		Pn1.scale(dt);
 		Pn1.add(p.pos);
 		
-		return new Particle(Pn1,Vn1,p.mass,p.color,p.age);
+		p.set(Pn1,Vn1,p.mass,p.color,p.timeBorn);
+		return p;
 	}
 	
 	private Vector3f calcA(ArrayList<Force> forces, Vector3f pos, Vector3f velo, float mass, float time)
