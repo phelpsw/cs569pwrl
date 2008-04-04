@@ -10,10 +10,10 @@ import java.util.Random;
 public class EmitterPoint extends Emitter {
 	private Texture texture;
 	
-	public EmitterPoint(int count, Vector3f pos, Vector3f velo, float velo_variance, Texture t)
+	public EmitterPoint(int count, Vector3f pos, Vector3f velo, float velo_variance, Texture t, float scale)
 	{
 		Random generator = new Random();
-	
+		
 		texture = t;
 		
 		ps = new ParticleSystem();
@@ -30,7 +30,7 @@ public class EmitterPoint extends Emitter {
 			nVelo.y = ry*(velo_variance*velo.y);
 			nVelo.z = rz*(velo_variance*velo.z);
 			
-			Particle p = new Particle(pos, nVelo, 0.1f, new Vector3f(1.0f,0.0f,0.0f),0);
+			Particle p = new Particle(pos, nVelo, 0.1f, new Vector3f(1.0f,1.0f,1.0f), 0, scale);
 			ps.particles.add(p);
 		}		
 	}
@@ -38,7 +38,7 @@ public class EmitterPoint extends Emitter {
 	@Override
 	public void refresh(float time) {
 		ps.refresh(time);
-		
+		Particle.cameraPos = cameraPos;
 		for(Particle p: ps.particles)
 		{
 			for(Updater u:updaters)

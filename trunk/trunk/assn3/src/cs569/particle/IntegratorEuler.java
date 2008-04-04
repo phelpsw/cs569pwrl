@@ -25,7 +25,7 @@ public class IntegratorEuler extends Integrator {
 		Pn1.scale(dt);
 		Pn1.add(p.pos);
 		
-		p.set(Pn1,Vn1,p.mass,p.color,p.timeBorn);
+		p.set(Pn1,Vn1,p.mass,p.color,p.timeBorn,p.scale);
 		
 		return p;
 	}

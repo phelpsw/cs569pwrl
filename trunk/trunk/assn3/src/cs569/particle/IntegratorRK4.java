@@ -53,7 +53,7 @@ public class IntegratorRK4 extends Integrator {
 		Vn1.scale(dt/6.0f);
 		Vn1.add(p.velo);
 		
-		p.set(Pn1,Vn1,p.mass,p.color,p.timeBorn);
+		p.set(Pn1,Vn1,p.mass,p.color,p.timeBorn,p.scale);
 		return p;
 	}
 
