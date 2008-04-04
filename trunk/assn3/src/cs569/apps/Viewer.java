@@ -221,9 +221,17 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 		pack();
 		setVisible(true);
 		
+		// set up the particle emitter
 		Vector3f eppos = new Vector3f((float)0.0,(float)0.0,(float)0.0);
 		Vector3f epvelo = new Vector3f((float)1.0,(float)1.0,(float)1.0);
-		EmitterPoint ep = new EmitterPoint(10, eppos, epvelo, 0.4f);
+		float variance = .4f;
+		
+		Texture smoket = Texture.getTexture("src/textures/smoke.png");
+		EmitterPoint ep = new EmitterPoint(10, eppos, epvelo, variance, smoket);
+		ep.addUpdater(new UpdaterAgeRestart(eppos, epvelo, variance, 1.0f, .5f));
+		ep.addUpdater(new UpdaterColorMorph(1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, .5f));
+		ep.addForce(new ForceWind(new Vector3f(0.0f,0.0f,-1.0f),1.0f,3.0f,0.1f));
+		ep.addForce(new ForceGravity());
 		emitterObjects.add(ep);
 		
 		/* Refresh the display */
@@ -657,13 +665,12 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 
 	private void renderParticleSystem(GL gl)
 	{
-	    Texture smoket = Texture.getTexture("src/textures/smoke.png");
 	    gl.glBlendFunc(GL.GL_SRC_ALPHA,GL.GL_DST_ALPHA);
 		gl.glAlphaFunc(GL.GL_GREATER,0.1f);
 		for (Emitter e: emitterObjects)
 		{
 			// Bind the texture to texture unit 0 
-			smoket.bindTexture(gl, 0);
+			e.getTexture().bindTexture(gl, 0);
 			
 			e.refresh((System.currentTimeMillis() - startTime) / 1000.0f);
 			for(Particle p: e.getParticles())
@@ -696,7 +703,7 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 				billboardSphericalEnd(gl);
 			}
 			// Deactivate texturing 
-			smoket.unbindTexture(gl);
+			e.getTexture().unbindTexture(gl);
 		}
 	}
 
