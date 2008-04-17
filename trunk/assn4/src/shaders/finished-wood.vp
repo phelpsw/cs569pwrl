@@ -1,0 +1,49 @@
+#version 110
+
+/** 
+ * Wood shader implementation based on
+ * "Measuring and Modeling the Appearance of Finished Wood"
+ * by Stephen R. Marschner, Stephen H. Westin, Adam Arbree, 
+ * and Jonathan T. Moon. In Proceedings of SIGGRAPH 2005. 
+ * Ported from RenderMan to GLSL by Wenzel Jakob
+ */
+
+uniform vec4 eyePosition, lightPosition;
+
+varying vec3 lightVector, eyeVector;
+
+void main() {
+	gl_Position = ftransform();
+
+	/* Normal, tangent and binormal in world coordinates */
+	vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
+	vec3 tangent = gl_NormalMatrix * gl_Color.rgb;
+
+	/* Gram-schmidt orthogonalization (needed for
+	   normal maps on objects with non-uniform scaling) */
+	tangent = normalize(tangent - normal * dot(tangent, normal));
+
+	vec3 binormal = cross(normal, tangent);
+
+	/* Vertex->Light in world coordinates */
+	vec4 worldSpacePos = gl_ModelViewMatrix * gl_Vertex;
+	vec3 toLight = (lightPosition - worldSpacePos).xyz;
+	/* Vertex->Eye in world coordinates */
+	vec3 toEye = (eyePosition - worldSpacePos).xyz;
+
+	/* Transform into tangent-space coordinate system */
+	lightVector = vec3(
+		dot(tangent, toLight),
+		dot(binormal, toLight),
+		dot(normal, toLight)
+	);
+
+	eyeVector = vec3(
+		dot(tangent, toEye),
+		dot(binormal, toEye),
+		dot(normal, toEye)
+	);
+
+	/* Forward the texture coordinates */
+	gl_TexCoord[0] = gl_MultiTexCoord0;
+}
