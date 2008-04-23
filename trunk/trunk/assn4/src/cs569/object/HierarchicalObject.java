@@ -79,7 +79,7 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 	/** The name of this object */
 	protected String name;
 
-	/**
+	/**haha
 	 * Should be used only be the Parser. Please name your objects!
 	 */
 	public HierarchicalObject() {
@@ -115,6 +115,7 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 		boolean result = true;
 		
 		distance = Camera.topFrustPlane.distance(new Vector3f(boundingSphere.getCenter()));
+		//System.out.println(distance + " " + boundingSphere.getRadius());
 		if(distance < -boundingSphere.getRadius())
 			return false; // outside
 		else if (distance < boundingSphere.getRadius())
