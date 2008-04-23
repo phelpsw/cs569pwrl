@@ -4,8 +4,8 @@ import javax.vecmath.Vector3f;
 
 public class FrustumPlane {
 
-	private Vector3f center;
-	private Vector3f normal;
+	private Vector3f center = new Vector3f();
+	private Vector3f normal = new Vector3f();
 	
 	private float d;
 
@@ -17,8 +17,8 @@ public class FrustumPlane {
 	//set normal and center of plane
 	public void setNormalAndPoint(Vector3f normal, Vector3f point)
 	{
-		this.center = point;
-		this.normal = normal;
+		this.center.set(point);
+		this.normal.set(normal);
 		normal.normalize();
 		
 		d = -(normal.dot(point));
