@@ -66,13 +66,18 @@ public class Camera {
 	protected float nearWidth;
 	protected float farWidth;
 	
-	public static FrustumPlane topFrustPlane = new FrustumPlane();
-	public static FrustumPlane botFrustPlane = new FrustumPlane();
-	public static FrustumPlane leftFrustPlane = new FrustumPlane();
-	public static FrustumPlane rightFrustPlane = new FrustumPlane();
-	public static FrustumPlane nearFrustPlane = new FrustumPlane();
-	public static FrustumPlane farFrustPlane = new FrustumPlane();
-	
+	public static final int TOP = 0;
+	public static final int BOT = 1;
+	public static final int RIGHT = 2;
+	public static final int LEFT = 3;
+	public static final int NEAR = 4;
+	public static final int FAR = 5;	
+	public static FrustumPlane[] fPlane = new FrustumPlane[6];
+	static {
+		for (int i=0; i<fPlane.length; i++)
+			fPlane[i] = new FrustumPlane();
+	}
+				
 	/**
 	 * The default camera position
 	 */
@@ -80,6 +85,8 @@ public class Camera {
 		eye.set(5, 3, -3);
 		target.set(0, 0, 0);
 		up.set(0, 1, 0);
+		
+		
 	}
 
 	/**
@@ -168,8 +175,8 @@ public class Camera {
 		Vector3f fc = new Vector3f(eye); 
 		fc.sub(Zn);
 		
-		nearFrustPlane.setNormalAndPoint(target,nc);
-		farFrustPlane.setNormalAndPoint(Z,fc);
+		fPlane[NEAR].setNormalAndPoint(target,nc);
+		fPlane[FAR].setNormalAndPoint(Z,fc);
 		
 		Vector3f aux = new Vector3f();
 		Vector3f normal = new Vector3f();
@@ -201,7 +208,7 @@ public class Camera {
 		
 		normal.cross(normal,X);
 		
-		topFrustPlane.setNormalAndPoint(normal, aux);
+		fPlane[TOP].setNormalAndPoint(normal, aux);
 
 		// BOTTOM Plane
 		aux.set(nc);
@@ -212,7 +219,7 @@ public class Camera {
 		
 		normal.cross(X,normal);
 		
-		botFrustPlane.setNormalAndPoint(normal, aux);
+		fPlane[BOT].setNormalAndPoint(normal, aux);
 		
 		// LEFT Plane
 		aux.set(nc);
@@ -223,7 +230,7 @@ public class Camera {
 		
 		normal.cross(normal,Y);
 		
-		leftFrustPlane.setNormalAndPoint(normal, aux);
+		fPlane[LEFT].setNormalAndPoint(normal, aux);
 		
 		// RIGHT Plane
 		aux.set(nc);
@@ -234,7 +241,11 @@ public class Camera {
 		
 		normal.cross(Y,normal);
 		
-		rightFrustPlane.setNormalAndPoint(normal, aux);
+		fPlane[RIGHT].setNormalAndPoint(normal, aux);
+		
+		System.out.println("TOP: center=" + fPlane[TOP].getCenter() + ", norm=" + fPlane[TOP].getNormal());
+		System.out.println("NEAR: center=" + fPlane[NEAR].getCenter() + ", norm=" + fPlane[NEAR].getNormal());
+		System.out.println("LEFT: center=" + fPlane[LEFT].getCenter() + ", norm=" + fPlane[LEFT].getNormal());
 
 	}
 

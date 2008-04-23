@@ -86,20 +86,25 @@ public class CityExplorer extends JFrame implements GLEventListener,
 		   to reduce loading times + memory requirements*/
 		object = (HierarchicalObject) parser.parse(getClass().getResource(
 				"/scenes/city/cityTextured.xml").getFile(), Scene.class);
+		        //"/scenes/city/citySimple.xml").getFile(), Scene.class);
 
 		/* Load additional parts and merge them into the city scene */
 		String otherParts[] = { "/scenes/city/plane.xml", "/scenes/city/roads.xml",
 				"/scenes/city/roofs.xml"
 		};
+		
 		for (int i=0; i<otherParts.length; i++) {
 			HierarchicalObject obj = ((HierarchicalObject) parser.parse(
 				getClass().getResource(otherParts[i]).getFile(), Scene.class));
+			System.out.println(" child count=" + obj.getChildCount());
 			for (int j=0; j<obj.getChildCount(); j++)
 				object.addObject((HierarchicalObject) obj.getChildAt(j));
 		}
 
-		object.recursiveUpdateBoundingSpheres();
-
+		object.recursiveUpdateBoundingSpheres();		
+		object.recursiveUpdateBoundingBoxes();
+						
+		
 		/* Start with a good view position */
 		float aspect = (float) viewWidth / viewHeight;
 		mainCamera.setEye(new Vector3f(65.3f, 18.5f, -25.7f));

@@ -6,16 +6,22 @@ public class FrustumPlane {
 
 	private Vector3f center;
 	private Vector3f normal;
+	
+	private float d;
 
 	public FrustumPlane()
 	{
 		
 	}
 	
+	//set normal and center of plane
 	public void setNormalAndPoint(Vector3f normal, Vector3f point)
 	{
 		this.center = point;
 		this.normal = normal;
+		normal.normalize();
+		
+		d = -(normal.dot(point));
 	}
 	
 	public Vector3f getCenter()
@@ -30,13 +36,18 @@ public class FrustumPlane {
 	
 	public float distance(Vector3f pt)
 	{
+				
+		return (d + normal.dot(pt));
+		/*
 		float d = center.length();
 		float k = (d + (normal.dot(pt)) / (normal.dot(normal)));
 		Vector3f closestPoint = new Vector3f(normal);
 		closestPoint.scale(k);
-		
-		pt.sub(closestPoint);
-		return pt.length();
+		Vector3f diff = new Vector3f(pt);
+		diff.sub(closestPoint);
+				
+		return diff.length();
+		*/
 	}
 }
 

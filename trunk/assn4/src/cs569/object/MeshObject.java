@@ -154,6 +154,23 @@ public class MeshObject extends HierarchicalObject {
 
 		boundingSphere.expandBy(meshBoundingSphere);
 	}
+	
+	public void recursiveUpdateBoundingBoxes() {
+		//super.recursiveUpdateBoundingBoxes();
+		
+		if (boundingBox.isInitialized() == false) {
+			/* The bounding sphere of the mesh vertices has
+			 * never been calculated
+			 */			
+			for (int i=0; i<numVertices*3; i+=3) {
+				Vector3f pt = new Vector3f(verts.get(i), verts.get(i+1), verts.get(i+2));
+				boundingBox.expandBy(pt);
+			}
+			//System.out.println("RECURSIVE " + name + ", " + boundingBox);
+		}
+		
+	}
+	
 
 	/**
 	 * Verify that the currently running shader is hooked up to
