@@ -30,9 +30,11 @@ public class FrustumPlane {
 	
 	public float distance(Vector3f pt)
 	{
-		float tmp = ((normal.dot(pt)) / (normal.dot(normal)));
+		float d = center.length();
+		float k = (d + (normal.dot(pt)) / (normal.dot(normal)));
 		Vector3f closestPoint = new Vector3f(normal);
-		closestPoint.scale(tmp);
+		closestPoint.scale(k);
+		
 		pt.sub(closestPoint);
 		return pt.length();
 	}
