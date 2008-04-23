@@ -18,6 +18,7 @@ import javax.vecmath.Vector3f;
 import cs569.camera.Camera;
 import cs569.material.Lambertian;
 import cs569.material.Material;
+import cs569.misc.BoundingBox;
 import cs569.misc.BoundingSphere;
 import cs569.misc.GLSLErrorException;
 import cs569.misc.GLUtils;
@@ -70,6 +71,8 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 	/** Bounding sphere in local space (always centered at (0, 0, 0) */
 	protected BoundingSphere boundingSphere = new BoundingSphere();
 	
+	protected BoundingBox boundingBox = new BoundingBox();
+	
 	/** The parent of this node */
 	private HierarchicalObject parent = null;
 
@@ -109,6 +112,43 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 	 */
 	protected abstract void draw(GL gl, GLU glu, Vector3f eye) throws GLSLErrorException;
 
+	public boolean boxInFrustum()
+	{
+		boolean result = true;
+		int out,in;
+
+		// for each plane do ...
+		for(int i=0; i < 6; i++) {
+
+			// reset counters for corners in and out
+			out=0;in=0;
+			// for each corner of the box do ...
+			// get out of the cycle as soon as a box as corners
+			// both inside and out of the frustum
+			for (int k = 0; k < 2 && (in==0 || out==0); k++) {
+			
+				// is the corner outside or inside
+				if (Camera.fPlane[i].distance(boundingBox.getVertex(k)) < 0)
+					out++;
+				else
+					in++;
+			}
+			//if all corners are out
+			if (in == 0)
+				return false;
+			// if some corners are out and others are in	
+			else if (out > 0)
+				result = true; // intersect
+		}
+		
+		return result;
+		
+		
+		
+		
+	}
+	
+	/*
 	public boolean sphereInFrustum()
 	{
 		float distance;
@@ -157,6 +197,7 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 		
 		return result;
 	}
+	*/
 	
 	/**
 	 * The main recursive rendering method for hierarchical objects. This method
@@ -176,7 +217,7 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 				gl.glMatrixMode(GL.GL_TEXTURE);
 			} else {
 				gl.glMatrixMode(m);
-			}
+			}			
 			gl.glPushMatrix();
 			gl.glMultMatrixf(GLUtils.fromMatrix4f(objectTransform), 0);
 		}
@@ -187,20 +228,29 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 		} else {
 			worldTransform.mul(((HierarchicalObject) getParent()).worldTransform, 
 					objectTransform);
-		}
-
-		if(sphereInFrustum() == false)
-		{
-			System.out.println("hello");
-			return;
-		}
+		}				
+	
+			//if (this.getChildCount() == 0)
+			//		System.out.println("glRender: " + name + ": " + boundingBox);
+			
 		
-		configMaterial(gl, eye);
-		draw(gl, glu, eye);
-
-		// Draw the children
-		for (HierarchicalObject currChild : children) {
-			currChild.glRender(gl, glu, eye);
+		
+		if(boxInFrustum() == false)
+		{
+			System.out.println("I'm culling");
+			
+		} else 
+		{
+			System.out.println("NO culling");
+			
+			configMaterial(gl, eye);
+			draw(gl, glu, eye);
+	
+			// Draw the children
+			for (HierarchicalObject currChild : children) {
+				currChild.glRender(gl, glu, eye);
+			}
+			
 		}
 
 		for (int m : matrixUpdateList) {
@@ -212,7 +262,7 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 			} else {
 				gl.glMatrixMode(m);
 			}
-			gl.glPopMatrix();
+			gl.glPopMatrix();	
 		}
 
 	}
@@ -503,6 +553,10 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 		return boundingSphere;
 	}
 
+	public BoundingBox getBoundingBox() {
+		return boundingBox;
+	}
+	
 	/**
 	 * Updates the hierarchy of bounding spheres
 	 */
@@ -523,6 +577,39 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 		}
 	}
 
+	public void recursiveUpdateBoundingBoxes() {
+		//boundingSphere.reset();
+		for (int i=0; i<getChildCount(); i++) {
+			HierarchicalObject child = (HierarchicalObject) getChildAt(i);
+			
+			/* The bounding box of a skinned object should not be included.
+			 * Instead, the skeleton will determine the correct bounding
+			 * sphere size
+			 */
+			if (child instanceof SkinnedMeshObject)
+				continue;
+
+			
+			child.recursiveUpdateBoundingBoxes();
+			
+			/*
+			if (child.getChildCount() == 0 && child instanceof MeshObject)
+			{
+			  	System.out.println("here setting mesh vertices");
+			  	MeshObject mo = (MeshObject) child;
+			  	mo.
+			} else
+			{
+			*/
+			BoundingBox b = child.getBoundingBox();
+			if (b.isInitialized())
+			 boundingBox.expandBy(b);
+			else
+			 System.out.println("PROBLEM - box not initialized");
+			
+			//System.out.println("(Heirarch) " + name + ", " + boundingBox);
+		}
+	}
 
 	/**
 	 * Set the update list to the input values

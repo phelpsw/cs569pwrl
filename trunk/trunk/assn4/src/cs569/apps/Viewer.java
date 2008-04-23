@@ -219,10 +219,10 @@ public class Viewer extends JFrame implements GLEventListener, ActionListener,
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		/* Create the default scene */
-		//object = defaultSceneMaker.make();
-		String filename = getClass().getResource("/scenes/mr_droopy.xml").getFile();
-		Parser parser = new Parser();
-		object = (HierarchicalObject) parser.parse(filename, Scene.class);
+		object = defaultSceneMaker.make();
+		//String filename = getClass().getResource("/scenes/mr_droopy.xml").getFile();
+		//Parser parser = new Parser();
+		//object = (HierarchicalObject) parser.parse(filename, Scene.class);
 		object.recursiveUpdateBoundingSpheres();
 		modelTree.setRoot(object);
 
