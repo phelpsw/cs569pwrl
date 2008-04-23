@@ -6,6 +6,7 @@ import javax.vecmath.Matrix4f;
 import javax.vecmath.Point2f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
+import javax.vecmath.Point3f;
 
 /**
  * Created on January 26, 2007
@@ -59,7 +60,19 @@ public class Camera {
 	protected Vector3f q = new Vector3f();
 	protected Matrix3f basis = new Matrix3f();
 	private Matrix4f translate = new Matrix4f();
-
+	
+	protected float nearHeight;
+	protected float farHeight;
+	protected float nearWidth;
+	protected float farWidth;
+	
+	public static FrustumPlane topFrustPlane = new FrustumPlane();
+	public static FrustumPlane botFrustPlane = new FrustumPlane();
+	public static FrustumPlane leftFrustPlane = new FrustumPlane();
+	public static FrustumPlane rightFrustPlane = new FrustumPlane();
+	public static FrustumPlane nearFrustPlane = new FrustumPlane();
+	public static FrustumPlane farFrustPlane = new FrustumPlane();
+	
 	/**
 	 * The default camera position
 	 */
@@ -85,7 +98,6 @@ public class Camera {
 		fov = yFov;
 		this.near = near;
 		this.far = far;
-
 	}
 	
 	/**
@@ -136,6 +148,94 @@ public class Camera {
 		inverseOrientation.transpose(orientation);
 		view.mul(orientation, translate);
 		inverseView.invert(view);
+		
+		setupFrustumPlanes(tanThetaY);
+	}
+	
+	public void setupFrustumPlanes(float tang)
+	{
+		// compute the centers of the near and far planes
+		Vector3f Z = new Vector3f(target);
+		Z.scale(-1.0f);
+		
+		Vector3f Zn = new Vector3f(Z);
+		Zn.scale(near);
+		Vector3f nc = new Vector3f(eye); 
+		nc.sub(Zn);
+		
+		Zn.set(Z);
+		Zn.scale(far);
+		Vector3f fc = new Vector3f(eye); 
+		fc.sub(Zn);
+		
+		nearFrustPlane.setNormalAndPoint(target,nc);
+		farFrustPlane.setNormalAndPoint(Z,fc);
+		
+		Vector3f aux = new Vector3f();
+		Vector3f normal = new Vector3f();
+		Vector3f Y = new Vector3f();
+		Vector3f X = new Vector3f();
+		
+		X.cross(up, Z);
+		X.normalize();
+		
+		Y.cross(Z, X);
+		
+		nearHeight = near * tang;
+		nearWidth = nearHeight * aspect;
+		farHeight = far * tang;
+		farWidth = farHeight * aspect;
+		
+		Vector3f Ynh = new Vector3f(Y);
+		Ynh.scale(nearHeight);
+		
+		Vector3f Xnw = new Vector3f(X);
+		Xnw.scale(nearWidth);
+		
+		// TOP Plane
+		aux.set(nc);
+		aux.add(Ynh);
+		normal.set(aux);
+		normal.sub(eye);
+		normal.normalize();
+		
+		normal.cross(normal,X);
+		
+		topFrustPlane.setNormalAndPoint(normal, aux);
+
+		// BOTTOM Plane
+		aux.set(nc);
+		aux.sub(Ynh);
+		normal.set(aux);
+		normal.sub(eye);
+		normal.normalize();
+		
+		normal.cross(X,normal);
+		
+		botFrustPlane.setNormalAndPoint(normal, aux);
+		
+		// LEFT Plane
+		aux.set(nc);
+		aux.sub(Xnw);
+		normal.set(aux);
+		normal.sub(eye);
+		normal.normalize();
+		
+		normal.cross(normal,Y);
+		
+		leftFrustPlane.setNormalAndPoint(normal, aux);
+		
+		// RIGHT Plane
+		aux.set(nc);
+		aux.add(Xnw);
+		normal.set(aux);
+		normal.sub(eye);
+		normal.normalize();
+		
+		normal.cross(Y,normal);
+		
+		rightFrustPlane.setNormalAndPoint(normal, aux);
+
 	}
 
 	/**

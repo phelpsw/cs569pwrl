@@ -15,6 +15,7 @@ import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
+import cs569.camera.Camera;
 import cs569.material.Lambertian;
 import cs569.material.Material;
 import cs569.misc.BoundingSphere;
@@ -108,6 +109,50 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 	 */
 	protected abstract void draw(GL gl, GLU glu, Vector3f eye) throws GLSLErrorException;
 
+	public boolean sphereInFrustum()
+	{
+		float distance;
+		boolean result = true;
+		
+		distance = Camera.topFrustPlane.distance(new Vector3f(boundingSphere.getCenter()));
+		if(distance < -boundingSphere.getRadius())
+			return false; // outside
+		else if (distance < boundingSphere.getRadius())
+			result = true; // intersection
+		
+		distance = Camera.botFrustPlane.distance(new Vector3f(boundingSphere.getCenter()));
+		if(distance < -boundingSphere.getRadius())
+			return false; // outside
+		else if (distance < boundingSphere.getRadius())
+			result = true; // intersection
+		
+		distance = Camera.leftFrustPlane.distance(new Vector3f(boundingSphere.getCenter()));
+		if(distance < -boundingSphere.getRadius())
+			return false; // outside
+		else if (distance < boundingSphere.getRadius())
+			result = true; // intersection
+		
+		distance = Camera.rightFrustPlane.distance(new Vector3f(boundingSphere.getCenter()));
+		if(distance < -boundingSphere.getRadius())
+			return false; // outside
+		else if (distance < boundingSphere.getRadius())
+			result = true; // intersection
+		
+		distance = Camera.nearFrustPlane.distance(new Vector3f(boundingSphere.getCenter()));
+		if(distance < -boundingSphere.getRadius())
+			return false; // outside
+		else if (distance < boundingSphere.getRadius())
+			result = true; // intersection
+		
+		distance = Camera.farFrustPlane.distance(new Vector3f(boundingSphere.getCenter()));
+		if(distance < -boundingSphere.getRadius())
+			return false; // outside
+		else if (distance < boundingSphere.getRadius())
+			result = true; // intersection
+		
+		return result;
+	}
+	
 	/**
 	 * The main recursive rendering method for hierarchical objects. This method
 	 * sets the current transforms, configures the material, draws the current
@@ -131,6 +176,12 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 			gl.glMultMatrixf(GLUtils.fromMatrix4f(objectTransform), 0);
 		}
 
+		if(sphereInFrustum() == false)
+		{
+			System.out.println("hello");
+			return;
+		
+		}
 		/* Maintain a concatenated world transform (needed for linear skinning) */
 		if (getParent() == null) {
 			worldTransform.set(objectTransform);
