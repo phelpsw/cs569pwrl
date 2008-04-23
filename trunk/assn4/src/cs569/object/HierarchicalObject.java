@@ -235,13 +235,13 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 			
 		
 		
-		if(boxInFrustum() == false)
+		if(false && boxInFrustum() == false)
 		{
 			System.out.println("I'm culling");
 			
 		} else 
 		{
-			System.out.println("NO culling");
+			//System.out.println("NO culling");
 			
 			configMaterial(gl, eye);
 			draw(gl, glu, eye);

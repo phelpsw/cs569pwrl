@@ -19,7 +19,7 @@ public class FrustumPlane {
 	{
 		this.center.set(point);
 		this.normal.set(normal);
-		normal.normalize();
+		this.normal.normalize();
 		
 		d = -(normal.dot(point));
 	}

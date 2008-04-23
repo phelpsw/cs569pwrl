@@ -161,6 +161,7 @@ public class Camera {
 	
 	public void setupFrustumPlanes(float tang)
 	{
+		
 		// compute the centers of the near and far planes
 		Vector3f Z = new Vector3f(target);
 		Z.scale(-1.0f);
@@ -243,9 +244,15 @@ public class Camera {
 		
 		fPlane[RIGHT].setNormalAndPoint(normal, aux);
 		
+		
 		System.out.println("TOP: center=" + fPlane[TOP].getCenter() + ", norm=" + fPlane[TOP].getNormal());
+		System.out.println("BOT: center=" + fPlane[BOT].getCenter() + ", norm=" + fPlane[BOT].getNormal());
 		System.out.println("NEAR: center=" + fPlane[NEAR].getCenter() + ", norm=" + fPlane[NEAR].getNormal());
+		System.out.println("FAR: center=" + fPlane[FAR].getCenter() + ", norm=" + fPlane[FAR].getNormal());
 		System.out.println("LEFT: center=" + fPlane[LEFT].getCenter() + ", norm=" + fPlane[LEFT].getNormal());
+		System.out.println("RIGHT: center=" + fPlane[RIGHT].getCenter() + ", norm=" + fPlane[RIGHT].getNormal());
+		System.out.println("---");
+
 
 	}
 
