@@ -114,8 +114,12 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 		float distance;
 		boolean result = true;
 		
+		//System.out.println(worldTransform);
+		
+		BoundingSphere boundingSphere = this.boundingSphere.transform(this.getWorldTransform());
+		
 		distance = Camera.topFrustPlane.distance(new Vector3f(boundingSphere.getCenter()));
-		//System.out.println(distance + " " + boundingSphere.getRadius());
+		//System.out.println(distance + " " + boundingSphere.getRadius() + " " + boundingSphere.getCenter());
 		if(distance < -boundingSphere.getRadius())
 			return false; // outside
 		else if (distance < boundingSphere.getRadius())
@@ -177,12 +181,6 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 			gl.glMultMatrixf(GLUtils.fromMatrix4f(objectTransform), 0);
 		}
 
-		if(sphereInFrustum() == false)
-		{
-			System.out.println("hello");
-			return;
-		
-		}
 		/* Maintain a concatenated world transform (needed for linear skinning) */
 		if (getParent() == null) {
 			worldTransform.set(objectTransform);
@@ -191,6 +189,12 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 					objectTransform);
 		}
 
+		if(sphereInFrustum() == false)
+		{
+			System.out.println("hello");
+			return;
+		}
+		
 		configMaterial(gl, eye);
 		draw(gl, glu, eye);
 
