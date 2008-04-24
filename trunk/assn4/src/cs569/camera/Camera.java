@@ -4,6 +4,7 @@ import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Point2f;
+import javax.vecmath.Point4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Point3f;
@@ -157,50 +158,60 @@ public class Camera {
 		view.mul(orientation, translate);
 		inverseView.invert(view);
 		
-		setupFrustumPlanes(tanThetaY);
+		//setupFrustumPlanes(tanThetaY);
+		//Matrix4f ftform = new Matrix4f(projection);
+		//ftform.mul(view);
+		Matrix4f ftform = new Matrix4f(projection);
+		ftform.mul(view);
+		System.out.println(ftform);
+		setupFrustumPlanes(ftform); 
 	}
 	
-	public void setupFrustumPlanes(float tang)
+	// alt example:
+	// http://www.crownandcutlass.com/features/technicaldetails/frustum.html
+	
+	// implemented based on this example:
+	// http://www.lighthouse3d.com/opengl/viewfrustum/index.php?clipspaceimp
+	void setupFrustumPlanes(Matrix4f m) 
 	{
-		float sqWidthMax = 1.0f;
-		float sqWidthMin = -1.0f;
-		float sqCenter = (sqWidthMax - sqWidthMin)/2.0f;
 		
-		
-		Vector4f center = new Vector4f();
-		Vector4f normalPt = new Vector4f();
-		
-		// TOP
-		center.set(0.0f, 1.0f, 0.5f, 1.0f);
-		normalPt.set(0.0f, 0.0f, 0.5f, 1.0f);
-		
-		//System.out.println(normalPt);
-		
-		inverseProjection.transform(normalPt);
-		inverseProjection.transform(center);
-		
-		normalPt.scale(1.0f/normalPt.w);
-		center.scale(1.0f/center.w);
-		
-		inverseView.transform(normalPt);
-		inverseView.transform(center);
-		System.out.println(normalPt + " " + center);
-		Vector4f normal = new Vector4f();
-		normal.sub(normalPt, center);
-		
-		fPlane[TOP].setNormalAndPoint(new Vector3f(normal.x, normal.y, normal.z), new Vector3f(center.x, center.y, center.z));
-		
-		
-		System.out.println("TOP: center=" + fPlane[TOP].getOffset() + ", norm=" + fPlane[TOP].getNormal());
-		/*
-		System.out.println("BOT: center=" + fPlane[BOT].getCenter() + ", norm=" + fPlane[BOT].getNormal());
-		System.out.println("NEAR: center=" + fPlane[NEAR].getCenter() + ", norm=" + fPlane[NEAR].getNormal());
-		System.out.println("FAR: center=" + fPlane[FAR].getCenter() + ", norm=" + fPlane[FAR].getNormal());
-		System.out.println("LEFT: center=" + fPlane[LEFT].getCenter() + ", norm=" + fPlane[LEFT].getNormal());
-		System.out.println("RIGHT: center=" + fPlane[RIGHT].getCenter() + ", norm=" + fPlane[RIGHT].getNormal());
+		fPlane[NEAR].setCoefficients(
+					 m.m20 + m.m30,
+					 m.m21 + m.m31,
+					 m.m22 + m.m32,
+					 m.m23 + m.m33);
+		fPlane[FAR].setCoefficients( 
+					-m.m20 + m.m30,
+					-m.m21 + m.m31,
+					-m.m22 + m.m32,
+					-m.m23 + m.m33);
+		fPlane[BOT].setCoefficients(
+					 m.m10 + m.m30,
+					 m.m11 + m.m31,
+					 m.m12 + m.m32,
+					 m.m13 + m.m33);
+		fPlane[TOP].setCoefficients(  
+					-m.m10 + m.m30,
+					-m.m11 + m.m31,
+					-m.m12 + m.m32,
+					-m.m13 + m.m33);
+		fPlane[LEFT].setCoefficients(  
+					 m.m00 + m.m30,
+					 m.m01 + m.m31,
+					 m.m02 + m.m32,
+					 m.m03 + m.m33);
+		fPlane[RIGHT].setCoefficients(
+					-m.m00 + m.m30,
+					-m.m01 + m.m31,
+					-m.m02 + m.m32,
+					-m.m03 + m.m33);
+		System.out.println("TOP: offset=" + fPlane[TOP].getOffset() + ", norm=" + fPlane[TOP].getNormal());
+		System.out.println("BOT: offset=" + fPlane[BOT].getOffset() + ", norm=" + fPlane[BOT].getNormal());
+		System.out.println("NEAR: offset=" + fPlane[NEAR].getOffset() + ", norm=" + fPlane[NEAR].getNormal());
+		System.out.println("FAR: offset=" + fPlane[FAR].getOffset() + ", norm=" + fPlane[FAR].getNormal());
+		System.out.println("LEFT: offset=" + fPlane[LEFT].getOffset() + ", norm=" + fPlane[LEFT].getNormal());
+		System.out.println("RIGHT: offset=" + fPlane[RIGHT].getOffset() + ", norm=" + fPlane[RIGHT].getNormal());
 		System.out.println("---");
-		 */
-
 	}
 
 	/**
