@@ -44,7 +44,7 @@ import cs569.shaders.GLSLShader;
 public class CityExplorer extends JFrame implements GLEventListener, 
 	MouseMotionListener, KeyListener {
 	protected int viewWidth = 800;
-	protected int viewHeight = 800;
+	protected int viewHeight = 600;
 
 	protected HierarchicalObject object;
 	protected Point lastMouseLoc;
@@ -107,10 +107,11 @@ public class CityExplorer extends JFrame implements GLEventListener,
 		
 		/* Start with a good view position */
 		float aspect = (float) viewWidth / viewHeight;
-		//mainCamera.setEye(new Vector3f(65.3f, 18.5f, -25.7f));
-		//mainCamera.setTarget(new Vector3f(71.5f, 18.5f, -27.8f));
-		mainCamera.setEye(new Vector3f(0.0f, 0.0f, 0.0f));
-		mainCamera.setTarget(new Vector3f(1.0f, 0.0f, 0.0f));
+		mainCamera.setEye(new Vector3f(65.3f, 18.5f, -25.7f));
+		mainCamera.setTarget(new Vector3f(71.5f, 18.5f, -27.8f));
+		//mainCamera.setEye(new Vector3f(0.0f, 0.0f, 0.0f));
+		//mainCamera.setTarget(new Vector3f(1.0f, 0.0f, 0.0f));
+		mainCamera.setCulling(true);
 		overviewCamera.setEye(new Vector3f(85.2f, 254.9f, -74.1f));
 		overviewCamera.setTarget(new Vector3f(85.2f, 253.9f, -74.0f));
 

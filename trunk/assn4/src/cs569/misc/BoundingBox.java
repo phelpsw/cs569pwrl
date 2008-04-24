@@ -33,6 +33,32 @@ public class BoundingBox {
 		
 	}
 	
+	public Vector3f getVertexP(Vector3f norm)
+	{
+		Vector3f p = new Vector3f(minPoint);
+		if(norm.x >= 0)
+			p.x = maxPoint.x;
+		if(norm.y >= 0)
+			p.y = maxPoint.y;
+		if(norm.z >= 0)
+			p.z = maxPoint.z;
+		return p;
+	}
+	
+	public Vector3f getVertexN(Vector3f norm)
+	{
+		Vector3f n = new Vector3f(maxPoint);
+		if(norm.x >= 0)
+			n.x = minPoint.x;
+		if(norm.y >= 0)
+			n.y = minPoint.y;
+		if(norm.z >= 0)
+			n.z = minPoint.z;
+		return n;
+	}
+	
+	
+	
 	public void expandBy(BoundingBox b)
 	{
 		expandBy(b.maxPoint);
