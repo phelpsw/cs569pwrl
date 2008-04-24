@@ -79,6 +79,12 @@ public class Camera {
 		for (int i=0; i<fPlane.length; i++)
 			fPlane[i] = new FrustumPlane();
 	}
+	protected boolean enableCulling = false;
+	
+	public void setCulling(boolean val)
+	{
+		enableCulling = val;
+	}
 				
 	/**
 	 * The default camera position
@@ -158,13 +164,13 @@ public class Camera {
 		view.mul(orientation, translate);
 		inverseView.invert(view);
 		
-		//setupFrustumPlanes(tanThetaY);
-		//Matrix4f ftform = new Matrix4f(projection);
-		//ftform.mul(view);
-		Matrix4f ftform = new Matrix4f(projection);
-		ftform.mul(view);
-		System.out.println(ftform);
-		setupFrustumPlanes(ftform); 
+		if(enableCulling)
+		{
+			Matrix4f ftform = new Matrix4f(projection);
+			ftform.mul(view);
+			//System.out.println(ftform);
+			setupFrustumPlanes(ftform); 
+		}
 	}
 	
 	// alt example:
@@ -205,6 +211,7 @@ public class Camera {
 					-m.m01 + m.m31,
 					-m.m02 + m.m32,
 					-m.m03 + m.m33);
+		/*
 		System.out.println("TOP: offset=" + fPlane[TOP].getOffset() + ", norm=" + fPlane[TOP].getNormal());
 		System.out.println("BOT: offset=" + fPlane[BOT].getOffset() + ", norm=" + fPlane[BOT].getNormal());
 		System.out.println("NEAR: offset=" + fPlane[NEAR].getOffset() + ", norm=" + fPlane[NEAR].getNormal());
@@ -212,6 +219,7 @@ public class Camera {
 		System.out.println("LEFT: offset=" + fPlane[LEFT].getOffset() + ", norm=" + fPlane[LEFT].getNormal());
 		System.out.println("RIGHT: offset=" + fPlane[RIGHT].getOffset() + ", norm=" + fPlane[RIGHT].getNormal());
 		System.out.println("---");
+		*/
 	}
 
 	/**

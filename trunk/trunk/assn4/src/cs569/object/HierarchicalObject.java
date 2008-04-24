@@ -112,92 +112,22 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 	 */
 	protected abstract void draw(GL gl, GLU glu, Vector3f eye) throws GLSLErrorException;
 
-	public boolean boxInFrustum()
-	{
-		boolean result = true;
-		int out,in;
+	public boolean boxInFrustum() {
 
-		// for each plane do ...
+		boolean result = true;
+		//for each plane do ...
 		for(int i=0; i < 6; i++) {
 
-			// reset counters for corners in and out
-			out=0;in=0;
-			// for each corner of the box do ...
-			// get out of the cycle as soon as a box as corners
-			// both inside and out of the frustum
-			for (int k = 0; k < 2 && (in==0 || out==0); k++) {
-			
-				// is the corner outside or inside
-				if (Camera.fPlane[i].distance(boundingBox.getVertex(k)) < 0)
-					out++;
-				else
-					in++;
-			}
-			//if all corners are out
-			if (in == 0)
+			// is the positive vertex outside?
+			if (Camera.fPlane[i].distance(boundingBox.getVertexP(Camera.fPlane[i].getNormal())) < 0)
 				return false;
-			// if some corners are out and others are in	
-			else if (out > 0)
-				result = true; // intersect
+			// is the negative vertex outside?	
+			else if (Camera.fPlane[i].distance(boundingBox.getVertexN(Camera.fPlane[i].getNormal())) < 0)
+				result =  true;
 		}
-		
 		return result;
-		
-		
-		
-		
-	}
-	
-	/*
-	public boolean sphereInFrustum()
-	{
-		float distance;
-		boolean result = true;
-		
-		//System.out.println(worldTransform);
-		
-		BoundingSphere boundingSphere = this.boundingSphere.transform(this.getWorldTransform());
-		
-		distance = Camera.topFrustPlane.distance(new Vector3f(boundingSphere.getCenter()));
-		//System.out.println(distance + " " + boundingSphere.getRadius() + " " + boundingSphere.getCenter());
-		if(distance < -boundingSphere.getRadius())
-			return false; // outside
-		else if (distance < boundingSphere.getRadius())
-			result = true; // intersection
-		
-		distance = Camera.botFrustPlane.distance(new Vector3f(boundingSphere.getCenter()));
-		if(distance < -boundingSphere.getRadius())
-			return false; // outside
-		else if (distance < boundingSphere.getRadius())
-			result = true; // intersection
-		
-		distance = Camera.leftFrustPlane.distance(new Vector3f(boundingSphere.getCenter()));
-		if(distance < -boundingSphere.getRadius())
-			return false; // outside
-		else if (distance < boundingSphere.getRadius())
-			result = true; // intersection
-		
-		distance = Camera.rightFrustPlane.distance(new Vector3f(boundingSphere.getCenter()));
-		if(distance < -boundingSphere.getRadius())
-			return false; // outside
-		else if (distance < boundingSphere.getRadius())
-			result = true; // intersection
-		
-		distance = Camera.nearFrustPlane.distance(new Vector3f(boundingSphere.getCenter()));
-		if(distance < -boundingSphere.getRadius())
-			return false; // outside
-		else if (distance < boundingSphere.getRadius())
-			result = true; // intersection
-		
-		distance = Camera.farFrustPlane.distance(new Vector3f(boundingSphere.getCenter()));
-		if(distance < -boundingSphere.getRadius())
-			return false; // outside
-		else if (distance < boundingSphere.getRadius())
-			result = true; // intersection
-		
-		return result;
-	}
-	*/
+
+	 }
 	
 	/**
 	 * The main recursive rendering method for hierarchical objects. This method
@@ -229,12 +159,7 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 			worldTransform.mul(((HierarchicalObject) getParent()).worldTransform, 
 					objectTransform);
 		}				
-	
-			//if (this.getChildCount() == 0)
-			//		System.out.println("glRender: " + name + ": " + boundingBox);
-			
-		
-		
+
 		if(boxInFrustum() == false)
 		{
 			//System.out.println("I'm culling");
