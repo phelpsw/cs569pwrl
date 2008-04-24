@@ -293,7 +293,9 @@ public class MeshObject extends HierarchicalObject {
 			recursiveUpdateBoundingBoxes();
 			
 			if(CityExplorer.octtree.insert(this) == false)
-				System.out.println("ERROR object does not fit BB: " + boundingBox);
+			{
+				//System.out.println("ERROR object does not fit BB: " + boundingBox);
+			}
 		}
 	}
 

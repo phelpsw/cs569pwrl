@@ -80,15 +80,9 @@ public class CityExplorer extends JFrame implements GLEventListener,
 		getContentPane().add(createGLPanel(), BorderLayout.CENTER);
 		setLocation(100, 100);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		if(octtree == null)
-			System.out.println("I'm NULL before being allocated!!!!");
 		
 		// TODO: Define minpoint and width for initial tree size
-		octtree = new OctTree(new Vector3f(-50,-200,-50), 400);
-		
-		if(octtree == null)
-			System.out.println("I'm NULL after being allocated!!!!");
+		octtree = new OctTree(new Vector3f(-50,-100,-350), 400);
 		
 		/* Create the default scene */
 		Parser parser = new Parser();
@@ -138,6 +132,8 @@ public class CityExplorer extends JFrame implements GLEventListener,
 		animator = new Animator(canvas);
 		animator.setRunAsFastAsPossible(false);
 		animator.start();
+		
+		octtree.printExtreme();
 	}
 
 	public static void main(String[] args) {

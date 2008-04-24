@@ -169,8 +169,13 @@ public class OctNode {
 				return true;
 			}
 		}		
-			
+					
 		return false;		
+	}
+	
+	public String toString()
+	{
+		return "min=" + min + ", width=" + width;
 	}
 	
 }
