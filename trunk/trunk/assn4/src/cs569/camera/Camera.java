@@ -7,6 +7,7 @@ import javax.vecmath.Point2f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Point3f;
+import javax.vecmath.Vector4f;
 
 /**
  * Created on January 26, 2007
@@ -161,98 +162,44 @@ public class Camera {
 	
 	public void setupFrustumPlanes(float tang)
 	{
-		
-		// compute the centers of the near and far planes
-		Vector3f Z = new Vector3f(target);
-		Z.scale(-1.0f);
-		
-		Vector3f Zn = new Vector3f(Z);
-		Zn.scale(near);
-		Vector3f nc = new Vector3f(eye); 
-		nc.sub(Zn);
-		
-		Zn.set(Z);
-		Zn.scale(far);
-		Vector3f fc = new Vector3f(eye); 
-		fc.sub(Zn);
-		
-		fPlane[NEAR].setNormalAndPoint(target,nc);
-		fPlane[FAR].setNormalAndPoint(Z,fc);
-		
-		Vector3f aux = new Vector3f();
-		Vector3f normal = new Vector3f();
-		Vector3f Y = new Vector3f();
-		Vector3f X = new Vector3f();
-		
-		X.cross(up, Z);
-		X.normalize();
-		
-		Y.cross(Z, X);
-		
-		nearHeight = near * tang;
-		nearWidth = nearHeight * aspect;
-		farHeight = far * tang;
-		farWidth = farHeight * aspect;
-		
-		Vector3f Ynh = new Vector3f(Y);
-		Ynh.scale(nearHeight);
-		
-		Vector3f Xnw = new Vector3f(X);
-		Xnw.scale(nearWidth);
-		
-		// TOP Plane
-		aux.set(nc);
-		aux.add(Ynh);
-		normal.set(aux);
-		normal.sub(eye);
-		normal.normalize();
-		
-		normal.cross(normal,X);
-		
-		fPlane[TOP].setNormalAndPoint(normal, aux);
-
-		// BOTTOM Plane
-		aux.set(nc);
-		aux.sub(Ynh);
-		normal.set(aux);
-		normal.sub(eye);
-		normal.normalize();
-		
-		normal.cross(X,normal);
-		
-		fPlane[BOT].setNormalAndPoint(normal, aux);
-		
-		// LEFT Plane
-		aux.set(nc);
-		aux.sub(Xnw);
-		normal.set(aux);
-		normal.sub(eye);
-		normal.normalize();
-		
-		normal.cross(normal,Y);
-		
-		fPlane[LEFT].setNormalAndPoint(normal, aux);
-		
-		// RIGHT Plane
-		aux.set(nc);
-		aux.add(Xnw);
-		normal.set(aux);
-		normal.sub(eye);
-		normal.normalize();
-		
-		normal.cross(Y,normal);
-		
-		fPlane[RIGHT].setNormalAndPoint(normal, aux);
+		float sqWidthMax = 1.0f;
+		float sqWidthMin = -1.0f;
+		float sqCenter = (sqWidthMax - sqWidthMin)/2.0f;
 		
 		
-		System.out.println("TOP: center=" + fPlane[TOP].getCenter() + ", norm=" + fPlane[TOP].getNormal());
+		Vector4f center = new Vector4f();
+		Vector4f normalPt = new Vector4f();
+		
+		// TOP
+		center.set(0.0f, 1.0f, 0.5f, 1.0f);
+		normalPt.set(0.0f, 0.0f, 0.5f, 1.0f);
+		
+		//System.out.println(normalPt);
+		
+		inverseProjection.transform(normalPt);
+		inverseProjection.transform(center);
+		
+		normalPt.scale(1.0f/normalPt.w);
+		center.scale(1.0f/center.w);
+		
+		inverseView.transform(normalPt);
+		inverseView.transform(center);
+		System.out.println(normalPt + " " + center);
+		Vector4f normal = new Vector4f();
+		normal.sub(normalPt, center);
+		
+		fPlane[TOP].setNormalAndPoint(new Vector3f(normal.x, normal.y, normal.z), new Vector3f(center.x, center.y, center.z));
+		
+		
+		System.out.println("TOP: center=" + fPlane[TOP].getOffset() + ", norm=" + fPlane[TOP].getNormal());
+		/*
 		System.out.println("BOT: center=" + fPlane[BOT].getCenter() + ", norm=" + fPlane[BOT].getNormal());
 		System.out.println("NEAR: center=" + fPlane[NEAR].getCenter() + ", norm=" + fPlane[NEAR].getNormal());
 		System.out.println("FAR: center=" + fPlane[FAR].getCenter() + ", norm=" + fPlane[FAR].getNormal());
 		System.out.println("LEFT: center=" + fPlane[LEFT].getCenter() + ", norm=" + fPlane[LEFT].getNormal());
 		System.out.println("RIGHT: center=" + fPlane[RIGHT].getCenter() + ", norm=" + fPlane[RIGHT].getNormal());
 		System.out.println("---");
-
+		 */
 
 	}
 
