@@ -65,6 +65,17 @@ public class BoundingBox {
 		expandBy(b.minPoint);		
 	}
 	
+	public Vector3f getMinPoint()
+	{
+		return minPoint;
+	}
+	
+	public Vector3f getMaxPoint()
+	{
+		return maxPoint;
+	}
+	
+	
 	
 	public Vector3f getVertex(int i)
 	{
