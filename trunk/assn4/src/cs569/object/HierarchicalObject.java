@@ -112,8 +112,8 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 	 */
 	protected abstract void draw(GL gl, GLU glu, Vector3f eye) throws GLSLErrorException;
 
-	public boolean boxInFrustum() {
-
+	public boolean boxInFrustum() 
+	{
 		boolean result = true;
 		//for each plane do ...
 		for(int i=0; i < 6; i++) {
@@ -126,7 +126,6 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 				result =  true;
 		}
 		return result;
-
 	 }
 	
 	/**

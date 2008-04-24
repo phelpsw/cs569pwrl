@@ -2,9 +2,13 @@ package cs569.object;
 
 import java.util.ArrayList;
 
+import javax.media.opengl.GL;
+import javax.media.opengl.glu.GLU;
 import javax.vecmath.Vector3f;
 
+import cs569.camera.Camera;
 import cs569.misc.BoundingBox;
+import cs569.misc.GLSLErrorException;
 
 public class OctNode {
 
@@ -32,14 +36,18 @@ public class OctNode {
 		if (child[0] == null)	
 			initializeChildren();
 	
-		int countInside = 0;
+		int inside = 0;
 		for (int i=0; i<child.length; i++)
 		{
-			countInside += child[i].insert(o);
+			if (child[i].insert(o) > 0)
+			{
+				inside = 1;
+				break;
+			}
 		}
 		
 		// if meshobject didn't fit entirely in any smaller nodes
-		if (countInside == 0)
+		if (inside == 0)
 		{
 			if (obj == null)
 				obj = new ArrayList<MeshObject>();
@@ -96,10 +104,56 @@ public class OctNode {
 
 	}
 	
-	public int renderNode()
+	public void renderNode(GL gl, GLU glu, Vector3f eye) throws GLSLErrorException
 	{
-		return 0;
+		if(nodeInFrustum())
+		{
+			renderSelfObjects(gl, glu, eye);
+			renderChildren(gl, glu, eye);
+		}
 	}
+	
+	private void renderSelfObjects(GL gl, GLU glu, Vector3f eye) throws GLSLErrorException
+	{
+		if(obj != null)
+		{
+			for(int i=0; i<obj.size(); i++)
+			{
+				if(obj.get(i).boxInFrustum())
+					obj.get(i).glRender(gl, glu, eye);
+			}
+		}
+	}
+	
+	private void renderChildren(GL gl, GLU glu, Vector3f eye) throws GLSLErrorException
+	{
+		if(child[0] == null)
+			return;
+		for(int i=0; i<8;i++)
+			child[i].renderNode(gl, glu, eye);
+	}
+	
+	private boolean nodeInFrustum() 
+	{
+		Vector3f max = new Vector3f(min);
+		max.x+=width;max.y+=width;max.z+=width;
+		BoundingBox boundingBox = new BoundingBox();
+		boundingBox.expandBy(min);
+		boundingBox.expandBy(max);
+		
+		boolean result = true;
+		//for each plane do ...
+		for(int i=0; i < 6; i++) {
+
+			// is the positive vertex outside?
+			if (Camera.fPlane[i].distance(boundingBox.getVertexP(Camera.fPlane[i].getNormal())) < 0)
+				return false;
+			// is the negative vertex outside?	
+			else if (Camera.fPlane[i].distance(boundingBox.getVertexN(Camera.fPlane[i].getNormal())) < 0)
+				result =  true;
+		}
+		return result;
+	 }
 	
 	private boolean fitsEntirelyInNode(BoundingBox b)
 	{
