@@ -14,6 +14,7 @@ import javax.vecmath.Vector3f;
 
 import com.sun.opengl.util.BufferUtil;
 
+import cs569.apps.CityExplorer;
 import cs569.misc.BoundingSphere;
 import cs569.misc.GroupData;
 import cs569.misc.OBJLoader;
@@ -286,6 +287,14 @@ public class MeshObject extends HierarchicalObject {
 		}
 		this.verts = copyIntoNewBuffer(verts);
 		this.numVertices = verts.length / 3;
+		
+		if(CityExplorer.octtree != null)
+		{
+			recursiveUpdateBoundingBoxes();
+			
+			if(CityExplorer.octtree.insert(this) == false)
+				System.out.println("ERROR object does not fit BB: " + boundingBox);
+		}
 	}
 
 	/**

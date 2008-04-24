@@ -26,6 +26,7 @@ import cs569.misc.GLSLErrorException;
 import cs569.misc.GLUtils;
 import cs569.misc.Parser;
 import cs569.object.HierarchicalObject;
+import cs569.object.OctTree;
 import cs569.object.Scene;
 import cs569.shaders.GLSLShader;
 
@@ -71,6 +72,7 @@ public class CityExplorer extends JFrame implements GLEventListener,
 			(float) (2 * new Vector3f(0.0f, 3.0f,-4.0f).length())
 	);
 	protected boolean showOverview = false;
+	public static OctTree octtree = null;
 
 	public CityExplorer() {
 		super("City Explorer");
@@ -79,6 +81,15 @@ public class CityExplorer extends JFrame implements GLEventListener,
 		setLocation(100, 100);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+		if(octtree == null)
+			System.out.println("I'm NULL before being allocated!!!!");
+		
+		// TODO: Define minpoint and width for initial tree size
+		octtree = new OctTree(new Vector3f(-50,-200,-50), 400);
+		
+		if(octtree == null)
+			System.out.println("I'm NULL after being allocated!!!!");
+		
 		/* Create the default scene */
 		Parser parser = new Parser();
 
@@ -119,7 +130,7 @@ public class CityExplorer extends JFrame implements GLEventListener,
 		mainCamera.setYFOV(45.0f/aspect);
 		overviewCamera.setAspect(aspect);
 		overviewCamera.setYFOV(45.0f/aspect);
-
+		
 		pack();
 		setVisible(true);
 
@@ -204,7 +215,9 @@ public class CityExplorer extends JFrame implements GLEventListener,
 			gl.glMatrixMode(GL.GL_MODELVIEW);
 			gl.glLoadIdentity();
 
-			object.glRender(gl, glu, eye);
+			// TODO: Octtree vs bounding box based culling can be selected here
+			//object.glRender(gl, glu, eye);
+			octtree.renderTree(gl, glu, eye);
 		} catch (GLSLErrorException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(this,

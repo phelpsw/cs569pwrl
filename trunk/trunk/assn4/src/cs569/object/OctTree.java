@@ -1,6 +1,10 @@
 package cs569.object;
 
+import javax.media.opengl.GL;
+import javax.media.opengl.glu.GLU;
 import javax.vecmath.Vector3f;
+
+import cs569.misc.GLSLErrorException;
 
 public class OctTree {
 
@@ -13,13 +17,14 @@ public class OctTree {
 	
 	public boolean insert(MeshObject o)
 	{
-		root.insert(o);
+		if(root.insert(o) == 0)
+			return false;
 		return true;
 	}
 	
-	public void renderTree()
+	public void renderTree(GL gl, GLU glu, Vector3f eye) throws GLSLErrorException
 	{
-		root.renderNode();
+		root.renderNode(gl, glu, eye);
 	}
 	
 }
