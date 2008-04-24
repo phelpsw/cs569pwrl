@@ -114,7 +114,7 @@ public class RotationGizmo {
 		Matrix4f inverseView = camera.getInverseViewMatrix();
 
 		/* Convert into a world-space ray using the inverse camera
-		   transformations and homogeneous coordinate */
+		   transformations and homogeneous coordinate */		
 		Vector4f near = new Vector4f(posInClipSpace.x, posInClipSpace.y, 0.0f, 1.0f);
 		Vector4f far = new Vector4f(posInClipSpace.x, posInClipSpace.y, 1.0f, 1.0f);
 		inverseProjection.transform(near);
