@@ -101,7 +101,6 @@ public class CityExplorer extends JFrame implements GLEventListener,
 		for (int i=0; i<otherParts.length; i++) {
 			HierarchicalObject obj = ((HierarchicalObject) parser.parse(
 				getClass().getResource(otherParts[i]).getFile(), Scene.class));
-			System.out.println(" child count=" + obj.getChildCount());
 			for (int j=0; j<obj.getChildCount(); j++)
 				object.addObject((HierarchicalObject) obj.getChildAt(j));
 		}
@@ -121,7 +120,7 @@ public class CityExplorer extends JFrame implements GLEventListener,
 		overviewCamera.setTarget(new Vector3f(85.2f, 253.9f, -74.0f));
 
 		mainCamera.setAspect(aspect);
-		mainCamera.setYFOV(45.0f/aspect);
+		mainCamera.setYFOV(45.0f/aspect);		
 		overviewCamera.setAspect(aspect);
 		overviewCamera.setYFOV(45.0f/aspect);
 		
@@ -133,7 +132,7 @@ public class CityExplorer extends JFrame implements GLEventListener,
 		animator.setRunAsFastAsPossible(false);
 		animator.start();
 		
-		octtree.printExtreme();
+		//octtree.printExtreme();
 	}
 
 	public static void main(String[] args) {

@@ -159,23 +159,14 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 					objectTransform);
 		}				
 
-		if(boxInFrustum() == false)
-		{
-			//System.out.println("I'm culling");
-			
-		} else 
-		{
-			//System.out.println("NO culling");
-			
-			configMaterial(gl, eye);
-			draw(gl, glu, eye);
+		configMaterial(gl, eye);
+		draw(gl, glu, eye);
 	
-			// Draw the children
-			for (HierarchicalObject currChild : children) {
-				currChild.glRender(gl, glu, eye);
-			}
-			
+		// Draw the children
+		for (HierarchicalObject currChild : children) {
+			currChild.glRender(gl, glu, eye);
 		}
+					
 
 		for (int m : matrixUpdateList) {
 			if (m >= GL.GL_TEXTURE0

@@ -6,6 +6,8 @@ public class BoundingBox {
 
 	Vector3f minPoint = new Vector3f(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
 	Vector3f maxPoint = new Vector3f(Float.MIN_VALUE, Float.MIN_VALUE, Float.MIN_VALUE);
+	Vector3f tmpPoint = new Vector3f();
+	
 	private boolean initialized = false;
 	
 	public boolean isInitialized()
@@ -35,26 +37,26 @@ public class BoundingBox {
 	
 	public Vector3f getVertexP(Vector3f norm)
 	{
-		Vector3f p = new Vector3f(minPoint);
+		tmpPoint.set(minPoint);
 		if(norm.x >= 0)
-			p.x = maxPoint.x;
+			tmpPoint.x = maxPoint.x;
 		if(norm.y >= 0)
-			p.y = maxPoint.y;
+			tmpPoint.y = maxPoint.y;
 		if(norm.z >= 0)
-			p.z = maxPoint.z;
-		return p;
+			tmpPoint.z = maxPoint.z;
+		return tmpPoint;
 	}
 	
 	public Vector3f getVertexN(Vector3f norm)
 	{
-		Vector3f n = new Vector3f(maxPoint);
+		tmpPoint.set(maxPoint);
 		if(norm.x >= 0)
-			n.x = minPoint.x;
+			tmpPoint.x = minPoint.x;
 		if(norm.y >= 0)
-			n.y = minPoint.y;
+			tmpPoint.y = minPoint.y;
 		if(norm.z >= 0)
-			n.z = minPoint.z;
-		return n;
+			tmpPoint.z = minPoint.z;
+		return tmpPoint;
 	}
 	
 	
