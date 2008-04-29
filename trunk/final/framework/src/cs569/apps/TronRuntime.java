@@ -76,6 +76,7 @@ import cs569.misc.GLSLErrorException;
 import cs569.misc.GLUtils;
 import cs569.misc.OBJLoaderException;
 import cs569.misc.Parser;
+import cs569.misc.RotationGizmo;
 import cs569.object.DefaultScene;
 import cs569.object.HierarchicalObject;
 import cs569.object.MeshObject;
@@ -95,6 +96,8 @@ import cs569.texture.PostProcessStage;
 import cs569.texture.ShadowMap;
 import cs569.texture.Texture;
 import cs569.texture.TextureGUI;
+import cs569.tron.Map;
+import cs569.tron.Player;
 
 /**
  * Created on January 26, 2007
@@ -137,7 +140,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	}
 
 	// The viewer for this application
-	private static Viewer mainView;
+	private static TronRuntime mainView;
 	// The default scene assembler
 	private ParameterizedObjectMaker defaultSceneMaker = new DefaultScene();
 	// List of all active frame buffer objecs
@@ -146,6 +149,15 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	private List<FrameBufferObject> hdrFrameBufferObjects = new ArrayList<FrameBufferObject>();
 	// List of all active animations
 	private List<Animated> animatedObjects = new ArrayList<Animated>();
+	
+	
+	
+	
+	private Player player1;
+	private long lastTime;
+	
+	
+	
 
 	// the current size of GL viewport
 	protected int viewWidth = DEFAULT_VIEWPORT_SIZE;
@@ -172,7 +184,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	private final MaterialSelectionPanel matSelectPanel = new MaterialSelectionPanel();
 
 	/* Gizmos */
-	//private RotationGizmo rotationGizmo = new RotationGizmo(this);
+	private RotationGizmo rotationGizmo = new RotationGizmo(this);
 
 	/* Main scene camera and a virtual camera corresponding to the light source */
 	protected Camera mainCamera = new Camera();
@@ -195,7 +207,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	private long startTime = System.currentTimeMillis();
 
 	public TronRuntime() {
-		super("GigaTRON4000XP+ Ridiculously Extreme Edition 4 - I hope this is not under copywrite");
+		super("CS 569 Viewer");
 
 		JPanel main = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -219,12 +231,19 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 
 		/* Create the default scene */
 		//object = defaultSceneMaker.make();
-		String filename = getClass().getResource("/scenes/mr_droopy.xml").getFile();
-		Parser parser = new Parser();
-		object = (HierarchicalObject) parser.parse(filename, Scene.class);
+		//String filename = getClass().getResource("/scenes/mr_droopy.xml").getFile();
+		//Parser parser = new Parser();
+		//object = (HierarchicalObject) parser.parse(filename, Scene.class);
+		object = new Map();
+		
+		player1 = new Player(mainCamera, true);
+		object.addObject(player1.getCurrentWall());
+		object.addObject(player1.getVehicle());
+		
 		object.recursiveUpdateBoundingSpheres();
 		modelTree.setRoot(object);
-
+		
+		
 		pack();
 		setVisible(true);
 
@@ -240,7 +259,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		mainView = new Viewer();
+		mainView = new TronRuntime();
 	}
 
 	/**
@@ -434,7 +453,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	/**
 	 * Return the main viewer instance.
 	 */
-	public static final Viewer getMainViewer() {
+	public static final TronRuntime getMainViewer() {
 		return mainView;
 	}
 
@@ -469,11 +488,9 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	/**
 	 * Return the rotation gizmo
 	 */
-	/*
 	public RotationGizmo getRotationGizmo() {
 		return rotationGizmo;
 	}
-	*/
 	
 	/**
 	 * Return the active particle system
@@ -540,6 +557,8 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 				sfqTexture.blit(gl);
 			}
 	
+			gamePlay();
+			
 			Vector3f eye = new Vector3f();
 			renderCamera(gl, eye);
 			gl.glMatrixMode(GL.GL_MODELVIEW);
@@ -547,7 +566,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 
 			if (!hdrEnabled) {
 				object.glRender(gl, glu, eye);
-				//rotationGizmo.glRender(gl, glu, eye);
+				rotationGizmo.glRender(gl, glu, eye);
 				if (particles != null)
 					particles.glRender(gl, glu, eye);
 			} else {
@@ -568,6 +587,15 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		}
 	}
 
+	private void gamePlay()
+	{
+		float dt = System.currentTimeMillis() - lastTime;
+		player1.update(dt);
+		
+		
+		lastTime = System.currentTimeMillis();
+	}
+	
 	/**
 	 * Setup the camera
 	 */
@@ -576,12 +604,12 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 			lightCamera.updateMatrices();
 			eye.set(lightCamera.getEye());
 			setProjectionForCamera(lightCamera, gl);
-			//rotationGizmo.setCamera(lightCamera);
+			rotationGizmo.setCamera(lightCamera);
 		} else {
 			mainCamera.updateMatrices();
 			eye.set(mainCamera.getEye());
 			setProjectionForCamera(mainCamera, gl);
-			//rotationGizmo.setCamera(mainCamera);
+			rotationGizmo.setCamera(mainCamera);
 		}
 	}
 
@@ -884,7 +912,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	 */
 	public void mousePressed(MouseEvent e) {
 		if ((e.getModifiersEx() & InputEvent.BUTTON3_DOWN_MASK) == InputEvent.BUTTON3_DOWN_MASK) {
-			//rotationGizmo.startDrag(e);
+			rotationGizmo.startDrag(e);
 			canvas.repaint();
 		}
 		lastMousePoint.set(e.getX(), e.getY());
@@ -918,7 +946,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	 */
 	public void mouseDragged(MouseEvent e) {
 		if ((e.getModifiersEx() & InputEvent.BUTTON3_DOWN_MASK) == InputEvent.BUTTON3_DOWN_MASK) {
-			//rotationGizmo.drag(e);
+			rotationGizmo.drag(e);
 			canvas.repaint();
 			return;
 		}
@@ -941,7 +969,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	public void mouseReleased(MouseEvent e) {
 		mouseDown = false;
 		if (e.getButton() == 3) {
-			//rotationGizmo.endDrag(e);
+			rotationGizmo.endDrag(e);
 			canvas.repaint();
 		}
 	}
@@ -957,7 +985,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		if (mat != null) {
 			setMatPanel(mat.getPropertyPanel());
 		}
-		//rotationGizmo.setObject(obj);
+		rotationGizmo.setObject(obj);
 		canvas.repaint();
 	}
 
@@ -990,14 +1018,20 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 
 	public void mouseClicked(MouseEvent e) {
 	}
-
-	public void keyTyped(KeyEvent e) {
-	}
-
+	
 	public void keyPressed(KeyEvent e) {
 	}
 
-	public void keyReleased(KeyEvent e) {
+	public void keyReleased(KeyEvent e) {		
+		switch (e.getKeyCode()) {
+			//case KeyEvent.VK_DOWN: downKeyPressed = false; break;
+			//case KeyEvent.VK_UP: upKeyPressed = false; break;
+			case KeyEvent.VK_LEFT: player1.move(Player.MOVE_LEFT, (Map) object); break;
+			case KeyEvent.VK_RIGHT: player1.move(Player.MOVE_RIGHT, (Map) object); break;
+		}
+	}
+
+	public void keyTyped(KeyEvent e) {
 	}
 
 	// //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1176,6 +1210,8 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 
 		}
 
+		
+		
 		/**
 		 * Used to store the classes with short names in the Combo box
 		 * 

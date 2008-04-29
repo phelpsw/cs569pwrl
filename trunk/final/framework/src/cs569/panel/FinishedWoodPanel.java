@@ -10,7 +10,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.event.ChangeEvent;
 
-import cs569.apps.Viewer;
+import cs569.apps.TronRuntime;
 import cs569.material.FinishedWood;
 import cs569.texture.Texture;
 
@@ -148,7 +148,7 @@ public class FinishedWoodPanel extends MaterialPanel implements ItemListener {
 		finishedWood.setFiberTexture((Texture) fiberMapComboBox.getSelectedItem());
 		finishedWood.setBetaTexture((Texture) betaMapComboBox.getSelectedItem());
 		fireUpdate();
-		Viewer.requestRepaint();
+		TronRuntime.requestRepaint();
 	}
 
 	public void stateChanged(ChangeEvent e) {
@@ -176,6 +176,6 @@ public class FinishedWoodPanel extends MaterialPanel implements ItemListener {
 		}
 
 		fireUpdate();
-		Viewer.requestRepaint();
+		TronRuntime.requestRepaint();
 	}
 }

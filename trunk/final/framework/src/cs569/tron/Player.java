@@ -39,7 +39,13 @@ public class Player {
 	{
 		this.camera = camera;
 		this.humanCtl = human;		
+		vehicle = new Vehicle();	
+		direction = new Vector2f(0,1);
+		position = new Vector2f(0,0);
+		velocity = 3;
+		currentWall = new Wall(position);
 		
+		//TODO set camera position
 	}
 	
 	public boolean checkCollisionWithWalls(Vector3f pos) // might be better to use boundingbox
@@ -56,6 +62,8 @@ public class Player {
 		
 		currentWall.setEnd(position);
 		vehicle.setPos(position);
+		
+		//TODO update camera
 	}
 	
 	// modify camera and vehicle positions
@@ -92,6 +100,10 @@ public class Player {
 	public void setCurrentWall(Wall wall)
 	{
 		currentWall = wall;
+	}
+	public Wall getCurrentWall()
+	{
+		return currentWall;
 	}
 
 }

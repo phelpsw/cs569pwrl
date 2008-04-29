@@ -6,7 +6,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
 
-import cs569.apps.Viewer;
+import cs569.apps.TronRuntime;
 import cs569.material.Material;
 
 /**
@@ -26,7 +26,7 @@ public abstract class MaterialPanel extends JPanel implements ActionListener,
 	protected Material baseMat;
 
 	protected MaterialPanel() {
-		addPropertyChangeListener(MATERIAL_PANEL_UPDATE, Viewer.getMainViewer());
+		addPropertyChangeListener(MATERIAL_PANEL_UPDATE, TronRuntime.getMainViewer());
 		setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 5));
 		setLayout(null);
 	}

@@ -19,7 +19,7 @@ import javax.vecmath.Vector4f;
 
 import com.sun.opengl.util.BufferUtil;
 
-import cs569.apps.Viewer;
+import cs569.apps.TronRuntime;
 import cs569.camera.Camera;
 import cs569.object.HierarchicalObject;
 
@@ -65,7 +65,7 @@ public class RotationGizmo {
 	// Rotation algorithm-related attributes
 	// //////////////////////////////////////////////////////////////////////////////////////////////////
 	/** Reference to the viewer object */
-	protected Viewer viewer;
+	protected TronRuntime viewer;
 	/** Reference to the viewport's camera */
 	protected Camera camera;
 	/** Reference to the currently associated object */
@@ -82,7 +82,7 @@ public class RotationGizmo {
 	/**
 	 * Create a new invisible rotation gizmo
 	 */
-	public RotationGizmo(Viewer viewer) {
+	public RotationGizmo(TronRuntime viewer) {
 		/* Create enough space for the created geometry */
 		vertices = BufferUtil.newFloatBuffer((ARC_RESOLUTION+1)*ARC_COUNT*3);
 		indices = BufferUtil.newIntBuffer(ARC_RESOLUTION*ARC_COUNT*2);
