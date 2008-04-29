@@ -4,7 +4,7 @@ import javax.media.opengl.GL;
 import javax.vecmath.Color3f;
 import javax.vecmath.Vector3f;
 
-import cs569.apps.Viewer;
+import cs569.apps.TronRuntime;
 import cs569.misc.GLSLErrorException;
 import cs569.texture.Texture;
 
@@ -60,7 +60,7 @@ public class FinishedWoodShader extends GLSLShader {
 		fiberTexture.bindTexture(gl, 3);
 		
 		gl.glUniform4f(eyePositionHandle, eye.x, eye.y, eye.z, 1.0f);
-		Vector3f light = Viewer.getMainViewer().getLightPosition();
+		Vector3f light = TronRuntime.getMainViewer().getLightPosition();
 		gl.glUniform4f(lightPositionHandle, light.x, light.y, light.z, 1.0f);
 
 		gl.glUniform1f(roughnessHandle, roughness);

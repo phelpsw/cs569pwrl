@@ -4,8 +4,7 @@ import javax.media.opengl.GL;
 import javax.vecmath.Color3f;
 import javax.vecmath.Vector3f;
 
-import cs569.apps.CityExplorer;
-import cs569.apps.Viewer;
+import cs569.apps.TronRuntime;
 import cs569.misc.GLSLErrorException;
 
 /**
@@ -63,10 +62,8 @@ public class LambertianShader extends GLSLShader {
 		Color3f diffuseColorValue = (Color3f) params[1];
 
 		Vector3f light;
-		if (Viewer.getMainViewer() != null)
-			light = Viewer.getMainViewer().getLightPosition();
-		else
-			light = CityExplorer.getCityExplorer().getLightPosition();
+		light = TronRuntime.getMainViewer().getLightPosition();
+			
 
 		gl.glUniform4f(lightPosition, light.x, light.y, light.z, 1.0f);
 

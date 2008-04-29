@@ -3,7 +3,7 @@ package cs569.shaders;
 import javax.media.opengl.GL;
 import javax.vecmath.Matrix4f;
 
-import cs569.apps.Viewer;
+import cs569.apps.TronRuntime;
 import cs569.camera.Camera;
 import cs569.misc.GLSLErrorException;
 import cs569.misc.GLUtils;
@@ -41,7 +41,7 @@ public class ShadowedPhongShader extends PhongShader {
 	public void setGLSLParams(GL gl, Object... params) {
 		super.setGLSLParams(gl, params);
 
-		Camera viewCamera = Viewer.getMainViewer().getCurrentCamera();
+		Camera viewCamera = TronRuntime.getMainViewer().getCurrentCamera();
 		ShadowMap shadowMap = (ShadowMap) params[4];
 
 		Camera lightCamera = shadowMap.getLightCamera();

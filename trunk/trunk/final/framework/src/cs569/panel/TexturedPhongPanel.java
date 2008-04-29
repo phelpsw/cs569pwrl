@@ -8,7 +8,7 @@ import javax.media.opengl.GL;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
-import cs569.apps.Viewer;
+import cs569.apps.TronRuntime;
 import cs569.material.TexturedPhong;
 import cs569.texture.Texture;
 
@@ -49,6 +49,6 @@ public class TexturedPhongPanel extends PhongPanel implements ItemListener {
 	public void itemStateChanged(ItemEvent e) {
 		((TexturedPhong) phong).setDiffuseTexture((Texture) textureCombo.getSelectedItem());
 		fireUpdate();
-		Viewer.requestRepaint();
+		TronRuntime.requestRepaint();
 	}
 }

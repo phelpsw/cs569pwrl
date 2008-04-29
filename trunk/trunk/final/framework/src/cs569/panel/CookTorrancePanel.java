@@ -5,7 +5,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
 import javax.swing.event.ChangeEvent;
 
-import cs569.apps.Viewer;
+import cs569.apps.TronRuntime;
 import cs569.material.CookTorrance;
 
 /**
@@ -148,6 +148,6 @@ public class CookTorrancePanel extends MaterialPanel {
 		}
 
 		fireUpdate();
-		Viewer.requestRepaint();
+		TronRuntime.requestRepaint();
 	}
 }

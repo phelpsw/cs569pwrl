@@ -10,7 +10,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.event.ChangeEvent;
 
-import cs569.apps.Viewer;
+import cs569.apps.TronRuntime;
 import cs569.material.Reflection;
 import cs569.texture.Texture;
 
@@ -54,7 +54,7 @@ public class ReflectionPanel extends MaterialPanel implements ItemListener {
 	public void itemStateChanged(ItemEvent e) {
 		reflection.setTexture((Texture) ((JComboBox) e.getSource()).getSelectedItem());
 		fireUpdate();
-		Viewer.requestRepaint();
+		TronRuntime.requestRepaint();
 	}
 	
 	public void stateChanged(ChangeEvent e) {

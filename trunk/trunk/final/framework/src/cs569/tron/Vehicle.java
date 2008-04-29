@@ -20,7 +20,7 @@ public class Vehicle extends HierarchicalObject {
 	public Vehicle()
 	{
 		MeshObject box = PrimitiveFactory.makeBox("Box");
-		box.setMaterial(new Lambertian(new Color3f(0.05f, 0.05f, 0.05f)));
+		box.setMaterial(new Lambertian(new Color3f(1f, 0.05f, 0.05f)));
 		this.addObject(box);
 		
 		//TODO make vehicle out of primitives

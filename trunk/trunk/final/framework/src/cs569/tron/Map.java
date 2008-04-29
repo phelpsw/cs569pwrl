@@ -42,9 +42,5 @@ public class Map extends HierarchicalObject {
 		this.addObject(wall);
 	}
 	
-	public void addVehicle(Vehicle vehicle)
-	{
-		this.addObject(vehicle);
-	}
 
 }
