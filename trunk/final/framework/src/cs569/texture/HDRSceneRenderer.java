@@ -3,6 +3,7 @@ package cs569.texture;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
+import cs569.apps.TronRuntime;
 import cs569.apps.Viewer;
 import cs569.camera.Camera;
 import cs569.misc.GLSLErrorException;
@@ -14,6 +15,7 @@ import cs569.shaders.ToneMappingShader;
 public class HDRSceneRenderer extends FrameBufferObject {
 	
 	protected Viewer viewer;
+	protected TronRuntime tronRuntime;
 	protected ToneMappingShader toneMapper;
 	
 	public boolean enabled;
@@ -22,12 +24,23 @@ public class HDRSceneRenderer extends FrameBufferObject {
 		super(identifier, HDR_TEXTURE_FBO, width, height);
 		toneMapper = (ToneMappingShader)GLSLShader.getShader(ToneMappingShader.class);
 		this.viewer = viewer;
+		this.tronRuntime = null;
+	}
+	
+	public HDRSceneRenderer(String identifier, TronRuntime tronRuntime, int width, int height) {
+		super(identifier, HDR_TEXTURE_FBO, width, height);
+		toneMapper = (ToneMappingShader)GLSLShader.getShader(ToneMappingShader.class);
+		this.viewer = null;
+		this.tronRuntime = tronRuntime;
 	}
 	
 	@Override
 	public void renderImpl(GL gl, GLU glu, HierarchicalObject object) throws GLSLErrorException {
-		
-		Camera camera = viewer.getCurrentCamera();
+		Camera camera;
+		if(viewer == null)
+			camera = tronRuntime.getCurrentCamera();
+		else
+			camera = viewer.getCurrentCamera();
 		
 		gl.glMatrixMode(GL.GL_PROJECTION);
 		gl.glLoadIdentity();
@@ -37,9 +50,15 @@ public class HDRSceneRenderer extends FrameBufferObject {
 		gl.glLoadIdentity();
 		
 		object.glRender(gl, glu, camera.getEye());
-		viewer.getRotationGizmo().glRender(gl, glu, camera.getEye());
-		if (viewer.getParticleSystem() != null)
-			viewer.getParticleSystem().glRender(gl, glu, camera.getEye());
+		if(viewer == null) // tron activated!
+		{
+			if (tronRuntime.getParticleSystem() != null)
+				tronRuntime.getParticleSystem().glRender(gl, glu, camera.getEye());
+		} else { // in viewer mode
+			viewer.getRotationGizmo().glRender(gl, glu, camera.getEye());
+			if (viewer.getParticleSystem() != null)
+				viewer.getParticleSystem().glRender(gl, glu, camera.getEye());
+		}
 	}
 	
 	public void doToneMapping(GL gl, Texture texture)
