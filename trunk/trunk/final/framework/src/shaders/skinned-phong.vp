@@ -1,0 +1,50 @@
+#version 110
+
+#define NUM_BONES   22
+
+/* Uniform Inputs */
+uniform vec4 lightPosition;
+uniform vec4 eyePosition;
+uniform mat4 boneTransform[NUM_BONES];
+
+/* Additional per-vertex attributes */
+attribute float weight0, weight1, weight2, weight3,
+	weight4, weight5;
+
+attribute float weightIndex0, weightIndex1, 
+	weightIndex2, weightIndex3, weightIndex4,
+	weightIndex5;
+
+/* Outputs -> fragment program */
+varying vec3 lightVector, eyeVector, normal;
+
+void main() {
+	vec4 vertex = 
+		  boneTransform[int(weightIndex0)] * gl_Vertex * weight0
+		+ boneTransform[int(weightIndex1)] * gl_Vertex * weight1
+		+ boneTransform[int(weightIndex2)] * gl_Vertex * weight2
+		+ boneTransform[int(weightIndex3)] * gl_Vertex * weight3
+		+ boneTransform[int(weightIndex4)] * gl_Vertex * weight4
+		+ boneTransform[int(weightIndex5)] * gl_Vertex * weight5;
+
+	gl_Position = gl_ModelViewProjectionMatrix * vertex;
+
+	vec4 n = vec4(gl_Normal, 0);
+	normal = 
+		 (boneTransform[int(weightIndex0)] * n * weight0
+		+ boneTransform[int(weightIndex1)] * n * weight1
+		+ boneTransform[int(weightIndex2)] * n * weight2
+		+ boneTransform[int(weightIndex3)] * n * weight3
+		+ boneTransform[int(weightIndex4)] * n * weight4
+		+ boneTransform[int(weightIndex5)] * n * weight5).xyz;
+
+	/* Normal in world coordinates */
+	normal = normalize(normal);
+
+	/* Vertex->Light in world coordinates */
+	vec4 worldSpacePos = gl_ModelViewMatrix * vertex;
+	lightVector = (lightPosition - worldSpacePos).xyz;
+
+	/* Vertex->Eye in world coordinates */
+	eyeVector = (eyePosition - worldSpacePos).xyz;
+}
