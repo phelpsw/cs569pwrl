@@ -25,64 +25,68 @@ public class PrimitiveFactory {
 	public static final MeshObject makePlane(String name, int numU, int numV) {
 		
 		float lengthU, lengthV;
+		int numPlanes=numU*numV;
 		
 		lengthU = 1.0f/numU;
 		lengthV = 1.0f/numV;
 		// length of UV is 1 (0 to 1), length of plane is 2 (-1 to 1)
 		
-		float[] verts = new float[(2*numU + 2*numV) * 3];
-		float[] norms = new float[(2*numU + 2*numV) * 3];
-		float[] txt = new float[(2*numU + 2*numV) * 2];
-		int[] tris = new int[2*numU + 2*numV];
+		float[] verts = new float[numPlanes*4 * 3];
+		float[] norms = new float[numPlanes*4 * 3];
+		float[] txt = new float[numPlanes*4 * 2];
+		int[] tris = new int[numPlanes*2*3];
 		
-		Vector3f pos1 = new Vector3f();
-		Vector3f pos2 = new Vector3f();
-		Vector3f pos3 = new Vector3f();
-		Vector3f pos4 = new Vector3f();
-		
-		Vector2f txt1 = new Vector2f();
-		Vector2f txt2 = new Vector2f();
-		Vector2f txt3 = new Vector2f();
-		Vector2f txt4 = new Vector2f();
+		Vector3f[] pos = new Vector3f[] {new Vector3f(),new Vector3f(),new Vector3f(),new Vector3f()};
 		
 		int xIndex=0;
 		int zIndex=0;
-		
-		//loop
-		
-		//position starts in upper left, and goes counter-clockwise
-		pos1.set(-1 + xIndex*lengthU*2, 0, -1 + zIndex*lengthV*2);		
-		pos2.set(-1 + xIndex*lengthU*2, 0, -1 + (zIndex+1)*lengthV*2);
-		
-		pos3.set(-1 + (xIndex+1)*lengthU*2, 0, -1 + (zIndex+1)*lengthV);
-		pos4.set(-1 + (xIndex+1)*lengthU*2, 0, -1 + zIndex*lengthV);
+		int base;
 				
-		txt1.set(0, 0);		
-		txt2.set(0, 1);		
-		txt3.set(1, 1);
-		txt4.set(1, 0);		
-		
-		//tris 0, 1, 2, 0, 2, 3
-		//norms 0, 1, 0
-		
-		
-		
-		//verts[num*12 + 0] = num*lengthU
-		
-		
-		for (int i=0; i<lengthV; i++)
+		for (int i=0; i<numPlanes; i++)
 		{
-			for (int j=0; j<lengthU; j++)
-			{
+			// go left to right, top to bottom
+			xIndex = i%numU;
+			zIndex = (int)i/numU;
+			
+			System.out.println("plane #" + i + ", xIndex=" + xIndex+ ", zIndex =" +zIndex + " lengths:" + lengthU + ", " + lengthV);
+		
+		 //position starts in upper left, and goes counter-clockwise
+		 pos[0].set(-1 + xIndex*lengthU*2, 0, -1 + zIndex*lengthV*2);		
+		 pos[1].set(-1 + xIndex*lengthU*2, 0, -1 + (zIndex+1)*lengthV*2);
+		
+		 pos[2].set(-1 + (xIndex+1)*lengthU*2, 0, -1 + (zIndex+1)*lengthV*2);
+		 pos[3].set(-1 + (xIndex+1)*lengthU*2, 0, -1 + zIndex*lengthV*2);
+		 
+		 // for each corner of the plane 
+		 for (int j=0; j<4; j++)
+		 {
+	      base = i*12 + j*3;
+		  verts[base] = pos[j].x;
+		  verts[base + 1] = pos[j].y;
+		  verts[base + 2] = pos[j].z;
+		  System.out.println(" corner " + j + ": " + pos[j]);
+		  
+		  //norms 0, 1, 0 
+		  norms[base] = 0;
+		  norms[base+1] = 1;
+		  norms[base+2] = 0;		  
+		 }
 				
-				
-			}
+		 //texture: (0,0), (0,1), (1,1), (1,0)
+		 txt[i*8] = 0; txt[i*8+1] = 0;
+		 txt[i*8+2] = 0; txt[i*8+3] = 1;
+		 txt[i*8+4] = 1; txt[i*8+5] = 1;
+		 txt[i*8+6] = 1; txt[i*8+7] = 0;
+		 		 		 
+		//tris 0, 1, 2, 0, 2, 3
+		 tris[i*6] = i*4;
+		 tris[i*6+1] = i*4 + 1;
+		 tris[i*6+2] = i*4 + 2;
+		 tris[i*6+3] = i*4;
+		 tris[i*6+4] = i*4 + 2;
+		 tris[i*6+5] = i*4 + 3;
+		 
 		}
-		
-		
-		
-		
-		
 		
 		
 		return new TangentSpaceMeshObject(verts, tris, norms,
