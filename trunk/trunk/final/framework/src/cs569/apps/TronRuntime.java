@@ -189,10 +189,10 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	/* Main scene camera and a virtual camera corresponding to the light source */
 	protected Camera mainCamera = new Camera();
 	protected Camera lightCamera = new Camera(
-			new Vector3f(0.0f, 3.0f,-4.0f),
+			new Vector3f(0.0f, 100.0f,1.0f),
 			new Vector3f(0, 0, 0), 
-			new Vector3f(0, 1, 0), 70, 1.0f, 
-			(float) (2 * new Vector3f(0.0f, 3.0f,-4.0f).length())
+			new Vector3f(0, 1, 0), 70, 0.1f, 
+			(float) (2 * new Vector3f(0.0f, 100.0f,1.0f).length())
 	);
 	
 	/* HDR rendering */
