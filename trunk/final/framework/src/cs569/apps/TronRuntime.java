@@ -207,7 +207,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	private long startTime = System.currentTimeMillis();
 
 	public TronRuntime() {
-		super("CS 569 Viewer");
+		super("GigaTRON 4000XP+ Extreme Edition 4");
 
 		if (sidePanelOn)
 		{
@@ -338,12 +338,15 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 
 		// the file menu
 		JMenu fileMenu = new JMenu("File");
-		String[] fileMenuItemNames = {"Load scene ..",  "Save scene ..", "Exit" };
-		String[] fileMenuItemActions = { "geomFile", "save", "exit" };
-		char[] fileMenuMnemonics = {'l', 's', 'x'};
+		//String[] fileMenuItemNames = {"Load scene ..",  "Save scene ..", "Exit" };
+		//String[] fileMenuItemActions = { "geomFile", "save", "exit" };
+		//char[] fileMenuMnemonics = {'l', 's', 'x'};
+		String[] fileMenuItemNames = {"Exit" };
+		String[] fileMenuItemActions = {"exit" };		
+		char[] fileMenuMnemonics = {'x'};
 		KeyStroke[] keyStrokes = {
-				KeyStroke.getKeyStroke("control L"),
-				KeyStroke.getKeyStroke("control S"),
+				//KeyStroke.getKeyStroke("control L"),
+				//KeyStroke.getKeyStroke("control S"),
 				KeyStroke.getKeyStroke("alt X")
 		};
 		addMenuItems(fileMenu, fileMenuItemNames, fileMenuItemActions,
@@ -351,6 +354,8 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		);
 		menuBar.add(fileMenu);
 
+		/*
+		
 		// first the geometry menu
 		JMenu geometryMenu = new JMenu("Geometry");
 		geometryMenu.getPopupMenu().setLabel("Geometry");
@@ -370,7 +375,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		char[] cameraMenuMnemonics= {'M', 'L'};
 		addMenuItems(cameraMenu, cameraMenuItemNames, cameraMenuItemActions, cameraMenuMnemonics, null);
 		menuBar.add(cameraMenu);
-
+			
 		// The orbit menu
 		JMenu orbitMenu = new JMenu("Orbit");
 		orbitMenu.getPopupMenu().setLabel("Orbit");
@@ -414,6 +419,8 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	    String[] particlesMenuItemActions = { "Fountain", "Fire", "Swarm" };
 	    addMenuItems(particlesMenu, particlesMenuItemNames, particlesMenuItemActions, null, null);
 	    menuBar.add(particlesMenu);
+*/
+
 
 	    return menuBar;
 	}
@@ -702,21 +709,26 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	public void initializeTextures(GL gl) {
 		/* Load the 'Ben's backyard' environment map 
 		    - from http://www.bencloward.com/textures_extra.shtml */
+		/*
 		Texture backyard = Texture.createCubeMapFromFile("Backyard", 
 				"/textures/cubemap/backyard_", ".png");
 		backyard.initializeTexture(gl);
+		*/
 
 		/* Load the 'Grace cathedral' environment map 
 		    - made by Paul Debevec */
+		/*
 		Texture grace = Texture.createCubeMapFromFile("Grace Cathedral", 
 				"/textures/cubemap/grace_", ".png");
 		grace.initializeTexture(gl);
+		*/
 		
 		/* Load some normalmap/diffuse textures */
 		Texture.getTexture("/textures/stoneBrickDiffuse.jpg").initializeTexture(gl);
 		Texture.getTexture("/textures/stoneBrickNormal.jpg").initializeTexture(gl);
 
 		/* Load parts of the 'Finished wood' data set */
+		/*
 		String[] woodTypes = {"cmaple", "walnut2"};
 		String[] textureTypes = {"axis", "beta", "diffuse", "fiber"};
 		for (String woodType: woodTypes) {
@@ -726,7 +738,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 				Texture.create2DTextureFromFile(identifier, identifier, 
 					GL.GL_LINEAR, GL.GL_REPEAT, true, isLinear).initializeTexture(gl);
 			}
-		}
+		} */
 
 		/* A vague-looking particle from the student game 'Alpha Strain' */
 		Texture.getTexture("src/textures/smoke.png").initializeTexture(gl);

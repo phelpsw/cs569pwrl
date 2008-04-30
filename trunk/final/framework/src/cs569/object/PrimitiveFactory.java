@@ -48,7 +48,7 @@ public class PrimitiveFactory {
 			xIndex = i%numU;
 			zIndex = (int)i/numU;
 			
-			System.out.println("plane #" + i + ", xIndex=" + xIndex+ ", zIndex =" +zIndex + " lengths:" + lengthU + ", " + lengthV);
+			//System.out.println("plane #" + i + ", xIndex=" + xIndex+ ", zIndex =" +zIndex + " lengths:" + lengthU + ", " + lengthV);
 		
 		 //position starts in upper left, and goes counter-clockwise
 		 pos[0].set(-1 + xIndex*lengthU*2, 0, -1 + zIndex*lengthV*2);		
@@ -64,7 +64,7 @@ public class PrimitiveFactory {
 		  verts[base] = pos[j].x;
 		  verts[base + 1] = pos[j].y;
 		  verts[base + 2] = pos[j].z;
-		  System.out.println(" corner " + j + ": " + pos[j]);
+		  //System.out.println(" corner " + j + ": " + pos[j]);
 		  
 		  //norms 0, 1, 0 
 		  norms[base] = 0;
