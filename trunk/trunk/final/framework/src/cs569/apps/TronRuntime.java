@@ -191,7 +191,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	protected Camera lightCamera = new Camera(
 			new Vector3f(0.0f, 3.0f,-4.0f),
 			new Vector3f(0, 0, 0), 
-			new Vector3f(0, 1, 0), 45, 0.1f, 
+			new Vector3f(0, 1, 0), 70, 1.0f, 
 			(float) (2 * new Vector3f(0.0f, 3.0f,-4.0f).length())
 	);
 	
@@ -236,7 +236,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		//object = (HierarchicalObject) parser.parse(filename, Scene.class);
 		object = new Map();
 		
-		player1 = new Player(mainCamera, true);
+		player1 = new Player(mainCamera, Player.PLAYER1, true);
 		object.addObject(player1.getCurrentWall());
 		object.addObject(player1.getVehicle());
 		
