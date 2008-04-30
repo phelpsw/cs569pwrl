@@ -301,7 +301,7 @@ public class Texture {
 	 */
 	public static final Texture create2DTextureFromFile(String identifier, String imageFileName, int filterMode, int wrapMode,
 			boolean useMipMap, boolean isLinear) {
-		System.out.println("Loading texture \"" + imageFileName + "\" ..");
+		//System.out.println("Loading texture \"" + imageFileName + "\" ..");
 		URL resURL = Texture.class.getResource(imageFileName);
 		BufferedImage bufferedImage = loadImageFromFile(resURL == null ? imageFileName : resURL.getFile());
 		int imageWidth = bufferedImage.getWidth();

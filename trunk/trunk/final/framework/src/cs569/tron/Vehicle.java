@@ -22,6 +22,7 @@ public class Vehicle extends HierarchicalObject {
 	private Group bike_body;
 	private Group bike_window;
 	private Group bike_hub;
+	private Group bike_wheel;
 	
 	private static final float LIGHT_CYCLE_SCALE = 4.0f;
 	
@@ -37,10 +38,13 @@ public class Vehicle extends HierarchicalObject {
 		bike_body = new Group("LightCycle_Body");
 		bike_window = new Group("LightCycle_Window");
 		bike_hub = new Group("LightCycle_Hub");
+		bike_wheel = new Group("LightCycle_Wheel");
 		
 		bike.addObject(bike_body);
 		bike.addObject(bike_window);
 		bike.addObject(bike_hub);
+		bike.addObject(bike_wheel);
+		
 		
 		MeshObject cylinder_body = PrimitiveFactory.makeCylinder(10, 30, "Body");
 		cylinder_body.setTranslate(0.0f, 0.0f, 0.0f);
@@ -52,7 +56,7 @@ public class Vehicle extends HierarchicalObject {
 		cylinder_fwheel.setTranslate(0.75f, -0.1f, 0.0f);
 		cylinder_fwheel.setScale(0.2f, 0.2f, 0.2f);
 		cylinder_fwheel.setRotationAxisAngle(90.0f, 1.0f, 0.0f, 0.0f);
-		bike_body.addObject(cylinder_fwheel);
+		bike_wheel.addObject(cylinder_fwheel);
 		
 		MeshObject sphere_fhub = PrimitiveFactory.makeSphere(10, 30, "FHub");
 		sphere_fhub.setTranslate(0.75f, -0.1f, 0.0f);
@@ -63,7 +67,7 @@ public class Vehicle extends HierarchicalObject {
 		cylinder_bwheel.setTranslate(-0.75f, -0.1f, 0.0f);
 		cylinder_bwheel.setScale(0.2f, 0.2f, 0.2f);
 		cylinder_bwheel.setRotationAxisAngle(90.0f, 1.0f, 0.0f, 0.0f);
-		bike_body.addObject(cylinder_bwheel);
+		bike_wheel.addObject(cylinder_bwheel);
 		
 		MeshObject sphere_rhub = PrimitiveFactory.makeSphere(10, 30, "RHub");
 		sphere_rhub.setTranslate(-0.75f, -0.1f, 0.0f);
@@ -130,6 +134,12 @@ public class Vehicle extends HierarchicalObject {
 	{
 		bike_hub.setMaterial(in);
 	}
+	
+	public void setWheelMaterial(Material in)
+	{
+		bike_wheel.setMaterial(in);
+	}
+	
 	
 	public void setWindowMaterial(Material in)
 	{
