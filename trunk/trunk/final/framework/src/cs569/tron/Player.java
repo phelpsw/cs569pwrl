@@ -43,8 +43,8 @@ public class Player {
 	
 	Vector3f deltaEye = new Vector3f();
 	Vector3f deltaTarget = new Vector3f();
-	static float eyeDampeningConstant = 0.1f;
-	static float targetDampeningConstant = 0.05f;
+	static float eyeDampeningConstant = 0.00125f;
+	static float targetDampeningConstant = 0.00425f;
 	
 	Vector2f temp = new Vector2f();
 	static float cameraTargetHorizontalOffset = 5.0f;
@@ -116,24 +116,21 @@ public class Player {
 		
 		currentWall.setEnd(position);
 		vehicle.setPos(position);
-		System.out.println("vehicle position: " + position + " " + dt);
 		
 		cameraObjectiveTargetPosition.set(position.x + direction.x * cameraTargetHorizontalOffset , 0.0f, position.y + direction.y * cameraTargetHorizontalOffset);
 		cameraObjectivePosition.set(position.x - direction.x * cameraHorizontalOffset , cameraVerticalOffset, position.y - direction.y * cameraHorizontalOffset);
 		
 		deltaEye.sub(camera.getEye(), cameraObjectivePosition);
-		deltaEye.scale(-eyeDampeningConstant);
+		deltaEye.scale(-eyeDampeningConstant*dt);
 		
 		deltaTarget.sub(camera.getTarget(), cameraObjectiveTargetPosition);
-		deltaTarget.scale(-targetDampeningConstant);
+		deltaTarget.scale(-targetDampeningConstant*dt);
 		
 		cameraCurrentPosition.set(camera.getEye());
 		cameraCurrentPosition.add(deltaEye);
 		
 		cameraCurrentTargetPosition.set(camera.getTarget());
 		cameraCurrentTargetPosition.add(deltaTarget);
-		
-		System.out.println("Camera obj pos: " + cameraObjectivePosition + " Camera Current Pos: " + cameraCurrentPosition + " DeltaEye: " +deltaEye);
 		
 		camera.setEye(cameraCurrentPosition);
 		camera.setTarget(cameraCurrentTargetPosition);
