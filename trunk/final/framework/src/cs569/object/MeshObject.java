@@ -530,4 +530,15 @@ public class MeshObject extends HierarchicalObject {
 			normals.put(i*3+2, normal.z);
 		}
 	}
+
+	public void flipNormals() {
+		float f;
+		for (int i=0; i<normals.capacity(); i++)
+		{
+		 f = normals.get(i);
+		 f *= -1;
+		 normals.put(i, f);
+		}
+	}
+		
 }
