@@ -10,6 +10,7 @@ import javax.vecmath.Vector3f;
 
 import cs569.material.AnisotropicWard;
 import cs569.material.Lambertian;
+import cs569.material.TexturedPhong;
 import cs569.misc.GLSLErrorException;
 import cs569.object.HierarchicalObject;
 import cs569.object.MeshObject;
@@ -19,12 +20,25 @@ public class Map extends HierarchicalObject {
 	
 	public Map()
 	{
+		
+		/*
 		MeshObject plane = PrimitiveFactory.makePlane("Plane");
-		//plane.setTranslate(0, -0.5f, 0);
+		plane.setTranslate(0, -0.5f, 0);
 		plane.setMaterial(new AnisotropicWard(new Color3f(0.2f, 0.3f, 0.1f),
-				new Color3f(0.6f, 0.8f, 0.6f), 0.4f, 0.2f));		
-		plane.setScale(400, 400, 400);
+				new Color3f(0.6f, 0.8f, 0.6f), 0.4f, 0.2f));
+		//plane.setMaterial(new TexturedPhong());
+		//plane.setScale(400, 400, 400);
+		plane.setScale(100, 100, 100);
 		this.addObject(plane);
+		*/
+		
+		
+		MeshObject plane = PrimitiveFactory.makePlane("Ground", 30, 30);
+		plane.setTranslate(0, -1f, 0);
+		plane.setMaterial(new TexturedPhong());
+		plane.setScale(100, 100, 100);
+		this.addObject(plane);
+		
 	}
 	
 	
