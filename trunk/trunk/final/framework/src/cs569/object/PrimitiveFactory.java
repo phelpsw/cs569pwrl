@@ -2,7 +2,6 @@ package cs569.object;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
-
 /**
  * Created on January 26, 2007
  * Course: CS569 (Interactive Computer Graphics) by Steve Marschner
@@ -22,7 +21,7 @@ public class PrimitiveFactory {
 		return new TangentSpaceMeshObject(planeVerts, planeTriangles, planeNormals,
 				planeTexCoords, name);
 	}
-	
+
 	public static final MeshObject makePlane(String name, int numU, int numV) {
 		
 		float lengthU, lengthV;
@@ -109,8 +108,137 @@ public class PrimitiveFactory {
 	 * @param stacks
 	 * @param slices
 	 */
-	public static final MeshObject makeCone(int stacks, int slices, String name) {
-		return makeCylinder(stacks, slices, name);
+	public static final MeshObject makeCone(int stacks, int slices, String name) 
+	{
+
+		// Create all the vertex data
+		int size = slices + 2 + 2*(slices+1);
+		float[] vertices = new float[3 * size];
+		float[] normals = new float[3 * size];
+		float[] texCoords = new float[2 * size];
+
+		// Create the pole vertices
+		int pos = 0;
+		vertices[3 * pos] = 0;
+		vertices[3 * pos + 1] = 1;
+		vertices[3 * pos + 2] = 0;
+		normals[3 * pos] = 0;
+		normals[3 * pos + 1] = 1;
+		normals[3 * pos + 2] = 0;
+		texCoords[2 * pos] = 0.5f;
+		texCoords[2 * pos + 1] = 0.5f;
+		pos++;
+		vertices[3 * pos] = 0;
+		vertices[3 * pos + 1] = -1;
+		vertices[3 * pos + 2] = 0;
+		normals[3 * pos] = 0;
+		normals[3 * pos + 1] = -1;
+		normals[3 * pos + 2] = 0;
+		texCoords[2 * pos] = 0.5f;
+		texCoords[2 * pos + 1] = 0.5f;
+		pos++;
+
+		// Create the bottom cap vertices must duplicate the edges to get sharp corner
+		for (int ctr = 0; ctr < slices; ctr++) {
+			vertices[3 * pos] = cos(ctr * 2 * Math.PI / slices);
+			vertices[3 * pos + 1] = -1;
+			vertices[3 * pos + 2] = sin(ctr * 2 * Math.PI / slices);
+			normals[3 * pos] = 0;
+			normals[3 * pos + 1] = -1;
+			normals[3 * pos + 2] = 0;
+			texCoords[2 * pos] = (cos(ctr * 2 * Math.PI / slices) + 1) / 2;
+			texCoords[2 * pos + 1] = (sin(ctr * 2 * Math.PI / slices) + 1) / 2;
+			pos++;
+		}
+		
+		// Create the intermediate vertices (base)
+		for (int ctr1 = 0; ctr1 <= slices; ctr1++) {
+			
+			// The cosine and sine of the zenith
+			float cAcross1 = cos(ctr1 * 2 * Math.PI / slices);
+			float sAcross1 = sin(ctr1 * 2 * Math.PI / slices);
+
+			// Create the vertices
+			vertices[3 * pos] = cAcross1;
+			vertices[3 * pos + 1] = -1.0f;
+			vertices[3 * pos + 2] = sAcross1;
+
+			normals[3 * pos] = cAcross1 / (float)Math.sqrt(5);
+			normals[3 * pos + 1] = 2 / (float)Math.sqrt(5);
+			normals[3 * pos + 2] = sAcross1 / (float)Math.sqrt(5);
+			
+			texCoords[2 * pos] = ctr1 / (float) slices;
+			texCoords[2 * pos + 1] = 0.0f;
+			pos++;
+
+		}
+
+		// Create the intermediate vertices (point)
+		for (int ctr1 = 0; ctr1 <= slices; ctr1++) {
+			
+			// The cosine and sine of the zenith
+			float cAcross1 = cos(ctr1 * 2 * Math.PI / slices);
+			float sAcross1 = sin(ctr1 * 2 * Math.PI / slices);
+
+			// Create the vertices
+			vertices[3 * pos] = 0.0f;
+			vertices[3 * pos + 1] = 1.0f;
+			vertices[3 * pos + 2] = 0.0f;
+
+			normals[3 * pos] = cAcross1 / (float)Math.sqrt(Math.pow(cAcross1,2) + Math.pow(sAcross1,2) + 4.0);
+			normals[3 * pos + 1] = 2.0f / (float)Math.sqrt(Math.pow(cAcross1,2) + Math.pow(sAcross1,2) + 4.0);
+			normals[3 * pos + 2] = sAcross1 / (float)Math.sqrt(Math.pow(cAcross1,2) + Math.pow(sAcross1,2) + 4.0);
+			
+			texCoords[2 * pos] = ctr1 / (float) slices;
+			texCoords[2 * pos + 1] = 1.0f;
+			pos++;
+
+		}
+
+		// Create the triangles
+
+		int tris = 0;
+		size = 3*slices;
+		int[] triangles = new int[3 * size];
+
+		// Bottom
+		int i;
+		for (i = 0; i < slices-1; i++) {
+			triangles[3 * tris] = 1;
+			triangles[3 * tris + 1] = i + 2;
+			triangles[3 * tris + 2] = i + 3;
+			tris++;
+		}
+		triangles[3 * tris] = 1;
+		triangles[3 * tris + 1] = i + 2;
+		triangles[3 * tris + 2] = 2;
+		tris++;
+
+		
+		int offset = slices + 2;
+		for(i=0; i < slices; i++)
+		{
+			triangles[3 * tris] = i+offset;
+			triangles[3 * tris + 1] = i + 2*offset;
+			triangles[3 * tris + 2] = i + 2*offset - 1;
+			tris++;
+			triangles[3 * tris] = i+offset;
+			triangles[3 * tris + 1] = i+offset + 1;
+			triangles[3 * tris + 2] = i + 2*offset;
+			tris++;
+		}
+		
+		/*for(i = 0; i<3*size; i+=3)
+		{
+			System.out.println(triangles[i] + " " + triangles[i+1] + " " +triangles[i+2]);
+			System.out.println(triangles[i] + ": "+vertices[3*triangles[i]] + " " + vertices[3*triangles[i]+1] + " " +  vertices[3*triangles[i]+2]);
+			System.out.println(triangles[i+1] + ": "+vertices[3*triangles[i+1]] + " " + vertices[3*triangles[i+1]+1] + " " +  vertices[3*triangles[i+1]+2]);
+			System.out.println(triangles[i+2] + ": "+vertices[3*triangles[i+2]] + " " + vertices[3*triangles[i+2]+1] + " " +  vertices[3*triangles[i+2]+2]);
+		}*/
+		
+		
+		return new TangentSpaceMeshObject(vertices, triangles, normals, texCoords, name);
+
 	}
 
 	/**
