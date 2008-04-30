@@ -151,7 +151,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	private List<Animated> animatedObjects = new ArrayList<Animated>();
 	
 	
-	
+	private static final boolean sidePanelOn = false;
 	
 	private Player player1;
 	private long lastTime = -1; // negative to identify first timestep
@@ -160,8 +160,8 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	
 
 	// the current size of GL viewport
-	protected int viewWidth = DEFAULT_VIEWPORT_SIZE;
-	protected int viewHeight = DEFAULT_VIEWPORT_SIZE;
+	protected int viewWidth = 800; //DEFAULT_VIEWPORT_SIZE;
+	protected int viewHeight = 600; //DEFAULT_VIEWPORT_SIZE;
 
 	// Current state of the GUI
 	HierarchicalObject object;
@@ -209,6 +209,8 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	public TronRuntime() {
 		super("CS 569 Viewer");
 
+		if (sidePanelOn)
+		{
 		JPanel main = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
@@ -220,6 +222,10 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		main.add(createControlPanel(), c);
 
 		getContentPane().add(main);
+		} else
+		{
+			getContentPane().add(createGLPanel(), BorderLayout.CENTER);
+		}
 
 		// Setup the menuBar
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
@@ -244,7 +250,9 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		mainCamera.setEye(new Vector3f(20,3,0));
 		
 		object.recursiveUpdateBoundingSpheres();
-		modelTree.setRoot(object);
+		
+		if (sidePanelOn)
+			modelTree.setRoot(object);
 		
 		
 		pack();
@@ -279,8 +287,9 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		canvas.addKeyListener(this);
 		JPanel glPanel = new JPanel(new BorderLayout());
 		glPanel.add(canvas, BorderLayout.CENTER);
-		Dimension dimen = new Dimension(DEFAULT_VIEWPORT_SIZE,
-				DEFAULT_VIEWPORT_SIZE);
+		//Dimension dimen = new Dimension(DEFAULT_VIEWPORT_SIZE,
+		//		DEFAULT_VIEWPORT_SIZE);
+		Dimension dimen = new Dimension(viewWidth, viewHeight);
 		glPanel.setPreferredSize(dimen);
 		return glPanel;
 	}

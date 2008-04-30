@@ -39,6 +39,13 @@ public class TexturedPhong extends Phong {
 		P = in_P;
 		diffuseTexture = texture;
 	}
+	
+	public TexturedPhong(String texturePath) {
+		super(TexturedPhongShader.class);
+		diffuseColor.set(1.0f, 1.0f, 1.0f);		
+		diffuseTexture = Texture.getTexture(texturePath);
+	}
+	
 
 	public Texture getDiffuseTexture() {
 		return diffuseTexture;
