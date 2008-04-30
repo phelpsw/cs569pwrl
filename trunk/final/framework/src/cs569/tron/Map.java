@@ -19,26 +19,46 @@ import cs569.object.PrimitiveFactory;
 public class Map extends HierarchicalObject {
 	
 	public Map()
-	{
-		
-		/*
-		MeshObject plane = PrimitiveFactory.makePlane("Plane");
-		plane.setTranslate(0, -0.5f, 0);
-		plane.setMaterial(new AnisotropicWard(new Color3f(0.2f, 0.3f, 0.1f),
-				new Color3f(0.6f, 0.8f, 0.6f), 0.4f, 0.2f));
-		//plane.setMaterial(new TexturedPhong());
-		//plane.setScale(400, 400, 400);
-		plane.setScale(100, 100, 100);
-		this.addObject(plane);
-		*/
-		
-		
-		MeshObject plane = PrimitiveFactory.makePlane("Ground", 30, 30);
+	{		
+		MeshObject plane = PrimitiveFactory.makePlane("Ground", 100, 100);
 		plane.setTranslate(0, -1f, 0);
-		plane.setMaterial(new TexturedPhong());
-		plane.setScale(100, 100, 100);
+		plane.setMaterial(new TexturedPhong("/textures/tron/floor.png"));
+		plane.setScale(400, 400, 400);
 		this.addObject(plane);
 		
+		MeshObject wall = PrimitiveFactory.makePlane("Wall1", 30, 1);
+		wall.setRotationAxisAngle(-90, 1, 0, 0);
+		wall.setTranslate(0, 10, 400);
+		wall.setMaterial(new TexturedPhong("/textures/tron/rim_wall.png")); //
+		wall.setScale(400, 1, 10);
+		this.addObject(wall);		
+		
+		wall = PrimitiveFactory.makePlane("Wall2", 30, 1);
+		wall.setRotationAxisAngle(90, 1, 0, 0);
+		wall.mulRotation(180, 0, 1, 0); // flip right side up
+		wall.setTranslate(0, 10, -400);
+		wall.setMaterial(new TexturedPhong("/textures/tron/rim_wall.png")); //
+		wall.setScale(400, 1, 10);
+		this.addObject(wall);
+		
+		
+		wall = PrimitiveFactory.makePlane("Wall3", 30, 1);
+		wall.setRotationAxisAngle(90, 1, 0, 0);
+		wall.mulRotation(90, 0, 0, 1);
+		wall.mulRotation(180, 0, 1, 0); // flip right side up
+		wall.setTranslate(400, 10, 0);
+		wall.setMaterial(new TexturedPhong("/textures/tron/rim_wall.png")); //
+		wall.setScale(400, 1, 10);
+		this.addObject(wall);
+		
+		wall = PrimitiveFactory.makePlane("Wall4", 30, 1);
+		wall.setRotationAxisAngle(-90, 0, 0, 1);
+		wall.mulRotation(-90, 0, 1, 0); // flip right side up
+		wall.setTranslate(-400, 10, 0);
+		wall.setMaterial(new TexturedPhong("/textures/tron/rim_wall.png")); //
+		wall.setScale(400, 1, 10);
+		this.addObject(wall);
+				
 	}
 	
 	
