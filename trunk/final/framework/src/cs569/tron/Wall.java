@@ -4,27 +4,36 @@ import java.io.PrintStream;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
+import javax.vecmath.Color3f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 
+import cs569.material.Lambertian;
 import cs569.material.Material;
 import cs569.misc.GLSLErrorException;
 import cs569.object.HierarchicalObject;
+import cs569.object.MeshObject;
+import cs569.object.PrimitiveFactory;
 
 public class Wall extends HierarchicalObject {
 
 	Vector2f start = new Vector2f();
 	Vector2f end = new Vector2f();
-	static float height = 10;
-	static float width = .4f;
+	static float height = 1;
+	static float width = .05f;
 	Material material;
+	MeshObject box;
 	
 	public Wall(Vector2f startPos)
 	{
 		start.set(startPos);
 		end.set(startPos);
 		
-		
+		box = PrimitiveFactory.makeBox("Box");
+		box.setTranslate(startPos.x, 0.0f, startPos.y);
+		//box.setScale(0.2f, 0.2f, 0.2f);
+		box.setMaterial(new Lambertian(new Color3f(0.05f, 1.0f, 0.05f)));
+		this.addObject(box);
 	}
 	
 	@Override
@@ -39,9 +48,27 @@ public class Wall extends HierarchicalObject {
 		// TODO Auto-generated method stub
 	}
 	
+	Vector2f magnitude = new Vector2f();
+	
 	public void setEnd(Vector2f vEnd)
 	{
 		end.set(vEnd);
+		magnitude.sub(end, start);
+		
+		
+		magnitude.scale(0.5f);
+		box.setTranslate(start.x + magnitude.x, 0, start.y + magnitude.y);
+		
+		if(magnitude.x == 0.0f)
+			magnitude.x = width;
+		else if (magnitude.y == 0.0f)
+			magnitude.y = width;
+		else
+			System.out.println("Nonzero wall scale term error");
+		box.setScale(magnitude.x, height, magnitude.y);
+		
+		
+		
 	}
 
 }

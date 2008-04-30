@@ -24,7 +24,7 @@ public class Camera {
 	static final float THETA_LIMIT = 89.0f * (float) Math.PI / 180.0f;
 
 	/** The YFOV in degrees */
-	protected float fov = 25f;
+	protected float fov = 65f;
 
 	/** The near plane distance */
 	protected float near = 0.1f;
@@ -201,7 +201,16 @@ public class Camera {
 	 */
 	public void setTarget(Vector3f targetVec) {
 		target.set(targetVec);
-	}	
+	}
+	
+	/**
+	 * Sets the target of the camera.
+	 */
+	public void setTarget(float x, float y, float z) {
+		target.x = x;
+		target.y = y;
+		target.z = z;
+	}
 
 	/**
 	 * Sets the direction of the camera (based on the current eye pos.)
