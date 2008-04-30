@@ -154,7 +154,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	
 	
 	private Player player1;
-	private long lastTime = System.currentTimeMillis();
+	private long lastTime = -1; // negative to identify first timestep
 	
 	
 	
@@ -239,6 +239,9 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		player1 = new Player(mainCamera, Player.PLAYER1, true);
 		object.addObject(player1.getCurrentWall());
 		object.addObject(player1.getVehicle());
+		
+		// TODO: Configure better initial camera position
+		mainCamera.setEye(new Vector3f(20,3,0));
 		
 		object.recursiveUpdateBoundingSpheres();
 		modelTree.setRoot(object);
@@ -589,7 +592,15 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 
 	private void gamePlay()
 	{
+		// handle initial value
+		if(lastTime < 0)
+		{
+			lastTime = System.currentTimeMillis();
+			return;
+		}
+		
 		float dt = System.currentTimeMillis() - lastTime;
+		
 		player1.update(dt);
 		
 		
