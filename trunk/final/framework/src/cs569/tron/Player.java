@@ -68,7 +68,7 @@ public class Player {
 		vehicle = new Vehicle();	
 		direction = new Vector2f(0,1);
 		position = new Vector2f(0,0);
-		velocity = 20.0f;
+		velocity = 40.0f;
 		currentWall = new Wall(position);
 		
 		//TODO set camera position
