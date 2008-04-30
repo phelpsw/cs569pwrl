@@ -26,13 +26,18 @@ public class Player {
 	Vector2f direction; // direction the player is going
 	float velocity;   // distance per second
 	Wall currentWall;
+	Vector3f cameraPosition;
+	Vector3f cameraTargetPosition;
+	static float cameraTargetHorizontalOffset = 5.0f;
+	static float cameraHorizontalOffset = 15.0f;
+	static float cameraVerticalOffset = 10.0f;
 	
 	static Quat4f QUAT_RIGHT = new Quat4f();
 	static Quat4f QUAT_LEFT = new Quat4f();
 	
 	static {
-		QUAT_RIGHT.set(new AxisAngle4f(0,1,0,(float)-Math.PI/2.0f));
-		QUAT_LEFT.set(new AxisAngle4f(0,1,0,(float)Math.PI/2.0f));
+		QUAT_RIGHT.set(new AxisAngle4f(0,1,0,(float)Math.PI/2.0f));
+		QUAT_LEFT.set(new AxisAngle4f(0,1,0,(float)-Math.PI/2.0f));
 	}
 	
 	public Player(Camera camera, boolean human)
@@ -42,10 +47,14 @@ public class Player {
 		vehicle = new Vehicle();	
 		direction = new Vector2f(0,1);
 		position = new Vector2f(0,0);
-		velocity = 3;
+		velocity = .5f;
 		currentWall = new Wall(position);
 		
 		//TODO set camera position
+		cameraTargetPosition = new Vector3f(position.x + direction.x * cameraTargetHorizontalOffset , 0.0f, position.y + direction.y * cameraTargetHorizontalOffset);
+		camera.setTarget(cameraTargetPosition);
+		cameraPosition = new Vector3f(position.x - direction.x * cameraHorizontalOffset , cameraVerticalOffset, position.y - direction.y * cameraHorizontalOffset);
+		camera.setEye(cameraPosition);
 	}
 	
 	public boolean checkCollisionWithWalls(Vector3f pos) // might be better to use boundingbox
@@ -54,16 +63,21 @@ public class Player {
 	}
 	
 	//called every frame
+	// dt is in milliseconds
 	public void update(float dt)
 	{
 		Vector2f temp = new Vector2f(direction);
-		temp.scale(velocity*dt);
+		temp.scale(velocity*(1/dt));
 		position.add(temp);
 		
 		currentWall.setEnd(position);
 		vehicle.setPos(position);
+		System.out.println("vehicle position: " + position + " " + dt);
 		
-		//TODO update camera
+		cameraTargetPosition.set(position.x + direction.x * cameraTargetHorizontalOffset , 0.0f, position.y + direction.y * cameraTargetHorizontalOffset);
+		camera.setTarget(cameraTargetPosition);
+		cameraPosition.set(position.x - direction.x * cameraHorizontalOffset , cameraVerticalOffset, position.y - direction.y * cameraHorizontalOffset);
+		camera.setEye(cameraPosition);
 	}
 	
 	// modify camera and vehicle positions
@@ -78,14 +92,14 @@ public class Player {
 			if (moveType == Player.MOVE_LEFT)
 			{
 				temp = direction.x;
-				direction.x = -direction.y;
-				direction.y = temp;
+				direction.x = direction.y;
+				direction.y = -temp;
 				vehicle.addRotate(QUAT_LEFT);
 			} else if (moveType == Player.MOVE_RIGHT)
 			{
 				temp = direction.x;
-				direction.x = direction.y;
-				direction.y = -temp;
+				direction.x = -direction.y;
+				direction.y = temp;
 				vehicle.addRotate(QUAT_RIGHT);
 			}
 			
