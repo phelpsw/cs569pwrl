@@ -154,7 +154,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	
 	
 	private Player player1;
-	private long lastTime;
+	private long lastTime = System.currentTimeMillis();
 	
 	
 	

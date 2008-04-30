@@ -1,5 +1,8 @@
 package cs569.object;
 
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
+
 /**
  * Created on January 26, 2007
  * Course: CS569 (Interactive Computer Graphics) by Steve Marschner
@@ -18,6 +21,73 @@ public class PrimitiveFactory {
 	public static final MeshObject makePlane(String name) {
 		return new TangentSpaceMeshObject(planeVerts, planeTriangles, planeNormals,
 				planeTexCoords, name);
+	}
+	
+	public static final MeshObject makePlane(String name, int numU, int numV) {
+		
+		float lengthU, lengthV;
+		
+		lengthU = 1.0f/numU;
+		lengthV = 1.0f/numV;
+		// length of UV is 1 (0 to 1), length of plane is 2 (-1 to 1)
+		
+		float[] verts = new float[(2*numU + 2*numV) * 3];
+		float[] norms = new float[(2*numU + 2*numV) * 3];
+		float[] txt = new float[(2*numU + 2*numV) * 2];
+		int[] tris = new int[2*numU + 2*numV];
+		
+		Vector3f pos1 = new Vector3f();
+		Vector3f pos2 = new Vector3f();
+		Vector3f pos3 = new Vector3f();
+		Vector3f pos4 = new Vector3f();
+		
+		Vector2f txt1 = new Vector2f();
+		Vector2f txt2 = new Vector2f();
+		Vector2f txt3 = new Vector2f();
+		Vector2f txt4 = new Vector2f();
+		
+		int xIndex=0;
+		int zIndex=0;
+		
+		//loop
+		
+		//position starts in upper left, and goes counter-clockwise
+		pos1.set(-1 + xIndex*lengthU*2, 0, -1 + zIndex*lengthV*2);		
+		pos2.set(-1 + xIndex*lengthU*2, 0, -1 + (zIndex+1)*lengthV*2);
+		
+		pos3.set(-1 + (xIndex+1)*lengthU*2, 0, -1 + (zIndex+1)*lengthV);
+		pos4.set(-1 + (xIndex+1)*lengthU*2, 0, -1 + zIndex*lengthV);
+				
+		txt1.set(0, 0);		
+		txt2.set(0, 1);		
+		txt3.set(1, 1);
+		txt4.set(1, 0);		
+		
+		//tris 0, 1, 2, 0, 2, 3
+		//norms 0, 1, 0
+		
+		
+		
+		//verts[num*12 + 0] = num*lengthU
+		
+		
+		for (int i=0; i<lengthV; i++)
+		{
+			for (int j=0; j<lengthU; j++)
+			{
+				
+				
+			}
+		}
+		
+		
+		
+		
+		
+		
+		
+		return new TangentSpaceMeshObject(verts, tris, norms,
+				txt, name);
 	}
 
 	/**
