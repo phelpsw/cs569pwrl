@@ -36,10 +36,9 @@ public class Player {
 	static Quat4f QUAT_RIGHT = new Quat4f();
 	static Quat4f QUAT_LEFT = new Quat4f();
 	
-	
 	static {
-		QUAT_RIGHT.set(new AxisAngle4f(0,1,0,(float)Math.PI/2.0f));
-		QUAT_LEFT.set(new AxisAngle4f(0,1,0,(float)-Math.PI/2.0f));
+		QUAT_RIGHT.set(new AxisAngle4f(0,1,0,(float)-Math.PI/2.0f));
+		QUAT_LEFT.set(new AxisAngle4f(0,1,0,(float)Math.PI/2.0f));
 	}
 	
 	public Player(Camera camera, boolean human)
@@ -49,7 +48,7 @@ public class Player {
 		vehicle = new Vehicle();	
 		direction = new Vector2f(0,1);
 		position = new Vector2f(0,0);
-		velocity = 2f;
+		velocity = 20.0f;
 		currentWall = new Wall(position);
 		
 		//TODO set camera position
