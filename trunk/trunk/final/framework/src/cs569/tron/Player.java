@@ -28,12 +28,14 @@ public class Player {
 	Wall currentWall;
 	Vector3f cameraPosition;
 	Vector3f cameraTargetPosition;
+	Vector2f temp = new Vector2f();
 	static float cameraTargetHorizontalOffset = 5.0f;
 	static float cameraHorizontalOffset = 15.0f;
 	static float cameraVerticalOffset = 10.0f;
 	
 	static Quat4f QUAT_RIGHT = new Quat4f();
 	static Quat4f QUAT_LEFT = new Quat4f();
+	
 	
 	static {
 		QUAT_RIGHT.set(new AxisAngle4f(0,1,0,(float)Math.PI/2.0f));
@@ -47,7 +49,7 @@ public class Player {
 		vehicle = new Vehicle();	
 		direction = new Vector2f(0,1);
 		position = new Vector2f(0,0);
-		velocity = .5f;
+		velocity = 2f;
 		currentWall = new Wall(position);
 		
 		//TODO set camera position
@@ -66,8 +68,8 @@ public class Player {
 	// dt is in milliseconds
 	public void update(float dt)
 	{
-		Vector2f temp = new Vector2f(direction);
-		temp.scale(velocity*(1/dt));
+		temp.set(direction);
+		temp.scale(velocity*(dt/1000.0f));
 		position.add(temp);
 		
 		currentWall.setEnd(position);

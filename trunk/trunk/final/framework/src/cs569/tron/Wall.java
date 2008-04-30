@@ -55,16 +55,21 @@ public class Wall extends HierarchicalObject {
 		end.set(vEnd);
 		magnitude.sub(end, start);
 		
+		if (end.equals(start))
+			return;
 		
-		magnitude.scale(0.5f);
+		magnitude.scale(0.5f);		
 		box.setTranslate(start.x + magnitude.x, 0, start.y + magnitude.y);
 		
-		if(magnitude.x == 0.0f)
+		if(Math.abs(magnitude.x) <= 0.001f)
 			magnitude.x = width;
-		else if (magnitude.y == 0.0f)
+		else if (Math.abs(magnitude.y) <= 0.001f)
 			magnitude.y = width;
 		else
-			System.out.println("Nonzero wall scale term error");
+		{
+			System.out.println("Nonzero wall scale term error:" + magnitude);
+			System.exit(1);
+		}
 		box.setScale(magnitude.x, height, magnitude.y);
 		
 		
