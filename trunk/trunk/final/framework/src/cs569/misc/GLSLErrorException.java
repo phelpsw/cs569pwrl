@@ -33,7 +33,7 @@ public class GLSLErrorException extends Exception {
 		String infoLog = getInfoLog(gl, id);
 		if (status[0] == GL.GL_FALSE)
 			throw new GLSLErrorException(getInfoLog(gl, id));
-		else if (!infoLog.trim().equals(""))
+		else if (!infoLog.trim().equals("") && cs569.apps.TronRuntime.TEXTON)
 			System.out.println(infoLog); /* May contain helpful warnings */
 	}
 

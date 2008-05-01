@@ -114,6 +114,8 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 
 	// *******************CONSTANTS************************************************************
 
+	public static boolean TEXTON = false;
+	
 	// The sizes of the viewport and shadow map in pixels
 	protected static final int DEFAULT_VIEWPORT_SIZE = 512;
 
