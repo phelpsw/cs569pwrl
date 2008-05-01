@@ -162,7 +162,8 @@ public abstract class GLSLShader {
 			throws IOException, GLSLErrorException {
 		int shader = gl.glCreateShader(type);
 
-		System.out.println("Compiling '" + filename + "'");
+		if (cs569.apps.TronRuntime.TEXTON)
+			System.out.println("Compiling '" + filename + "'");
 		URL url = GLSLShader.class.getClassLoader().getResource(SHADER_PREFIX + filename);
 
 		BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
@@ -188,7 +189,8 @@ public abstract class GLSLShader {
 		fragmentShader = compileAndLoadShader(gl, GL.GL_FRAGMENT_SHADER,
 				fragmentShaderFileName);
 
-		System.out.println("Linking ..");
+		if (cs569.apps.TronRuntime.TEXTON)
+			System.out.println("Linking ..");
 		program = gl.glCreateProgram();
 		gl.glAttachShader(program, vertexShader);
 		gl.glAttachShader(program, fragmentShader);
@@ -205,7 +207,10 @@ public abstract class GLSLShader {
 			throws GLSLErrorException {
 		int location = gl.glGetUniformLocation(program, name);
 		if (location == -1)
-			System.out.println("Warning: Parameter '" + name + "' not found!");
+		{
+			if (cs569.apps.TronRuntime.TEXTON)
+				System.out.println("Warning: Parameter '" + name + "' not found!");
+		}
 		return location;
 	}
 
