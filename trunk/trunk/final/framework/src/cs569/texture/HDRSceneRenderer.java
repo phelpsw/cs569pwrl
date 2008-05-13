@@ -38,8 +38,8 @@ public class HDRSceneRenderer extends FrameBufferObject {
 		
 		object.glRender(gl, glu, camera.getEye());
 		viewer.getRotationGizmo().glRender(gl, glu, camera.getEye());
-		if (viewer.getParticleSystem() != null)
-			viewer.getParticleSystem().glRender(gl, glu, camera.getEye());
+		if (viewer.getParticleSystemHandler() != null)
+			viewer.getParticleSystemHandler().glRender(gl, glu, camera.getEye());
 	}
 	
 	public void doToneMapping(GL gl, Texture texture)
