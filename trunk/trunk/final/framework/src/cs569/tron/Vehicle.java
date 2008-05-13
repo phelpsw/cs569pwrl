@@ -150,4 +150,14 @@ public class Vehicle extends HierarchicalObject {
 	{
 		bike_body.setMaterial(in);
 	}
+	
+	public void setVisible(boolean val)
+	{
+		if(val)
+		{
+			this.setScale(LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE);
+		} else {
+			this.setScale(new Vector3f(0,0,0));
+		}
+	}
 }

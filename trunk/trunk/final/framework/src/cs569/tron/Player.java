@@ -70,7 +70,7 @@ public class Player {
 		position = new Vector2f(0,0);
 		velocity = 40.0f;
 		currentWall = new Wall(position);
-		
+
 		//TODO set camera position
 		cameraCurrentTargetPosition = new Vector3f(position.x + direction.x * cameraTargetHorizontalOffset , 0.0f, position.y + direction.y * cameraTargetHorizontalOffset);
 		cameraObjectiveTargetPosition = new Vector3f(cameraCurrentTargetPosition);
@@ -80,6 +80,11 @@ public class Player {
 		camera.setEye(cameraCurrentPosition);
 		
 		initVehicleColor(id);
+	}
+	
+	public void setVisible(boolean val)
+	{
+		vehicle.setVisible(val);
 	}
 	
 	private void initVehicleColor(int id)
