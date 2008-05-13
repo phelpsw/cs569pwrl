@@ -98,6 +98,7 @@ import cs569.texture.Texture;
 import cs569.texture.TextureGUI;
 import cs569.tron.Map;
 import cs569.tron.Player;
+import cs569.tron.TronParticleSystemHandler;
 
 /**
  * Created on January 26, 2007
@@ -114,8 +115,6 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 
 	// *******************CONSTANTS************************************************************
 
-	public static boolean TEXTON = false;
-	
 	// The sizes of the viewport and shadow map in pixels
 	protected static final int DEFAULT_VIEWPORT_SIZE = 512;
 
@@ -153,7 +152,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	private List<Animated> animatedObjects = new ArrayList<Animated>();
 	
 	
-	private static final boolean sidePanelOn = false;
+	
 	
 	private Player player1;
 	private long lastTime = -1; // negative to identify first timestep
@@ -162,13 +161,13 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	
 
 	// the current size of GL viewport
-	protected int viewWidth = 800; //DEFAULT_VIEWPORT_SIZE;
-	protected int viewHeight = 600; //DEFAULT_VIEWPORT_SIZE;
+	protected int viewWidth = DEFAULT_VIEWPORT_SIZE;
+	protected int viewHeight = DEFAULT_VIEWPORT_SIZE;
 
 	// Current state of the GUI
 	HierarchicalObject object;
 	HierarchicalObject toBeLoaded = null;
-	ParticleSystem particles = null;
+	TronParticleSystemHandler particleSystemHandler = new TronParticleSystemHandler();
 	protected int cameraViewMode = CAMERA_MAIN;
 	protected int cameraOrbitMode = CAMERA_MAIN;
 	
@@ -209,10 +208,8 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	private long startTime = System.currentTimeMillis();
 
 	public TronRuntime() {
-		super("GigaTRON 4000XP+ Extreme Edition 4");
+		super("CS 569 Viewer");
 
-		if (sidePanelOn)
-		{
 		JPanel main = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
@@ -224,10 +221,6 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		main.add(createControlPanel(), c);
 
 		getContentPane().add(main);
-		} else
-		{
-			getContentPane().add(createGLPanel(), BorderLayout.CENTER);
-		}
 
 		// Setup the menuBar
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
@@ -252,9 +245,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		mainCamera.setEye(new Vector3f(20,3,0));
 		
 		object.recursiveUpdateBoundingSpheres();
-		
-		if (sidePanelOn)
-			modelTree.setRoot(object);
+		modelTree.setRoot(object);
 		
 		
 		pack();
@@ -289,9 +280,8 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		canvas.addKeyListener(this);
 		JPanel glPanel = new JPanel(new BorderLayout());
 		glPanel.add(canvas, BorderLayout.CENTER);
-		//Dimension dimen = new Dimension(DEFAULT_VIEWPORT_SIZE,
-		//		DEFAULT_VIEWPORT_SIZE);
-		Dimension dimen = new Dimension(viewWidth, viewHeight);
+		Dimension dimen = new Dimension(DEFAULT_VIEWPORT_SIZE,
+				DEFAULT_VIEWPORT_SIZE);
 		glPanel.setPreferredSize(dimen);
 		return glPanel;
 	}
@@ -340,15 +330,12 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 
 		// the file menu
 		JMenu fileMenu = new JMenu("File");
-		//String[] fileMenuItemNames = {"Load scene ..",  "Save scene ..", "Exit" };
-		//String[] fileMenuItemActions = { "geomFile", "save", "exit" };
-		//char[] fileMenuMnemonics = {'l', 's', 'x'};
-		String[] fileMenuItemNames = {"Exit" };
-		String[] fileMenuItemActions = {"exit" };		
-		char[] fileMenuMnemonics = {'x'};
+		String[] fileMenuItemNames = {"Load scene ..",  "Save scene ..", "Exit" };
+		String[] fileMenuItemActions = { "geomFile", "save", "exit" };
+		char[] fileMenuMnemonics = {'l', 's', 'x'};
 		KeyStroke[] keyStrokes = {
-				//KeyStroke.getKeyStroke("control L"),
-				//KeyStroke.getKeyStroke("control S"),
+				KeyStroke.getKeyStroke("control L"),
+				KeyStroke.getKeyStroke("control S"),
 				KeyStroke.getKeyStroke("alt X")
 		};
 		addMenuItems(fileMenu, fileMenuItemNames, fileMenuItemActions,
@@ -356,8 +343,6 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		);
 		menuBar.add(fileMenu);
 
-		/*
-		
 		// first the geometry menu
 		JMenu geometryMenu = new JMenu("Geometry");
 		geometryMenu.getPopupMenu().setLabel("Geometry");
@@ -377,7 +362,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		char[] cameraMenuMnemonics= {'M', 'L'};
 		addMenuItems(cameraMenu, cameraMenuItemNames, cameraMenuItemActions, cameraMenuMnemonics, null);
 		menuBar.add(cameraMenu);
-			
+
 		// The orbit menu
 		JMenu orbitMenu = new JMenu("Orbit");
 		orbitMenu.getPopupMenu().setLabel("Orbit");
@@ -421,8 +406,6 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	    String[] particlesMenuItemActions = { "Fountain", "Fire", "Swarm" };
 	    addMenuItems(particlesMenu, particlesMenuItemNames, particlesMenuItemActions, null, null);
 	    menuBar.add(particlesMenu);
-*/
-
 
 	    return menuBar;
 	}
@@ -514,11 +497,13 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	}
 	
 	/**
-	 * Return the active particle system
+	 * Return the TronParticleSystemHandler
 	 */
-	public ParticleSystem getParticleSystem() {
-		return particles;
+	public TronParticleSystemHandler getParticleSystemHandler()
+	{
+		return particleSystemHandler;
 	}
+	
 	
 	// //////////////////////////////////////////////////////////////////////////////////////////////////
 	// Display methods
@@ -552,8 +537,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 			for (Animated animated : animatedObjects) {
 				animated.update((System.currentTimeMillis() - startTime) / 1000.0f);
 			}
-			if(particles != null)
-				particles.update((System.currentTimeMillis() - startTime) / 1000.0f);
+			particleSystemHandler.update((System.currentTimeMillis() - startTime) / 1000.0f);
 
 			/* Update the hierarchy of bounding spheres */
 			object.recursiveUpdateBoundingSpheres();
@@ -588,8 +572,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 			if (!hdrEnabled) {
 				object.glRender(gl, glu, eye);
 				rotationGizmo.glRender(gl, glu, eye);
-				if (particles != null)
-					particles.glRender(gl, glu, eye);
+				particleSystemHandler.glRender(gl,glu,eye);
 			} else {
 				hdr.doToneMapping(gl, hdrResult);
 			}
@@ -711,26 +694,21 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	public void initializeTextures(GL gl) {
 		/* Load the 'Ben's backyard' environment map 
 		    - from http://www.bencloward.com/textures_extra.shtml */
-		/*
 		Texture backyard = Texture.createCubeMapFromFile("Backyard", 
 				"/textures/cubemap/backyard_", ".png");
 		backyard.initializeTexture(gl);
-		*/
 
 		/* Load the 'Grace cathedral' environment map 
 		    - made by Paul Debevec */
-		/*
 		Texture grace = Texture.createCubeMapFromFile("Grace Cathedral", 
 				"/textures/cubemap/grace_", ".png");
 		grace.initializeTexture(gl);
-		*/
 		
 		/* Load some normalmap/diffuse textures */
 		Texture.getTexture("/textures/stoneBrickDiffuse.jpg").initializeTexture(gl);
 		Texture.getTexture("/textures/stoneBrickNormal.jpg").initializeTexture(gl);
 
 		/* Load parts of the 'Finished wood' data set */
-		/*
 		String[] woodTypes = {"cmaple", "walnut2"};
 		String[] textureTypes = {"axis", "beta", "diffuse", "fiber"};
 		for (String woodType: woodTypes) {
@@ -740,7 +718,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 				Texture.create2DTextureFromFile(identifier, identifier, 
 					GL.GL_LINEAR, GL.GL_REPEAT, true, isLinear).initializeTexture(gl);
 			}
-		} */
+		}
 
 		/* A vague-looking particle from the student game 'Alpha Strain' */
 		Texture.getTexture("src/textures/smoke.png").initializeTexture(gl);
@@ -819,8 +797,6 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 					textureActions(ac);
 				} else if (menuName.equals("Animation")) {
 					animationActions(ac);
-				} else if (menuName.equals("Particles")) {
-					particleActions(ac);
 				}
 				return;
 			}
@@ -908,36 +884,6 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 			}
 		} else if (ac.equals("ClearAll")) {
 			animatedObjects.clear();
-		}
-	}
-	
-	private void particleActions(String ac) {
-		// TODO
-		HierarchicalObject.unSetUpdateList();
-		toBeLoaded = new Scene();
-		
-		if(ac.equals("Fountain")) {
-			toBeLoaded = PrimitiveFactory.makePlane("plane");
-			toBeLoaded.setMaterial(new Lambertian(new Color3f(0.1f, 0.1f, 0.1f)));
-			toBeLoaded.setTranslate(new Vector3f(0,-0.05f,0));
-			toBeLoaded.setScale(4.0f, 4.0f, 4.0f);
-			particles = new ParticleSystem(1000);
-			particles.addForce(new Gravity(new Vector3f(0, -1, 0)));
-			particles.addEmitter(new FountainEmitter(100, 0.5f));
-			particles.addUpdater(new PlaneCollider(new Vector3f(0,1,0), 0, 0.5f));
-			particles.addUpdater(new ParticleColorAttenuator(8.0f, new Color4f(1,1,0.5f,1), new Color4f(1, 0, 0, 0)));
-		} else if(ac.equals("Fire")) {
-			toBeLoaded = PrimitiveFactory.makeCylinder(10, 30, "torch");
-			toBeLoaded.setScale(0.25f, 0.5f, 0.25f);
-			toBeLoaded.setTranslate(new Vector3f(0,-0.65f,0));
-			particles = new BillboardParticleSystem(Texture.getTexture("src/textures/smoke.png"), true, 100);
-			particles.addEmitter(new FireEmitter(5, 0.3f));
-			particles.addUpdater(new ParticleColorAttenuator(3.0f, new Color4f(1,1,0.5f,1), new Color4f(1, 0, 0, 0)));
-			particles.addUpdater(new FireUpdater());
-		} else if(ac.equals("Swarm")) {
-			particles = new SwarmParticleSystem(10000);
-			particles.addUpdater(new SwarmUpdater());
-			particles.addEmitter(new SwarmEmitter());
 		}
 	}
 
@@ -1062,6 +1008,10 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 			//case KeyEvent.VK_UP: upKeyPressed = false; break;
 			case KeyEvent.VK_LEFT: player1.move(Player.MOVE_LEFT, (Map) object); break;
 			case KeyEvent.VK_RIGHT: player1.move(Player.MOVE_RIGHT, (Map) object); break;
+			case KeyEvent.KEY_LOCATION_STANDARD:
+				switch(e.getKeyChar()) {
+				case 'x':System.out.println("Explosion");break;
+				}break;
 		}
 	}
 
