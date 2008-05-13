@@ -29,6 +29,9 @@ public class Wall extends HierarchicalObject {
 		start.set(startPos);
 		end.set(startPos);
 		
+		//collidable = true;
+		collidable = false;
+		
 		box = PrimitiveFactory.makeBox("Box");
 		box.setTranslate(startPos.x, 0.0f, startPos.y);
 		//box.setScale(0.2f, 0.2f, 0.2f);

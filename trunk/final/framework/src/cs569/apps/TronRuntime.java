@@ -99,6 +99,7 @@ import cs569.texture.TextureGUI;
 import cs569.tron.Map;
 import cs569.tron.Player;
 import cs569.tron.TronParticleSystemHandler;
+import cs569.tron.Vehicle;
 
 /**
  * Created on January 26, 2007
@@ -253,7 +254,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		// TODO: Configure better initial camera position
 		mainCamera.setEye(new Vector3f(20,3,0));
 		
-		object.recursiveUpdateBoundingSpheres();
+		object.recursiveUpdateBoundingBoxes();
 		
 		if (sidePanelOn)
 			modelTree.setRoot(object);
@@ -557,7 +558,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 			particleSystemHandler.update((System.currentTimeMillis() - startTime) / 1000.0f);
 
 			/* Update the hierarchy of bounding spheres */
-			object.recursiveUpdateBoundingSpheres();
+			object.recursiveUpdateBoundingBoxes();
 			
 			/* Do any render-to-texture operations before drawing the scene
 			   to the main frame buffer */
@@ -621,6 +622,16 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		
 		player1.update(dt);
 		
+		
+        Vehicle v = player1.getVehicle();
+        //v.recursiveUpdateBoundingBoxes(); // Just moved vehicle, but is this needed?
+        
+        if (object.recursiveCheckCollision(v.getTransformedBoundingBox()))
+        {
+        	//particleSystemHandler.explodePlayer(player1);
+        	System.out.println("explode");
+        }
+
 		
 		lastTime = System.currentTimeMillis();
 	}
@@ -1100,7 +1111,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 										+ filename + "\n" + exception);
 					}
 				}
-			} else if (action.equals("geomFile")) {
+			} /*else if (action.equals("geomFile")) {
 				JFileChooser chooser = new JFileChooser(ClassLoader.getSystemResource("").getPath());
 				//chooser.setFileFilter(new FileNameExtensionFilter("CS569 Scene", "xml"));
 				int returnVal = chooser.showOpenDialog(viewer);
@@ -1110,7 +1121,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 					HierarchicalObject loadObj = (HierarchicalObject) parse
 							.parse(filename, Scene.class);
 					loadObj.recursiveUpdateBoundingSpheres();
-					/* Get a picture of the whole scene.. */
+					
 					Vector3f eye = new Vector3f(0.0f, 3.0f, -4.0f);
 					eye.normalize();
 					eye.scale(loadObj.getBoundingSphere().getRadius()*3f);
@@ -1118,7 +1129,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 					mainCamera.setTarget(new Vector3f(0, 0, 0));
 					toBeLoaded = loadObj;
 				}
-			}
+			}*/
 			//			
 			// modelTree.setRoot(object);
 			canvas.repaint();
