@@ -14,7 +14,6 @@ import javax.vecmath.Vector3f;
 
 import com.sun.opengl.util.BufferUtil;
 
-import cs569.misc.BoundingSphere;
 import cs569.misc.GroupData;
 import cs569.misc.OBJLoader;
 import cs569.misc.OBJLoaderException;
@@ -50,9 +49,9 @@ public class MeshObject extends HierarchicalObject {
 
 	/** The GPU program currently associated with this mesh */
 	protected int program = 0;
-
+	
 	/** The bounding sphere comprising all mesh vertices */
-	protected BoundingSphere meshBoundingSphere = null;
+	//protected BoundingSphere meshBoundingSphere = null;
 
 	/**
 	 * Should be used only be the Parser. Please name your objects!
@@ -137,22 +136,20 @@ public class MeshObject extends HierarchicalObject {
 	/**
 	 * Calculate the bounding sphere comprising all mesh vertices
 	 */
-	@Override
-	public void recursiveUpdateBoundingSpheres() {
-		super.recursiveUpdateBoundingSpheres();
+	public void recursiveUpdateBoundingBoxes() {
+		//super.recursiveUpdateBoundingBoxes();
 		
-		if (meshBoundingSphere == null) {
+		if (boundingBox.isInitialized() == false) {
 			/* The bounding sphere of the mesh vertices has
 			 * never been calculated
-			 */
-			meshBoundingSphere = new BoundingSphere();
+			 */			
 			for (int i=0; i<numVertices*3; i+=3) {
-				Point3f pt = new Point3f(verts.get(i), verts.get(i+1), verts.get(i+2));
-				meshBoundingSphere.expandBy(pt);
+				Vector3f pt = new Vector3f(verts.get(i), verts.get(i+1), verts.get(i+2));
+				boundingBox.expandBy(pt);
 			}
+			//System.out.println("RECURSIVE " + name + ", " + boundingBox);
 		}
-
-		boundingSphere.expandBy(meshBoundingSphere);
+		
 	}
 
 	/**

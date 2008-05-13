@@ -26,6 +26,7 @@ public class Map extends HierarchicalObject {
 		int wallTiles = 10;
 		
 		MeshObject plane = PrimitiveFactory.makePlane("Ground", 100, 100);
+		plane.collidable = false;
 		plane.setTranslate(0, groundLevel, 0);
 		plane.setMaterial(new TexturedPhong("/textures/tron/floor.png"));
 		plane.setScale(mapWidth, 1, mapWidth);
@@ -33,6 +34,7 @@ public class Map extends HierarchicalObject {
 				
 		
 		MeshObject wall = PrimitiveFactory.makePlane("Wall1", wallTiles, 1);
+		wall.collidable = true;
 		wall.setRotationAxisAngle(-90, 1, 0, 0);
 		wall.setTranslate(0, wallHeight + groundLevel, mapWidth);
 		wall.setMaterial(new TexturedPhong("/textures/tron/rim_wall.png")); //
@@ -40,6 +42,7 @@ public class Map extends HierarchicalObject {
 		this.addObject(wall);		
 		
 		wall = PrimitiveFactory.makePlane("Wall2", wallTiles , 1);
+		wall.collidable = true; //false; //TODO make true and fix collision prob
 		wall.setRotationAxisAngle(90, 1, 0, 0);
 		wall.mulRotation(180, 0, 1, 0); // flip right side up
 		wall.setTranslate(0, wallHeight + groundLevel, -mapWidth);
@@ -48,6 +51,7 @@ public class Map extends HierarchicalObject {
 		this.addObject(wall);
 				
 		wall = PrimitiveFactory.makePlane("Wall3", wallTiles , 1);
+		wall.collidable = true;
 		wall.setRotationAxisAngle(90, 1, 0, 0);
 		wall.mulRotation(90, 0, 0, 1);
 		wall.mulRotation(180, 0, 1, 0); // flip right side up
@@ -57,6 +61,7 @@ public class Map extends HierarchicalObject {
 		this.addObject(wall);
 		
 		wall = PrimitiveFactory.makePlane("Wall4", wallTiles , 1);
+		wall.collidable = true;
 		wall.setRotationAxisAngle(-90, 0, 0, 1);
 		wall.mulRotation(-90, 0, 1, 0); // flip right side up
 		wall.setTranslate(-mapWidth, wallHeight + groundLevel, 0);
@@ -65,6 +70,7 @@ public class Map extends HierarchicalObject {
 		this.addObject(wall);
 		
 		MeshObject sky = PrimitiveFactory.makeSphere(10,10,"sky");
+		wall.collidable = false;
 		sky.flipNormals();
 		sky.setScale(600, 600, 600);
 		sky.setMaterial(new Lambertian(new Color3f(.3f,.3f,1)));

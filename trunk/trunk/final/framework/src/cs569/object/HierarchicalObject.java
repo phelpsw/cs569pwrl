@@ -14,10 +14,11 @@ import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
 
 import cs569.material.Lambertian;
 import cs569.material.Material;
-import cs569.misc.BoundingSphere;
+import cs569.misc.BoundingBox;
 import cs569.misc.GLSLErrorException;
 import cs569.misc.GLUtils;
 import cs569.misc.WritingUtils;
@@ -61,13 +62,14 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 	private Vector3f translate = new Vector3f(0.0f, 0.0f, 0.0f);
 	
 	/** Matrix version of the above - generated in updateObjectTransform() */
-	private Matrix4f objectTransform = new Matrix4f();
+	protected Matrix4f objectTransform = new Matrix4f(); 
 
 	/** Object transform * Parent's world transform - gets updated in glRender */
-	protected Matrix4f worldTransform = new Matrix4f();
+	protected Matrix4f worldTransform = new Matrix4f(); 
 
 	/** Bounding sphere in local space (always centered at (0, 0, 0) */
-	protected BoundingSphere boundingSphere = new BoundingSphere();
+	//protected BoundingSphere boundingSphere = new BoundingSphere();
+	protected BoundingBox boundingBox = new BoundingBox();
 	
 	/** The parent of this node */
 	private HierarchicalObject parent = null;
@@ -75,6 +77,10 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 	/** The children of this node */
 	private final Vector<HierarchicalObject> children = new Vector<HierarchicalObject>();
 
+	
+	public boolean collidable = false;
+	
+	
 	/** The name of this object */
 	protected String name;
 
@@ -93,6 +99,38 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 		setTransformToIdentity();
 		name = inName;
 	}
+	
+	public boolean recursiveCheckCollision(BoundingBox vehicleBox)
+	{		
+		//System.out.println("recursiveCheck of " + name);
+
+		if (collidable)
+		{
+			if (this.getTransformedBoundingBox().intersect(vehicleBox) == false)
+			{			
+				System.out.println("No intersection with " + name + ", vehicle:" + vehicleBox + ", "+name + ":" + getTransformedBoundingBox());							
+				return false;
+			} else
+			{
+				System.out.println("Collided with " + name + ", vehicle:" + vehicleBox + ", "+name + ":" + getTransformedBoundingBox());
+				
+				return true;
+			}
+		} else
+		{
+	//		System.out.println("generic " + name + ", vehicle:" + vehicleBox + ", "+name + ":" + getTransformedBoundingBox());
+		}
+
+		
+		for (HierarchicalObject currChild : children) {
+			if (currChild.recursiveCheckCollision(vehicleBox))
+				return true;
+		}
+				
+		return false;
+	}
+	
+	
 
 	// //////////////////////////////////////////////////////////////////////////////////////////////////
 	// Drawing
@@ -443,15 +481,41 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 	 * The sphere is in local coordinate system, e.g. it is always centered at
 	 * (0, 0, 0)
 	 */
-	public BoundingSphere getBoundingSphere() {
-		return boundingSphere;
+	//public BoundingSphere getBoundingSphere() {
+//		return boundingSphere;
+//	}
+	
+	public BoundingBox getBoundingBox() {
+		return boundingBox;
+	}
+	
+	public BoundingBox getTransformedBoundingBox()
+	{
+		//TODO speedup
+		Vector3f min = boundingBox.getMinPoint();
+		Vector3f max = boundingBox.getMaxPoint();
+				
+		Vector4f p1 = new Vector4f(min.x, min.y, min.z, 1);
+		Vector4f p2 = new Vector4f(max.x, max.y, max.z, 1);
+		worldTransform.transform(p1);
+		worldTransform.transform(p2);
+		
+		BoundingBox b =  new BoundingBox();
+		b.expandBy(new Vector3f(p1.x, p1.y, p1.z));
+		b.expandBy(new Vector3f(p2.x, p2.y, p2.z));
+		
+		
+		//System.out.println("worldTransform in tformBBox:" + worldTransform);
+		//System.out.println("bbox in tformBBox: " + b);
+		
+		return b;		
 	}
 
 	/**
 	 * Updates the hierarchy of bounding spheres
-	 */
-	public void recursiveUpdateBoundingSpheres() {
-		boundingSphere.reset();
+	 */	
+	public void recursiveUpdateBoundingBoxes() {
+		boundingBox.reset();
 		for (int i=0; i<getChildCount(); i++) {
 			HierarchicalObject child = (HierarchicalObject) getChildAt(i);
 			
@@ -462,11 +526,11 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 			if (child instanceof SkinnedMeshObject)
 				continue;
 
-			child.recursiveUpdateBoundingSpheres();
-			boundingSphere.expandBy(child.getBoundingSphere().transform(child.getObjectTransform()));
+			child.recursiveUpdateBoundingBoxes();
+			boundingBox.expandBy(child.getBoundingBox());
 		}
-	}
-
+	} 
+	
 
 	/**
 	 * Set the update list to the input values

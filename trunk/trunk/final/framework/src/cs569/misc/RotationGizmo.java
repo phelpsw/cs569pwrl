@@ -178,13 +178,16 @@ public class RotationGizmo {
 	public void startDrag(MouseEvent e) {
 		if (object == null)
 			return;
+		
+		
+		/*
 		Point2f posInClipSpace = new Point2f(e.getX(), e.getY());
 		viewer.windowToViewport(posInClipSpace);
 		posInClipSpace.x = Math.max(Math.min(posInClipSpace.x, 1.0f), -1.0f);
 		posInClipSpace.y = Math.max(Math.min(posInClipSpace.y, 1.0f), -1.0f);
 
 		boundingSphere = object.getBoundingSphere().transform(object.getWorldTransform());
-		/* Make it a tiny little bit larger */
+		
 		boundingSphere.setRadius(boundingSphere.getRadius() * 1.005f);
 
 		objectRotation.set(object.getRotation());
@@ -203,6 +206,7 @@ public class RotationGizmo {
 		inverseWorldRotation.set(worldRotation);
 		circleVisible = true;
 		update();
+		*/
 	}
 
 	public void drag(MouseEvent e) {
