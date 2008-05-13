@@ -33,7 +33,7 @@ public class BillboardParticleSystem extends ParticleSystem {
 	@Override
 	public int emit(Vector3f position, Vector3f velocity, Color4f color, float mass, float time, Object... params) {
 		if (params.length < 1)
-			throw new Error("SwarmParticleSystem.emit(): invalid number of objects");
+			throw new Error("BillboardParticleSystem.emit(): invalid number of objects");
 		
 		int idx = super.emit(position, velocity, color, mass, time);
 		if (idx > 0) {

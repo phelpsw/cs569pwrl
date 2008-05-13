@@ -5,7 +5,7 @@ import java.util.Random;
 import javax.vecmath.Color4f;
 import javax.vecmath.Vector3f;
 
-public class ExplosionEmitter implements ParticleEmitter {
+public class ExplosionParticleEmitter implements ParticleEmitter {
 
 	Random random;
 	int currentCount;
@@ -19,7 +19,7 @@ public class ExplosionEmitter implements ParticleEmitter {
 	 * @param emitRate The rate at which to emit particles, in particles per second
 	 * @param spread The radius of the cone of emission
 	 */
-	public ExplosionEmitter(int totalCount, float spread, Vector3f pos) {
+	public ExplosionParticleEmitter(int totalCount, float spread, Vector3f pos) {
 		this.totalCount = totalCount;
 		this.currentCount = 0;
 		this.random = new Random();
