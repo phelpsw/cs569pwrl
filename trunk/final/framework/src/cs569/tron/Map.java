@@ -20,10 +20,10 @@ public class Map extends HierarchicalObject {
 	
 	public Map()
 	{	
-		float wallHeight = 30;
-		float mapWidth = 400;
+		float wallHeight = 20;
+		float mapWidth = 200;
 		float groundLevel = -1;
-		int wallTiles = 10;
+		int wallTiles = 8;
 		
 		MeshObject plane = PrimitiveFactory.makePlane("Ground", 100, 100);
 		plane.collidable = false;
@@ -55,7 +55,7 @@ public class Map extends HierarchicalObject {
 		wall.setRotationAxisAngle(90, 1, 0, 0);
 		wall.mulRotation(90, 0, 0, 1);
 		wall.mulRotation(180, 0, 1, 0); // flip right side up
-		wall.setTranslate(400, wallHeight + groundLevel, 0);
+		wall.setTranslate(mapWidth, wallHeight + groundLevel, 0);
 		wall.setMaterial(new TexturedPhong("/textures/tron/rim_wall.png")); //
 		wall.setScale(mapWidth, 1, wallHeight);
 		this.addObject(wall);
