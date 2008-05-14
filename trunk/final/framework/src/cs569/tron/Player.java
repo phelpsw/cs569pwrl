@@ -16,6 +16,7 @@ import cs569.material.Lambertian;
 import cs569.material.Material;
 import cs569.material.Phong;
 import cs569.material.Reflection;
+import cs569.texture.Texture;
 
 public class Player {
 	
@@ -111,7 +112,7 @@ public class Player {
 			vehicle.setHubMaterial(new Lambertian(new Color3f(1.0f, 1.0f, 1.0f)));
 			vehicle.setWindowMaterial(new Phong(new Color3f(0.1f, 0.1f, 0.1f),new Color3f(1.0f, 1.0f, 1.0f),50.0f));
 			vehicle.setWheelMaterial(new Phong(new Color3f(0,.5f,0), new Color3f(1,1,1), 50.0f));
-			wallMaterial = new Glow(new Color3f(0.2f, 1.0f, 0.1f));
+			wallMaterial = new Glow(new Color3f(0.2f, 1.0f, 0.1f), new Color3f(0.2f, 1.0f, 0.1f), 1.0f, Texture.getTexture("/textures/tron/glowpattern.png"));
 			break;
 		case PLAYER2:
 			vehicle.setBodyMaterial(new AnisotropicWard(new Color3f(1.0f, 0.2f, 0.1f),
@@ -119,7 +120,7 @@ public class Player {
 			vehicle.setHubMaterial(new Lambertian(new Color3f(1.0f, 1.0f, 1.0f)));
 			vehicle.setWindowMaterial(new Phong(new Color3f(0.1f, 0.1f, 0.1f),new Color3f(1.0f, 1.0f, 1.0f),50.0f));
 			vehicle.setWheelMaterial(new Phong(new Color3f(.5f, 0,0), new Color3f(1,1,1), 50.0f));
-			wallMaterial = new Glow(new Color3f(1.0f, 0.2f, 0.1f));
+			wallMaterial = new Glow(new Color3f(1.0f, 0.2f, 0.1f), new Color3f(1.0f, 0.2f, 0.1f), 1.0f, Texture.getTexture("/textures/tron/glowpattern.png"));
 			break;
 		}		
 	}

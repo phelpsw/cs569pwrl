@@ -8,35 +8,43 @@ import javax.vecmath.Vector3f;
 
 import cs569.misc.WritingUtils;
 import cs569.shaders.GlowShader;
+import cs569.texture.Texture;
 
 public class Glow extends ShaderMaterial {
 	
 	// material properties
-	protected final Color3f diffuseColor = new Color3f();
+	protected Color3f baseColor = new Color3f();
+	protected Color3f glowColor = new Color3f();
+	protected float glowFactor;
+	protected Texture glowFilterTexture;
 
 	public Glow() {
 		super(GlowShader.class);
-		diffuseColor.set(1.0f, 1.0f, 1.0f);
+		baseColor.set(1.0f, 1.0f, 1.0f);
+		glowFilterTexture = Texture.getTexture("/textures/tron/glowpattern.png");
 	}
 	
-	public Glow(Color3f color) {
+	public Glow(Color3f baseColor, Color3f glowColor, float glowFactor, Texture glowFilterTexture) {
 		super(GlowShader.class);
-		diffuseColor.set(color);
+		this.baseColor.set(baseColor);
+		this.glowColor.set(glowColor);
+		this.glowFactor = glowFactor;
+		this.glowFilterTexture = glowFilterTexture;
 	}
 	
 	@Override
 	protected void configureShader(GL gl, Vector3f eye) {
-		shader.setGLSLParams(gl, eye, diffuseColor);
+		shader.setGLSLParams(gl, eye, baseColor, glowColor, glowFactor, glowFilterTexture);
 	}
 
 	@Override
 	public Material copy() {
-		return new Glow(diffuseColor);
+		return new Glow(baseColor, glowColor, glowFactor, glowFilterTexture);
 	}
 
 	@Override
 	protected void writeLocalData(PrintStream out, int indent) {
-		WritingUtils.writeColor(out, diffuseColor, "diffuseColor", indent);
+		WritingUtils.writeColor(out, baseColor, "diffuseColor", indent);
 	}
 	
 	/**
@@ -44,18 +52,18 @@ public class Glow extends ShaderMaterial {
 	 */
 	@Override
 	public void getApproximateDiffuseColor(Color3f outColor) {
-		outColor.set(diffuseColor);
+		outColor.set(baseColor);
 	}
 	
 	// *******************************
 	// * Material Property Functions *
 	// *******************************
-	public Color3f getDiffuseColor() {
-		return diffuseColor;
+	public Color3f getBaseColor() {
+		return baseColor;
 	}
 
-	public void setDiffuseColor(Color3f color) {
-		diffuseColor.set(color);
+	public void setBaseColor(Color3f color) {
+		baseColor.set(color);
 	}
 
 }

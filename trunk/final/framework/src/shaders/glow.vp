@@ -2,9 +2,10 @@
 
 /* Uniform Inputs */
 uniform vec4 lightPosition;
+uniform vec4 eyePosition;
 
 /* Outputs -> fragment program */
-varying vec3 lightVector, normal;
+varying vec3 lightVector, eyeVector, normal;
 
 void main() {
 	/* The following statement is almost equivalent to writing
@@ -22,4 +23,10 @@ void main() {
 	/* Vertex->Light in world coordinates */
 	vec4 worldSpacePos = gl_ModelViewMatrix * gl_Vertex;
 	lightVector = (lightPosition - worldSpacePos).xyz;
+
+	/* Vertex->Eye in world coordinates */
+	eyeVector = (eyePosition - worldSpacePos).xyz;
+	
+	/* Forward the texture coordinates */
+	gl_TexCoord[0] = gl_MultiTexCoord0;
 }
