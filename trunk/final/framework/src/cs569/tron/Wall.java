@@ -29,16 +29,15 @@ public class Wall extends HierarchicalObject {
 		start.set(startPos);
 		end.set(startPos);
 		
-		//collidable = true;
-		collidable = false;
-		
+		name = "WallTrail " + start.x + " " + start.y;
+	
 		box = PrimitiveFactory.makeBox("Box");
 		box.setTranslate(startPos.x, 0.0f, startPos.y);
 		//box.setScale(0.2f, 0.2f, 0.2f);
-		box.setMaterial(new Lambertian(new Color3f(0.05f, 1.0f, 0.05f)));
+		box.setMaterial(new Lambertian(new Color3f(0.05f, 1.0f, 0.05f)));		
 		this.addObject(box);
 	}
-	
+		
 	@Override
 	protected void draw(GL gl, GLU glu, Vector3f eye) throws GLSLErrorException {
 		//draw a box.  No super

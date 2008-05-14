@@ -100,6 +100,44 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 		name = inName;
 	}
 	
+	public BoundingBox getTransformedBoundingBox()
+	{
+		//TODO speedup
+		Vector3f min = boundingBox.getMinPoint();
+		Vector3f max = boundingBox.getMaxPoint();
+			
+				
+		Vector4f p1 = new Vector4f(min.x, min.y, min.z, 1);
+		Vector4f p2 = new Vector4f(max.x, max.y, max.z, 1);
+		worldTransform.transform(p1);
+		worldTransform.transform(p2);
+		//objectTransform.transform(p1);
+		//objectTransform.transform(p2);
+		
+		BoundingBox b =  new BoundingBox();
+		b.expandBy(new Vector3f(p1.x, p1.y, p1.z));
+		b.expandBy(new Vector3f(p2.x, p2.y, p2.z));
+		
+		
+		if (name.equals("WallTrail"))
+		{
+			System.out.println("Wall2: min/max=" + boundingBox);
+			System.out.println("       p1=" + p1 + ", p2=" + p2);
+			System.out.println("       bBox=" + b);
+		
+			System.out.println("object transform:\n" + objectTransform);
+			
+		}
+		
+		
+		
+		//System.out.println("worldTransform in tformBBox:" + worldTransform);
+		//System.out.println("bbox in tformBBox: " + b);
+		
+		return b;		
+	}
+
+	
 	public boolean recursiveCheckCollision(BoundingBox vehicleBox)
 	{		
 		//System.out.println("recursiveCheck of " + name);
@@ -108,7 +146,7 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 		{
 			if (this.getTransformedBoundingBox().intersect(vehicleBox) == false)
 			{			
-				System.out.println("No intersection with " + name + ", vehicle:" + vehicleBox + ", "+name + ":" + getTransformedBoundingBox());							
+				//System.out.println("No intersection with " + name + ", vehicle:" + vehicleBox + ", "+name + ":" + getTransformedBoundingBox());							
 				return false;
 			} else
 			{
@@ -488,29 +526,7 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 	public BoundingBox getBoundingBox() {
 		return boundingBox;
 	}
-	
-	public BoundingBox getTransformedBoundingBox()
-	{
-		//TODO speedup
-		Vector3f min = boundingBox.getMinPoint();
-		Vector3f max = boundingBox.getMaxPoint();
-				
-		Vector4f p1 = new Vector4f(min.x, min.y, min.z, 1);
-		Vector4f p2 = new Vector4f(max.x, max.y, max.z, 1);
-		worldTransform.transform(p1);
-		worldTransform.transform(p2);
 		
-		BoundingBox b =  new BoundingBox();
-		b.expandBy(new Vector3f(p1.x, p1.y, p1.z));
-		b.expandBy(new Vector3f(p2.x, p2.y, p2.z));
-		
-		
-		//System.out.println("worldTransform in tformBBox:" + worldTransform);
-		//System.out.println("bbox in tformBBox: " + b);
-		
-		return b;		
-	}
-
 	/**
 	 * Updates the hierarchy of bounding spheres
 	 */	

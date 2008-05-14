@@ -42,7 +42,7 @@ public class Map extends HierarchicalObject {
 		this.addObject(wall);		
 		
 		wall = PrimitiveFactory.makePlane("Wall2", wallTiles , 1);
-		wall.collidable = true; //false; //TODO make true and fix collision prob
+		wall.collidable = true; 
 		wall.setRotationAxisAngle(90, 1, 0, 0);
 		wall.mulRotation(180, 0, 1, 0); // flip right side up
 		wall.setTranslate(0, wallHeight + groundLevel, -mapWidth);
@@ -70,7 +70,7 @@ public class Map extends HierarchicalObject {
 		this.addObject(wall);
 		
 		MeshObject sky = PrimitiveFactory.makeSphere(10,10,"sky");
-		wall.collidable = false;
+		sky.collidable = false;
 		sky.flipNormals();
 		sky.setScale(600, 600, 600);
 		sky.setMaterial(new Lambertian(new Color3f(.3f,.3f,1)));
