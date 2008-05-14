@@ -2,6 +2,7 @@ package cs569.tron;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Color3f;
@@ -9,6 +10,7 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 
+import cs569.apps.TronRuntime;
 import cs569.camera.Camera;
 import cs569.material.AnisotropicWard;
 import cs569.material.Glow;
@@ -16,6 +18,7 @@ import cs569.material.Lambertian;
 import cs569.material.Material;
 import cs569.material.Phong;
 import cs569.material.Reflection;
+import cs569.misc.BoundingBox;
 import cs569.texture.Texture;
 
 public class Player {
@@ -46,6 +49,15 @@ public class Player {
 	Vector3f cameraCurrentTargetPosition;
 	Vector3f cameraObjectiveTargetPosition;
 	
+	BoundingBox aiBoundingBox = null;
+	static float aiLookAheadHorizontalOffsetMin = 0.0f;
+	static float aiLookAheadHorizontalOffsetMax = 8.0f;
+	Vector3f aiLookAheadMin = new Vector3f();
+	Vector3f aiLookAheadMax = new Vector3f();
+	Vector3f bbOffset = new Vector3f();
+	
+	Random rand = new Random();
+	
 	Vector3f deltaEye = new Vector3f();
 	Vector3f deltaTarget = new Vector3f();
 	static float eyeDampeningConstant = 0.00125f;
@@ -70,7 +82,7 @@ public class Player {
 	{
 		this.camera = new Camera();
 		this.humanCtl = human;	
-		this.id = id;			
+		this.id = id;
 		direction = new Vector2f();
 		position = new Vector2f();		
 
@@ -103,6 +115,11 @@ public class Player {
 		currentWall = new Wall(position, direction);
 		currentWall.setMaterial(this.wallMaterial);
 		
+		// perform AI operation if AI player
+		if(humanCtl == false)
+		{
+			aiBoundingBox = new BoundingBox();
+		}
 	}
 	
 	public Camera getCamera()
@@ -166,15 +183,35 @@ public class Player {
 		
 		camera.setEye(cameraCurrentPosition);
 		camera.setTarget(cameraCurrentTargetPosition);
+		
+		// perform AI operation if AI player
+		if(humanCtl == false)
+		{
+			
+			aiBoundingBox.reset();
+			aiLookAheadMin.set(position.x + direction.x * aiLookAheadHorizontalOffsetMin , 0.0f, position.y + direction.y * aiLookAheadHorizontalOffsetMin);
+			aiLookAheadMax.set(position.x + direction.x * aiLookAheadHorizontalOffsetMax , 0.0f, position.y + direction.y * aiLookAheadHorizontalOffsetMax);
+			aiBoundingBox.expandBy(aiLookAheadMin);
+			aiBoundingBox.expandBy(aiLookAheadMax);
+			if(TronRuntime.getRootObject().recursiveCheckCollision(aiBoundingBox))
+			{
+				if(rand.nextBoolean())
+				{
+					move(MOVE_RIGHT);
+					System.out.println("right");
+				} else {
+					move(MOVE_LEFT);
+					System.out.println("left");
+				}
+				System.out.println("collide");
+			}
+		}
 	}
 	
 	// modify camera and vehicle positions
-	public void move(int moveType, Map map)
+	public void move(int moveType)
 	{		
 		if (alive == false)
-			return;
-		
-		if (humanCtl == false)
 			return;
 		
 		if (moveType == Player.MOVE_LEFT || moveType == Player.MOVE_RIGHT)
@@ -197,7 +234,7 @@ public class Player {
 			currentWall.completeWall(position);
 			currentWall = new Wall(position, direction);
 			currentWall.setMaterial(this.wallMaterial);
-			map.addWall(currentWall);
+			((Map)TronRuntime.getRootObject()).addWall(currentWall);
 			
 			position.x += direction.x * 5;
 			position.y += direction.y * 5;
