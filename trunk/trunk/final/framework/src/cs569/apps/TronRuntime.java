@@ -158,9 +158,8 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	private static final boolean sidePanelOn = false;
 	
 	
-	private Player player1;
+	private Player[] player = new Player[2];	
 	private long lastTime = -1; // negative to identify first timestep
-	
 	
 	
 
@@ -191,8 +190,10 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	/* Gizmos */
 	private RotationGizmo rotationGizmo = new RotationGizmo(this);
 
-	/* Main scene camera and a virtual camera corresponding to the light source */
-	protected Camera mainCamera = new Camera();
+	/* Main scene camera and a virtual camera corresponding to the light source */	
+	protected Camera mainCamera = new Camera(); // null
+	
+	
 	protected Camera lightCamera = new Camera(
 			new Vector3f(0.0f, 100.0f,1.0f),
 			new Vector3f(0, 0, 0), 
@@ -247,13 +248,14 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		//object = (HierarchicalObject) parser.parse(filename, Scene.class);
 		object = new Map();
 		
-		player1 = new Player(mainCamera, Player.PLAYER1, true);
-		object.addObject(player1.getCurrentWall());
-		object.addObject(player1.getVehicle());
-		
-		// TODO: Configure better initial camera position
-		mainCamera.setEye(new Vector3f(20,3,0));
-		
+		for (int i=0; i<player.length; i++)
+		{
+		 player[i] = new Player(i, true);		
+		 object.addObject(player[i].getCurrentWall());
+		 object.addObject(player[i].getVehicle());
+		}
+				
+			
 		object.recursiveUpdateBoundingBoxes();
 		
 		if (sidePanelOn)
@@ -358,6 +360,17 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		);
 		menuBar.add(fileMenu);
 
+		
+		// first the geometry menu
+		JMenu gameMenu = new JMenu("Gameplay");
+		gameMenu.getPopupMenu().setLabel("Gameplay");
+		String[] gameMenuItemNames = { "1 Player", "2 Player"};
+		String[] gameMenuItemActions = { "gameplay1Player", "gameplay2Player"};
+		addMenuItems(gameMenu, gameMenuItemNames,
+				gameMenuItemActions, null, null);
+		menuBar.add(gameMenu);
+		
+		
 		/*
 		
 		// first the geometry menu
@@ -582,18 +595,35 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	
 			gamePlay();
 			
+			//*********************************
+			// Player 1		
+			mainCamera = player[0].getCamera();
+			gl.glViewport(0,0,viewWidth/2, viewHeight);
 			Vector3f eye = new Vector3f();
 			renderCamera(gl, eye);
 			gl.glMatrixMode(GL.GL_MODELVIEW);
 			gl.glLoadIdentity();
-
-			if (!hdrEnabled) {
-				object.glRender(gl, glu, eye);
-				rotationGizmo.glRender(gl, glu, eye);
-				particleSystemHandler.glRender(gl,glu,eye);
-			} else {
-				hdr.doToneMapping(gl, hdrResult);
-			}
+				
+			object.glRender(gl, glu, eye);
+			//rotationGizmo.glRender(gl, glu, eye);
+			particleSystemHandler.glRender(gl,glu,eye);
+			
+			
+			//*********************************
+			// Player 2
+			mainCamera = player[1].getCamera();
+			gl.glViewport(viewWidth/2, 0, viewWidth, viewHeight);
+			eye = new Vector3f();
+			renderCamera(gl, eye);
+			gl.glMatrixMode(GL.GL_MODELVIEW);
+			gl.glLoadIdentity();
+				
+			object.glRender(gl, glu, eye);
+			//rotationGizmo.glRender(gl, glu, eye);
+			particleSystemHandler.glRender(gl,glu,eye);
+			
+			
+			
 		} catch (GLSLErrorException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(this,
@@ -620,18 +650,23 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		
 		float dt = System.currentTimeMillis() - lastTime;
 		
-		player1.update(dt);
-		
-		
-        Vehicle v = player1.getVehicle();
-        //v.recursiveUpdateBoundingBoxes(); // Just moved vehicle, but is this needed?
-        
-        if (object.recursiveCheckCollision(v.getTransformedBoundingBox()))
-        {
-        	particleSystemHandler.explodePlayer(player1);
-        	System.out.println("explode");
-        }        
-
+		for (int i=0; i<player.length; i++)
+		{
+			if (player[i].alive == false)
+				continue; // skip player
+			
+			player[i].update(dt);
+					
+	        Vehicle v = player[i].getVehicle();
+	        //v.recursiveUpdateBoundingBoxes(); // Just moved vehicle, but is this needed?
+	        
+	        if (object.recursiveCheckCollision(v.getTransformedBoundingBox()))
+	        {
+	        	player[i].alive = false;
+	        	particleSystemHandler.explodePlayer(player[i]);
+	        	System.out.println("explode");
+	       	}
+		}
 		
 		lastTime = System.currentTimeMillis();
 	}
@@ -645,11 +680,11 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 			eye.set(lightCamera.getEye());
 			setProjectionForCamera(lightCamera, gl);
 			rotationGizmo.setCamera(lightCamera);
-		} else {
-			mainCamera.updateMatrices();
-			eye.set(mainCamera.getEye());
-			setProjectionForCamera(mainCamera, gl);
-			rotationGizmo.setCamera(mainCamera);
+		} else {			
+			 mainCamera.updateMatrices();
+			 eye.set(mainCamera.getEye());
+			 setProjectionForCamera(mainCamera, gl);
+			 rotationGizmo.setCamera(mainCamera);			
 		}
 	}
 
@@ -665,6 +700,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	 * @see net.java.games.jogl.GLEventListener#reshape(net.java.games.jogl.GLDrawable,
 	 *      int, int, int, int)
 	 */
+	//TODO rework for 2 player?
 	public void reshape(GLAutoDrawable gLDrawable, int x, int y, int width,
 			int height) {
 		final GL gl = gLDrawable.getGL();
@@ -873,6 +909,11 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	private void geometryActions(String ac) {
 		new Thread(new LoadingThread(ac, this)).start();
 	}
+	
+	/** Geometry actions */
+	private void gameActions(String ac) {
+		new Thread(new LoadingThread(ac, this)).start();
+	}
 
 	/** Camera Actions */
 	private void cameraActions(String ac) {
@@ -1039,11 +1080,11 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		switch (e.getKeyCode()) {
 			//case KeyEvent.VK_DOWN: downKeyPressed = false; break;
 			//case KeyEvent.VK_UP: upKeyPressed = false; break;
-			case KeyEvent.VK_LEFT: player1.move(Player.MOVE_LEFT, (Map) object); break;
-			case KeyEvent.VK_RIGHT: player1.move(Player.MOVE_RIGHT, (Map) object); break;
+			case KeyEvent.VK_LEFT: player[0].move(Player.MOVE_LEFT, (Map) object); break;
+			case KeyEvent.VK_RIGHT: player[0].move(Player.MOVE_RIGHT, (Map) object); break;
 			default:
 				switch(e.getKeyChar()) {
-				case 'x':particleSystemHandler.explodePlayer(player1);break;
+				case 'x':particleSystemHandler.explodePlayer(player[0]);break;
 				}break;
 		}
 	}
@@ -1082,6 +1123,9 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 			// set update list to default (assume no skinning unless we load a
 			//   skinned mesh
 			HierarchicalObject.unSetUpdateList();
+			
+					
+			
 			if (action.equals("geomDefault")) {
 				// set the default object
 				toBeLoaded = defaultSceneMaker.make();
