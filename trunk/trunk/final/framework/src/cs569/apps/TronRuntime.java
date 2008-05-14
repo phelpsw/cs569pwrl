@@ -69,6 +69,7 @@ import cs569.material.Material;
 import cs569.material.NormalMappedPhong;
 import cs569.material.Phong;
 import cs569.material.Reflection;
+import cs569.material.ShadowedGlow;
 import cs569.material.ShadowedPhong;
 import cs569.material.SkinnedPhong;
 import cs569.material.SkinnedPhongProper;
@@ -197,11 +198,9 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	
 	
 	protected Camera lightCamera = new Camera(
-			new Vector3f(0.0f, 100.0f,1.0f),
+			new Vector3f(0.0f, 400.0f,1.0f),
 			new Vector3f(0, 0, 0), 
-			new Vector3f(0, 1, 0), 70, 0.1f, 
-			(float) (2 * new Vector3f(0.0f, 100.0f,1.0f).length())
-	);
+			new Vector3f(0, 1, 0), 54, 350, 450);
 	
 	/* HDR rendering */
 	protected static boolean hdrEnabled = false;
@@ -259,8 +258,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		 object.addObject(player[i].getCurrentWall());
 		 object.addObject(player[i].getVehicle());
 		}
-				
-			
+		
 		object.recursiveUpdateBoundingBoxes();
 		
 		if (sidePanelOn)
@@ -655,6 +653,18 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		// handle initial value
 		if(lastTime < 0)
 		{
+			/*
+			((Map)(object)).setGroundMaterial(
+					new ShadowedPhong());
+			*/
+			((Map)(object)).setGroundMaterial(
+					new ShadowedGlow(
+							new Color3f(0.1f,0.1f,0.1f), 
+							new Color3f(0.8f,0.8f,0.8f), 
+							1.0f, 
+							Texture.getTexture("/textures/tron/floor.png"), 
+							Texture.getTexture("Shadow map")));
+			
 			lastTime = System.currentTimeMillis();
 			return;
 		}
@@ -752,7 +762,6 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 
 		try {
 			initializeTextures(gl);
-
 			GLSLShader.initializeShaders(gl);
 
 			/* Initialize all frame buffer objects */
@@ -807,7 +816,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		Texture.getTexture("src/textures/smoke.png").initializeTexture(gl);
 		
 		/* Create some frame buffer objects and attach them to the scene */
-		ShadowMap shadowMap = new ShadowMap("Shadow map", lightCamera, 1024, 1024);
+		ShadowMap shadowMap = new ShadowMap("Shadow map", lightCamera, 2048, 2048);
 		frameBufferObjects.add(shadowMap);
 
 		/* Create a dynamic cube-map generator and place it at the center of the sphere 
