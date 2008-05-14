@@ -163,7 +163,8 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	
 	private Player[] player = new Player[2];	
 	private long lastTime = -1; // negative to identify first timestep
-	
+
+	private boolean gameRunning = false;
 	
 
 	// the current size of GL viewport
@@ -179,7 +180,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	
 	// Screen filling texture
 	protected Texture sfqTexture = null;
-
+	
 	// UI elements
 	private DefaultTreeModel modelTree;
 	private JTree modelTreeView;
@@ -271,6 +272,18 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		animator = new Animator(canvas);
 		animator.setRunAsFastAsPossible(false);
 		animator.start();
+	}
+	
+	public void resetGame()
+	{
+		object = new Map();	
+		
+		for (int i=0; i<player.length; i++)
+		{
+		 player[i].resetPlayer();
+		 object.addObject(player[i].getCurrentWall());
+		 object.addObject(player[i].getVehicle());
+		}
 	}
 
 	/**
@@ -596,7 +609,8 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 				sfqTexture.blit(gl);
 			}
 	
-			gamePlay();
+			if (gameRunning)
+				gamePlay();
 			
 			//*********************************
 			// Player 1		
@@ -941,10 +955,14 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		if (ac.equals("gameplay1Player"))
 		{			
 		 player[1].humanCtl = false;
+		 resetGame();
+		 gameRunning = true;
+		 
 		} else
-		{
-			System.out.println("2 player");
+		{		
 			player[1].humanCtl = true;
+			resetGame();
+			 gameRunning = true;
 		}
 	}
 
@@ -1107,15 +1125,18 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	}
 	
 	public void keyPressed(KeyEvent e) {
-		switch (e.getKeyCode()) {
-		 case KeyEvent.VK_LEFT: player[0].move(Player.MOVE_LEFT, (Map) object); break;
-		 case KeyEvent.VK_RIGHT: player[0].move(Player.MOVE_RIGHT, (Map) object); break;		
-		 default:
-			switch(e.getKeyChar()) {
-			case 'a':
-				player[1].move(Player.MOVE_LEFT, (Map)object); break;
-			case 'd':
-				player[1].move(Player.MOVE_RIGHT, (Map)object); break;
+		if (gameRunning)
+		{			
+			switch (e.getKeyCode()) {
+			 case KeyEvent.VK_LEFT: player[0].move(Player.MOVE_LEFT, (Map) object); break;
+			 case KeyEvent.VK_RIGHT: player[0].move(Player.MOVE_RIGHT, (Map) object); break;		
+			 default:
+				switch(e.getKeyChar()) {
+				case 'a':
+					player[1].move(Player.MOVE_LEFT, (Map)object); break;
+				case 'd':
+					player[1].move(Player.MOVE_RIGHT, (Map)object); break;
+				}
 			}
 		}
 		
@@ -1125,7 +1146,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		switch(e.getKeyChar()) {
 		case 'x':
 			particleSystemHandler.explodePlayer(player[0]);
-			break;			
+			break;				
 		}		
 	}
 

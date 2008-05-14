@@ -30,7 +30,7 @@ public class Player {
 	public static final int PLAYER1=0;
 	public static final int PLAYER2=1;
 	
-	int id; // Player 1 this value == 1
+	int id; // Player 1 this value == 0
 	Camera camera;
 	Vehicle vehicle;	
 	public boolean humanCtl; // ai will be player too, don't want to update cam for ai
@@ -69,26 +69,40 @@ public class Player {
 	public Player(int id, boolean human)
 	{
 		this.camera = new Camera();
-		this.humanCtl = human;		
-		vehicle = new Vehicle();	
-		direction = new Vector2f(0,1);
-		position = new Vector2f(id*20,id*20);
-		vehicle.setPos(position);
-		velocity = 80.0f;
+		this.humanCtl = human;	
+		this.id = id;			
+		direction = new Vector2f();
+		position = new Vector2f();		
 
-		//TODO set camera position
-		cameraCurrentTargetPosition = new Vector3f(position.x + direction.x * cameraTargetHorizontalOffset , 0.0f, position.y + direction.y * cameraTargetHorizontalOffset);
-		cameraObjectiveTargetPosition = new Vector3f(cameraCurrentTargetPosition);
-		camera.setTarget(cameraCurrentTargetPosition);
-		cameraCurrentPosition = new Vector3f(position.x - direction.x * cameraHorizontalOffset , cameraVerticalOffset, position.y - direction.y * cameraHorizontalOffset);
-		cameraObjectivePosition = new Vector3f(cameraCurrentPosition);
-		camera.setEye(cameraCurrentPosition);
+		cameraCurrentTargetPosition = new Vector3f();
+		cameraObjectiveTargetPosition = new Vector3f();		
+		cameraCurrentPosition = new Vector3f();
+		cameraObjectivePosition = new Vector3f();
 		
+		resetPlayer();
+	}
+	
+	public void resetPlayer()
+	{
+		alive = true;
+		velocity = 80.0f;
+		vehicle = new Vehicle();
 		initVehicleColor(id);
+		direction.set(0,1);
+		position.set(id*20,id*20);
+		vehicle.setPos(position);
 		
+		cameraCurrentTargetPosition.set(position.x + direction.x * cameraTargetHorizontalOffset , 0.0f, position.y + direction.y * cameraTargetHorizontalOffset);
+		cameraObjectiveTargetPosition.set(cameraCurrentTargetPosition);
+		camera.setTarget(cameraCurrentTargetPosition);
+		cameraCurrentPosition.set(position.x - direction.x * cameraHorizontalOffset , cameraVerticalOffset, position.y - direction.y * cameraHorizontalOffset);
+		cameraObjectivePosition.set(cameraCurrentPosition);
+		camera.setEye(cameraCurrentPosition);
+
 		// Walls must be setup after vehicle is initialized
 		currentWall = new Wall(position, direction);
-		currentWall.setMaterial(this.wallMaterial);		
+		currentWall.setMaterial(this.wallMaterial);
+		
 	}
 	
 	public Camera getCamera()
