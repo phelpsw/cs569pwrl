@@ -19,22 +19,35 @@ public class Wall extends HierarchicalObject {
 
 	Vector2f start = new Vector2f();
 	Vector2f end = new Vector2f();
+	Vector2f dir = new Vector2f();
 	static float height = 1;
 	static float width = .05f;
 	Material material;
 	MeshObject box;
 	
-	public Wall(Vector2f startPos)
+	static float offset = 5; 
+	
+	public Wall(Vector2f startPos, Vector2f direction)
 	{
 		start.set(startPos);
-		end.set(startPos);
+		end.set(startPos);		
+		dir.set(direction);
+		end.x = end.x - dir.x * offset;
+		end.y = end.y - dir.y * offset;
+		
+		//System.out.println("New wall start: " + start + ", end: " + end + ", dir: " + dir);
 		
 		name = "WallTrail " + start.x + " " + start.y;
 	
-		box = PrimitiveFactory.makeBox("Box");
+		box = PrimitiveFactory.makeBox("WallTrailBox_" + startPos.x + "_" + startPos.y);		
 		box.setTranslate(startPos.x, 0.0f, startPos.y);
 		box.collidable = true;
-		this.addObject(box);
+
+	}
+	
+	public void setCollidable(boolean c)
+	{
+		box.collidable = c;
 	}
 		
 	@Override
@@ -44,6 +57,11 @@ public class Wall extends HierarchicalObject {
 		
 	}
 
+	public void setMaterial(Material m)
+	{	
+		box.setMaterial(m);
+	}
+	
 	@Override
 	protected void writeLocalData(PrintStream out, int indent) {
 		// TODO Auto-generated method stub
@@ -51,13 +69,36 @@ public class Wall extends HierarchicalObject {
 	
 	Vector2f magnitude = new Vector2f();
 	
+	public void completeWall(Vector2f vEnd)	
+	{
+	 setEndOffset(vEnd, 0);	
+	}
+		
 	public void setEnd(Vector2f vEnd)
 	{
+		setEndOffset(vEnd, offset);
+	}
+		
+	private void setEndOffset(Vector2f vEnd, float wallOffset)
+	{
+		//System.out.println("wall box bbox " + box.getTransformedBoundingBox());
 		end.set(vEnd);
+		end.x -= dir.x * wallOffset;
+		end.y -= dir.y * wallOffset;
 		magnitude.sub(end, start);
 		
-		if (end.equals(start))
+		if (magnitude.dot(dir) <= 0)
+		{
+			//System.out.println("no wall yet, end:" + end);			
 			return;
+		}
+				
+		
+		if (this.getChildCount() == 0)
+		{
+			//System.out.println("Add wall, end: " + end);
+			this.addObject(box);
+		}
 		
 		magnitude.scale(0.5f);		
 		box.setTranslate(start.x + magnitude.x, 0, start.y + magnitude.y);
@@ -72,6 +113,8 @@ public class Wall extends HierarchicalObject {
 			
 		}
 		box.setScale(magnitude.x, height, magnitude.y);
+		
+		//System.out.println("AFTER wall box bbox " + box.getTransformedBoundingBox());
 		
 		
 		
