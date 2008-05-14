@@ -166,21 +166,27 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 
 	private boolean gameRunning = false;
 	
+	
 
 	// the current size of GL viewport
 	protected int viewWidth = 800; //DEFAULT_VIEWPORT_SIZE;
 	protected int viewHeight = 600; //DEFAULT_VIEWPORT_SIZE;
 
 	// Current state of the GUI
-	HierarchicalObject object;
+	static HierarchicalObject object;
 	HierarchicalObject toBeLoaded = null;
 	TronParticleSystemHandler particleSystemHandler = new TronParticleSystemHandler();
 	protected int cameraViewMode = CAMERA_MAIN;
 	protected int cameraOrbitMode = CAMERA_MAIN;
 	
+	public static HierarchicalObject getRootObject()
+	{
+		return object;
+	}
+	
 	// Screen filling texture
 	protected Texture sfqTexture = null;
-	
+
 	// UI elements
 	private DefaultTreeModel modelTree;
 	private JTree modelTreeView;
@@ -1128,15 +1134,18 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		if (gameRunning)
 		{			
 			switch (e.getKeyCode()) {
-			 case KeyEvent.VK_LEFT: player[0].move(Player.MOVE_LEFT, (Map) object); break;
-			 case KeyEvent.VK_RIGHT: player[0].move(Player.MOVE_RIGHT, (Map) object); break;		
+			 case KeyEvent.VK_LEFT: player[0].move(Player.MOVE_LEFT); break;
+			 case KeyEvent.VK_RIGHT: player[0].move(Player.MOVE_RIGHT); break;		
 			 default:
-				switch(e.getKeyChar()) {
-				case 'a':
-					player[1].move(Player.MOVE_LEFT, (Map)object); break;
-				case 'd':
-					player[1].move(Player.MOVE_RIGHT, (Map)object); break;
-				}
+				 if(player[1].humanCtl)
+				 {
+					switch(e.getKeyChar()) {
+					case 'a':
+						player[1].move(Player.MOVE_LEFT); break;
+					case 'd':
+						player[1].move(Player.MOVE_RIGHT); break;
+					}
+				 }
 			}
 		}
 		
