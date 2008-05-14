@@ -54,9 +54,7 @@ public class Player {
 	Vector2f temp = new Vector2f();
 	static float cameraTargetHorizontalOffset = 5.0f;
 	static float cameraHorizontalOffset = 15.0f;
-	static float cameraVerticalOffset = 10.0f;
-	
-	static float wallOffset = 5;
+	static float cameraVerticalOffset = 10.0f;	
 	
 	static Quat4f QUAT_RIGHT = new Quat4f();
 	static Quat4f QUAT_LEFT = new Quat4f();
@@ -74,7 +72,8 @@ public class Player {
 		this.humanCtl = human;		
 		vehicle = new Vehicle();	
 		direction = new Vector2f(0,1);
-		position = new Vector2f(id*20,id*20);				
+		position = new Vector2f(id*20,id*20);
+		vehicle.setPos(position);
 		velocity = 40.0f;
 
 		//TODO set camera position
@@ -88,10 +87,7 @@ public class Player {
 		initVehicleColor(id);
 		
 		// Walls must be setup after vehicle is initialized
-		temp.set(position);
-		temp.x -= direction.x * wallOffset;
-		temp.y -= direction.y * wallOffset;		
-		currentWall = new Wall(temp);
+		currentWall = new Wall(position, direction);
 		currentWall.setMaterial(this.wallMaterial);		
 	}
 	
@@ -136,12 +132,8 @@ public class Player {
 		temp.set(direction);
 		temp.scale(velocity*(dt/1000.0f));
 		position.add(temp);					
-		vehicle.setPos(position);
-		
-		temp.set(position);
-		temp.x -= direction.x * wallOffset;
-		temp.y -= direction.y * wallOffset;
-		currentWall.setEnd(temp);
+		vehicle.setPos(position);		
+		currentWall.setEnd(position);
 		
 		cameraObjectiveTargetPosition.set(position.x + direction.x * cameraTargetHorizontalOffset , 0.0f, position.y + direction.y * cameraTargetHorizontalOffset);
 		cameraObjectivePosition.set(position.x - direction.x * cameraHorizontalOffset , cameraVerticalOffset, position.y - direction.y * cameraHorizontalOffset);
@@ -187,13 +179,16 @@ public class Player {
 				direction.y = tmp;
 				vehicle.addRotate(QUAT_RIGHT);
 			}
-			
-			temp.set(position);
-			temp.x -= direction.x * wallOffset;
-			temp.y -= direction.y * wallOffset;						
-			currentWall = new Wall(temp);
+											
+			currentWall.completeWall(position);
+			currentWall = new Wall(position, direction);
 			currentWall.setMaterial(this.wallMaterial);
 			map.addWall(currentWall);
+			
+			position.x += direction.x * 5;
+			position.y += direction.y * 5;
+			vehicle.setPos(position);
+			
 			
 		}
 	}
