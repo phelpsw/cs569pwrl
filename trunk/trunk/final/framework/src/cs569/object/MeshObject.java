@@ -267,6 +267,10 @@ public class MeshObject extends HierarchicalObject {
 		this.verts = copyIntoNewBuffer(verts);
 		this.numVertices = verts.length / 3;
 	}
+	
+	public FloatBuffer getVertices() {
+		return verts;
+	}
 
 	/**
 	 * Should only be used by the Parser.
