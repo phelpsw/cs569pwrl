@@ -11,7 +11,9 @@ import javax.vecmath.Vector3f;
 
 import cs569.camera.Camera;
 import cs569.material.AnisotropicWard;
+import cs569.material.Glow;
 import cs569.material.Lambertian;
+import cs569.material.Material;
 import cs569.material.Phong;
 import cs569.material.Reflection;
 
@@ -37,6 +39,7 @@ public class Player {
 	private Wall currentWall;
 	private Wall lastWall;
 	public boolean alive = true;
+	private Material wallMaterial = null;
 	
 	Vector3f cameraCurrentPosition;
 	Vector3f cameraObjectivePosition;
@@ -71,8 +74,6 @@ public class Player {
 		direction = new Vector2f(0,1);
 		position = new Vector2f(id*20,id*20);				
 		velocity = 40.0f;
-		currentWall = new Wall(position);
-		lastWall = null;
 
 		//TODO set camera position
 		cameraCurrentTargetPosition = new Vector3f(position.x + direction.x * cameraTargetHorizontalOffset , 0.0f, position.y + direction.y * cameraTargetHorizontalOffset);
@@ -82,8 +83,12 @@ public class Player {
 		cameraObjectivePosition = new Vector3f(cameraCurrentPosition);
 		camera.setEye(cameraCurrentPosition);
 		
-		
 		initVehicleColor(id);
+		
+		// Walls must be setup after vehicle is initialized
+		currentWall = new Wall(position);
+		currentWall.setMaterial(this.wallMaterial);
+		lastWall = null;
 	}
 	
 	public Camera getCamera()
@@ -106,6 +111,7 @@ public class Player {
 			vehicle.setHubMaterial(new Lambertian(new Color3f(1.0f, 1.0f, 1.0f)));
 			vehicle.setWindowMaterial(new Phong(new Color3f(0.1f, 0.1f, 0.1f),new Color3f(1.0f, 1.0f, 1.0f),50.0f));
 			vehicle.setWheelMaterial(new Phong(new Color3f(0,.5f,0), new Color3f(1,1,1), 50.0f));
+			wallMaterial = new Glow(new Color3f(0.2f, 1.0f, 0.1f));
 			break;
 		case PLAYER2:
 			vehicle.setBodyMaterial(new AnisotropicWard(new Color3f(1.0f, 0.2f, 0.1f),
@@ -113,6 +119,7 @@ public class Player {
 			vehicle.setHubMaterial(new Lambertian(new Color3f(1.0f, 1.0f, 1.0f)));
 			vehicle.setWindowMaterial(new Phong(new Color3f(0.1f, 0.1f, 0.1f),new Color3f(1.0f, 1.0f, 1.0f),50.0f));
 			vehicle.setWheelMaterial(new Phong(new Color3f(.5f, 0,0), new Color3f(1,1,1), 50.0f));
+			wallMaterial = new Glow(new Color3f(1.0f, 0.2f, 0.1f));
 			break;
 		}		
 	}
@@ -160,6 +167,7 @@ public class Player {
 				lastWall.box.collidable = true; // wall trail 3 old is now collidable
 			lastWall = currentWall;
 			currentWall = new Wall(position);
+			currentWall.setMaterial(this.wallMaterial);
 			map.addWall(currentWall);
 			
 			float temp;

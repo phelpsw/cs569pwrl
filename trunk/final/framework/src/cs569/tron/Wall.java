@@ -33,8 +33,6 @@ public class Wall extends HierarchicalObject {
 	
 		box = PrimitiveFactory.makeBox("Box");
 		box.setTranslate(startPos.x, 0.0f, startPos.y);
-		//box.setScale(0.2f, 0.2f, 0.2f);
-		box.setMaterial(new Lambertian(new Color3f(0.05f, 1.0f, 0.05f)));		
 		this.addObject(box);
 	}
 		
