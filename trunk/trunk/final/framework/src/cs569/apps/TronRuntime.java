@@ -628,9 +628,9 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
         
         if (object.recursiveCheckCollision(v.getTransformedBoundingBox()))
         {
-        	//particleSystemHandler.explodePlayer(player1);
+        	particleSystemHandler.explodePlayer(player1);
         	System.out.println("explode");
-        }
+        }        
 
 		
 		lastTime = System.currentTimeMillis();

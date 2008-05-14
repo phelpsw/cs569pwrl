@@ -34,7 +34,8 @@ public class Player {
 	Vector2f position; // current position
 	Vector2f direction; // direction the player is going
 	float velocity;   // distance per second
-	Wall currentWall;
+	private Wall currentWall;
+	private Wall lastWall;
 	
 	Vector3f cameraCurrentPosition;
 	Vector3f cameraObjectivePosition;
@@ -70,6 +71,7 @@ public class Player {
 		position = new Vector2f(0,0);
 		velocity = 40.0f;
 		currentWall = new Wall(position);
+		lastWall = null;
 
 		//TODO set camera position
 		cameraCurrentTargetPosition = new Vector3f(position.x + direction.x * cameraTargetHorizontalOffset , 0.0f, position.y + direction.y * cameraTargetHorizontalOffset);
@@ -108,10 +110,6 @@ public class Player {
 		}		
 	}
 	
-	public boolean checkCollisionWithWalls(Vector3f pos) // might be better to use boundingbox
-	{
-		return false;
-	}
 	
 	//called every frame
 	// dt is in milliseconds
@@ -120,7 +118,7 @@ public class Player {
 		temp.set(direction);
 		temp.scale(velocity*(dt/1000.0f));
 		position.add(temp);
-		
+				
 		currentWall.setEnd(position);
 		vehicle.setPos(position);
 		
@@ -147,7 +145,10 @@ public class Player {
 	public void move(int moveType, Map map)
 	{		
 		if (moveType == Player.MOVE_LEFT || moveType == Player.MOVE_RIGHT)
-		{
+		{			
+			if (lastWall != null)
+				lastWall.box.collidable = true; // wall trail 3 old is now collidable
+			lastWall = currentWall;
 			currentWall = new Wall(position);
 			map.addWall(currentWall);
 			
