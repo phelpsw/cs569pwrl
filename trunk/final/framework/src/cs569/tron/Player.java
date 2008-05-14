@@ -74,7 +74,7 @@ public class Player {
 		direction = new Vector2f(0,1);
 		position = new Vector2f(id*20,id*20);
 		vehicle.setPos(position);
-		velocity = 40.0f;
+		velocity = 80.0f;
 
 		//TODO set camera position
 		cameraCurrentTargetPosition = new Vector3f(position.x + direction.x * cameraTargetHorizontalOffset , 0.0f, position.y + direction.y * cameraTargetHorizontalOffset);
