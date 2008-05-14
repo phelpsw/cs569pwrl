@@ -10,13 +10,18 @@ import javax.vecmath.Vector3f;
 
 import cs569.material.AnisotropicWard;
 import cs569.material.Lambertian;
+import cs569.material.Material;
+import cs569.material.ShadowedGlow;
 import cs569.material.TexturedPhong;
 import cs569.misc.GLSLErrorException;
 import cs569.object.HierarchicalObject;
 import cs569.object.MeshObject;
 import cs569.object.PrimitiveFactory;
+import cs569.shaders.ShadowedGlowShader;
+import cs569.texture.Texture;
 
 public class Map extends HierarchicalObject {
+	private MeshObject ground;
 	
 	public Map()
 	{	
@@ -25,12 +30,12 @@ public class Map extends HierarchicalObject {
 		float groundLevel = -1;
 		int wallTiles = 8;
 		
-		MeshObject plane = PrimitiveFactory.makePlane("Ground", 100, 100);
-		plane.collidable = false;
-		plane.setTranslate(0, groundLevel, 0);
-		plane.setMaterial(new TexturedPhong("/textures/tron/floor.png"));
-		plane.setScale(mapWidth, 1, mapWidth);
-		this.addObject(plane);		
+		ground = PrimitiveFactory.makePlane("Ground", 100, 100);
+		ground.collidable = false;
+		ground.setTranslate(0, groundLevel, 0);
+		ground.setMaterial(new TexturedPhong("/textures/tron/floor.png"));
+		ground.setScale(mapWidth, 1, mapWidth);
+		this.addObject(ground);		
 				
 		
 		MeshObject wall = PrimitiveFactory.makePlane("Wall1", wallTiles, 1);
@@ -77,6 +82,11 @@ public class Map extends HierarchicalObject {
 		this.addObject(sky);
 		
 				
+	}
+	
+	public void setGroundMaterial(Material in)
+	{
+		ground.setMaterial(in);
 	}
 	
 	
