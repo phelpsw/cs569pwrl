@@ -1107,23 +1107,26 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	}
 	
 	public void keyPressed(KeyEvent e) {
+		switch (e.getKeyCode()) {
+		 case KeyEvent.VK_LEFT: player[0].move(Player.MOVE_LEFT, (Map) object); break;
+		 case KeyEvent.VK_RIGHT: player[0].move(Player.MOVE_RIGHT, (Map) object); break;		
+		 default:
+			switch(e.getKeyChar()) {
+			case 'a':
+				player[1].move(Player.MOVE_LEFT, (Map)object); break;
+			case 'd':
+				player[1].move(Player.MOVE_RIGHT, (Map)object); break;
+			}
+		}
+		
 	}
 
-	public void keyReleased(KeyEvent e) {		
-		switch (e.getKeyCode()) {
-			//case KeyEvent.VK_DOWN: downKeyPressed = false; break;
-			//case KeyEvent.VK_UP: upKeyPressed = false; break;
-			case KeyEvent.VK_LEFT: player[0].move(Player.MOVE_LEFT, (Map) object); break;
-			case KeyEvent.VK_RIGHT: player[0].move(Player.MOVE_RIGHT, (Map) object); break;
-			default:
-				switch(e.getKeyChar()) {
-				case 'x':particleSystemHandler.explodePlayer(player[0]);break;
-				case 'a':
-					player[1].move(Player.MOVE_LEFT, (Map)object); break;
-				case 'd':
-					player[1].move(Player.MOVE_RIGHT, (Map)object); break;
-				}break;
-		}
+	public void keyReleased(KeyEvent e) {				
+		switch(e.getKeyChar()) {
+		case 'x':
+			particleSystemHandler.explodePlayer(player[0]);
+			break;			
+		}		
 	}
 
 	public void keyTyped(KeyEvent e) {
