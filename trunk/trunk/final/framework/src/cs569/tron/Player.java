@@ -38,7 +38,6 @@ public class Player {
 	Vector2f direction; // direction the player is going
 	float velocity;   // distance per second
 	private Wall currentWall;
-	private Wall lastWall;
 	public boolean alive = true;
 	private Material wallMaterial = null;
 	
@@ -56,6 +55,8 @@ public class Player {
 	static float cameraTargetHorizontalOffset = 5.0f;
 	static float cameraHorizontalOffset = 15.0f;
 	static float cameraVerticalOffset = 10.0f;
+	
+	static float wallOffset = 5;
 	
 	static Quat4f QUAT_RIGHT = new Quat4f();
 	static Quat4f QUAT_LEFT = new Quat4f();
@@ -87,9 +88,11 @@ public class Player {
 		initVehicleColor(id);
 		
 		// Walls must be setup after vehicle is initialized
-		currentWall = new Wall(position);
-		currentWall.setMaterial(this.wallMaterial);
-		lastWall = null;
+		temp.set(position);
+		temp.x -= direction.x * wallOffset;
+		temp.y -= direction.y * wallOffset;		
+		currentWall = new Wall(temp);
+		currentWall.setMaterial(this.wallMaterial);		
 	}
 	
 	public Camera getCamera()
@@ -112,7 +115,7 @@ public class Player {
 			vehicle.setHubMaterial(new Lambertian(new Color3f(1.0f, 1.0f, 1.0f)));
 			vehicle.setWindowMaterial(new Phong(new Color3f(0.1f, 0.1f, 0.1f),new Color3f(1.0f, 1.0f, 1.0f),50.0f));
 			vehicle.setWheelMaterial(new Phong(new Color3f(0,.5f,0), new Color3f(1,1,1), 50.0f));
-			wallMaterial = new Glow(new Color3f(0.2f, 1.0f, 0.1f), new Color3f(0.2f, 1.0f, 0.1f), 1.0f, Texture.getTexture("/textures/tron/glowpattern.png"));
+			wallMaterial = new Glow(new Color3f(0.2f, 1.0f, 0.1f), new Color3f(0.2f, 1.0f, 0.1f), 1.0f, Texture.getTexture("/textures/tron/white.png"));
 			break;
 		case PLAYER2:
 			vehicle.setBodyMaterial(new AnisotropicWard(new Color3f(1.0f, 0.2f, 0.1f),
@@ -120,7 +123,7 @@ public class Player {
 			vehicle.setHubMaterial(new Lambertian(new Color3f(1.0f, 1.0f, 1.0f)));
 			vehicle.setWindowMaterial(new Phong(new Color3f(0.1f, 0.1f, 0.1f),new Color3f(1.0f, 1.0f, 1.0f),50.0f));
 			vehicle.setWheelMaterial(new Phong(new Color3f(.5f, 0,0), new Color3f(1,1,1), 50.0f));
-			wallMaterial = new Glow(new Color3f(1.0f, 0.2f, 0.1f), new Color3f(1.0f, 0.2f, 0.1f), 1.0f, Texture.getTexture("/textures/tron/glowpattern.png"));
+			wallMaterial = new Glow(new Color3f(1.0f, 0.2f, 0.1f), new Color3f(1.0f, 0.2f, 0.1f), 1.0f, Texture.getTexture("/textures/tron/white.png"));
 			break;
 		}		
 	}
@@ -132,10 +135,13 @@ public class Player {
 	{
 		temp.set(direction);
 		temp.scale(velocity*(dt/1000.0f));
-		position.add(temp);
-				
-		currentWall.setEnd(position);
+		position.add(temp);					
 		vehicle.setPos(position);
+		
+		temp.set(position);
+		temp.x -= direction.x * wallOffset;
+		temp.y -= direction.y * wallOffset;
+		currentWall.setEnd(temp);
 		
 		cameraObjectiveTargetPosition.set(position.x + direction.x * cameraTargetHorizontalOffset , 0.0f, position.y + direction.y * cameraTargetHorizontalOffset);
 		cameraObjectivePosition.set(position.x - direction.x * cameraHorizontalOffset , cameraVerticalOffset, position.y - direction.y * cameraHorizontalOffset);
@@ -166,28 +172,28 @@ public class Player {
 			return;
 		
 		if (moveType == Player.MOVE_LEFT || moveType == Player.MOVE_RIGHT)
-		{			
-			if (lastWall != null)
-				lastWall.box.collidable = true; // wall trail 3 old is now collidable
-			lastWall = currentWall;
-			currentWall = new Wall(position);
-			currentWall.setMaterial(this.wallMaterial);
-			map.addWall(currentWall);
-			
-			float temp;
+		{									
+			float tmp;
 			if (moveType == Player.MOVE_LEFT)
 			{
-				temp = direction.x;
+				tmp = direction.x;
 				direction.x = direction.y;
-				direction.y = -temp;
+				direction.y = -tmp;
 				vehicle.addRotate(QUAT_LEFT);
 			} else if (moveType == Player.MOVE_RIGHT)
 			{
-				temp = direction.x;
+				tmp = direction.x;
 				direction.x = -direction.y;
-				direction.y = temp;
+				direction.y = tmp;
 				vehicle.addRotate(QUAT_RIGHT);
 			}
+			
+			temp.set(position);
+			temp.x -= direction.x * wallOffset;
+			temp.y -= direction.y * wallOffset;						
+			currentWall = new Wall(temp);
+			currentWall.setMaterial(this.wallMaterial);
+			map.addWall(currentWall);
 			
 		}
 	}

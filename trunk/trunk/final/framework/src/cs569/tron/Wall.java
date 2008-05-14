@@ -33,6 +33,7 @@ public class Wall extends HierarchicalObject {
 	
 		box = PrimitiveFactory.makeBox("Box");
 		box.setTranslate(startPos.x, 0.0f, startPos.y);
+		box.collidable = true;
 		this.addObject(box);
 	}
 		
@@ -68,7 +69,7 @@ public class Wall extends HierarchicalObject {
 		else
 		{
 			System.out.println("Nonzero wall scale term error:" + magnitude);
-			System.exit(1);
+			
 		}
 		box.setScale(magnitude.x, height, magnitude.y);
 		
