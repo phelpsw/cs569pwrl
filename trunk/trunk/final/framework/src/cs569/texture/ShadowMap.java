@@ -34,7 +34,7 @@ public class ShadowMap extends FrameBufferObject {
 
 		/* Push the Z coordinates back just a little to avoid Z-fighting */
 		gl.glEnable(GL.GL_POLYGON_OFFSET_FILL);
-		gl.glPolygonOffset(4.0f, 8.0f);
+		gl.glPolygonOffset(0.5f, 300.0f);
 		object.glRender(gl, glu, lightCamera.getEye());
 		gl.glDisable(GL.GL_POLYGON_OFFSET_FILL);
 	}
