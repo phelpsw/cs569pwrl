@@ -24,8 +24,8 @@ public class Player {
 	public static final int MOVE_RIGHT=0;
 	public static final int MOVE_LEFT=1;
 	
-	public static final int PLAYER1=1;
-	public static final int PLAYER2=2;
+	public static final int PLAYER1=0;
+	public static final int PLAYER2=1;
 	
 	int id; // Player 1 this value == 1
 	Camera camera;
@@ -36,6 +36,7 @@ public class Player {
 	float velocity;   // distance per second
 	private Wall currentWall;
 	private Wall lastWall;
+	public boolean alive = true;
 	
 	Vector3f cameraCurrentPosition;
 	Vector3f cameraObjectivePosition;
@@ -62,13 +63,13 @@ public class Player {
 	
 	// TODO: Add easing into position functionality for both the target and the camera position
 	
-	public Player(Camera camera, int id, boolean human)
+	public Player(int id, boolean human)
 	{
-		this.camera = camera;
+		this.camera = new Camera();
 		this.humanCtl = human;		
 		vehicle = new Vehicle();	
 		direction = new Vector2f(0,1);
-		position = new Vector2f(0,0);
+		position = new Vector2f(id*20,id*20);				
 		velocity = 40.0f;
 		currentWall = new Wall(position);
 		lastWall = null;
@@ -81,9 +82,15 @@ public class Player {
 		cameraObjectivePosition = new Vector3f(cameraCurrentPosition);
 		camera.setEye(cameraCurrentPosition);
 		
+		
 		initVehicleColor(id);
 	}
 	
+	public Camera getCamera()
+	{
+		return camera;
+	}
+		
 	public void setVisible(boolean val)
 	{
 		vehicle.setVisible(val);
@@ -93,14 +100,14 @@ public class Player {
 	{
 		switch(id)
 		{
-		case 1:
+		case PLAYER1:
 			vehicle.setBodyMaterial(new AnisotropicWard(new Color3f(0.2f, 1.0f, 0.1f),
 				new Color3f(0.6f, 0.8f, 0.6f), 0.4f, 0.2f));
 			vehicle.setHubMaterial(new Lambertian(new Color3f(1.0f, 1.0f, 1.0f)));
 			vehicle.setWindowMaterial(new Phong(new Color3f(0.1f, 0.1f, 0.1f),new Color3f(1.0f, 1.0f, 1.0f),50.0f));
 			vehicle.setWheelMaterial(new Phong(new Color3f(0,.5f,0), new Color3f(1,1,1), 50.0f));
 			break;
-		case 2:
+		case PLAYER2:
 			vehicle.setBodyMaterial(new AnisotropicWard(new Color3f(1.0f, 0.2f, 0.1f),
 					new Color3f(0.8f, 0.6f, 0.6f), 0.4f, 0.2f));
 			vehicle.setHubMaterial(new Lambertian(new Color3f(1.0f, 1.0f, 1.0f)));
@@ -144,6 +151,9 @@ public class Player {
 	// modify camera and vehicle positions
 	public void move(int moveType, Map map)
 	{		
+		if (alive == false)
+			return;
+		
 		if (moveType == Player.MOVE_LEFT || moveType == Player.MOVE_RIGHT)
 		{			
 			if (lastWall != null)
