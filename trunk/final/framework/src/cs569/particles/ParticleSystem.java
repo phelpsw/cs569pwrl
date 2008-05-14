@@ -52,6 +52,18 @@ public class ParticleSystem extends HierarchicalObject implements Animated, Inte
 	/* Dead particle management */
 	private Stack<Integer> deadParticles;
 	
+	Vector3f tmpvec = new Vector3f();
+	public Vector3f getParticlePosition(int index)
+	{
+		arrayToVector(particleState, 6*index, tmpvec);
+		return tmpvec;
+	}
+	
+	public Vector3f getParticleVelocity(int index)
+	{
+		arrayToVector(particleState, 6*index+3, tmpvec);
+		return tmpvec;
+	}
 	
 	public ParticleSystem(int nParticles) {
 		

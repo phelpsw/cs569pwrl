@@ -151,13 +151,26 @@ public class Vehicle extends HierarchicalObject {
 		bike_body.setMaterial(in);
 	}
 	
+	public Material getBodyMaterial()
+	{
+		return bike_body.getMaterial();
+	}
+	
 	public void setVisible(boolean val)
 	{
 		if(val)
 		{
-			this.setScale(LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE);
+			//this.setScale(LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE);
+			bike_body.setScale(LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE);
+			bike_window.setScale(LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE);
+			bike_hub.setScale(LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE);
+			bike_wheel.setScale(LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE);
 		} else {
-			this.setScale(new Vector3f(0,0,0));
+			//this.setScale(0,0,0);
+			bike_body.setScale(0,0,0);
+			bike_window.setScale(0,0,0);
+			bike_hub.setScale(0,0,0);
+			bike_wheel.setScale(0,0,0);
 		}
 	}
 }
