@@ -35,10 +35,10 @@ public class ExplosionParticleEmitter implements ParticleEmitter {
 		
 		while (currentCount < totalCount) {
 			
-			vel.set(2*random.nextFloat()-1, 0, 2*random.nextFloat()-1);
+			vel.set(2*random.nextFloat()-1, 2*random.nextFloat()-1, 2*random.nextFloat()-1);
 			vel.normalize();
 			vel.scale(random.nextFloat()*spread);
-			vel.set(vel.x, 1.5f, vel.z);
+			vel.set(vel.x, vel.y, vel.z);
 			
 			particleSystem.emit(pos, vel, color, 1, time);
 			currentCount++;
