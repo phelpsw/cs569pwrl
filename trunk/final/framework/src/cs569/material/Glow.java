@@ -7,6 +7,7 @@ import javax.vecmath.Color3f;
 import javax.vecmath.Vector3f;
 
 import cs569.misc.WritingUtils;
+import cs569.shaders.GLSLShader;
 import cs569.shaders.GlowShader;
 import cs569.texture.Texture;
 
@@ -21,6 +22,16 @@ public class Glow extends ShaderMaterial {
 	public Glow() {
 		super(GlowShader.class);
 		baseColor.set(1.0f, 1.0f, 1.0f);
+		glowColor.set(1.0f, 1.0f, 1.0f);
+		glowFactor = 1.0f;
+		glowFilterTexture = Texture.getTexture("/textures/tron/glowpattern.png");
+	}
+	
+	public Glow(Class<? extends GLSLShader> shaderClass) {
+		super(shaderClass);
+		baseColor.set(1.0f, 1.0f, 1.0f);
+		glowColor.set(1.0f, 1.0f, 1.0f);
+		glowFactor = 1.0f;
 		glowFilterTexture = Texture.getTexture("/textures/tron/glowpattern.png");
 	}
 	
