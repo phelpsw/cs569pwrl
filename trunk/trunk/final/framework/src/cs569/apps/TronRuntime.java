@@ -63,6 +63,7 @@ import cs569.camera.Camera;
 import cs569.material.AnisotropicWard;
 import cs569.material.CookTorrance;
 import cs569.material.FinishedWood;
+import cs569.material.Glow;
 import cs569.material.Lambertian;
 import cs569.material.Material;
 import cs569.material.NormalMappedPhong;
@@ -141,6 +142,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		registeredMaterials.add(ShadowedPhong.class);
 		registeredMaterials.add(Reflection.class);
 		registeredMaterials.add(FinishedWood.class);
+		registeredMaterials.add(Glow.class);
 	}
 
 	// The viewer for this application
