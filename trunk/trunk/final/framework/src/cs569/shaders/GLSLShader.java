@@ -59,6 +59,7 @@ public abstract class GLSLShader {
 		registerShader(GaussianBlurShader.class, new GaussianBlurShader());
 		registerShader(BloomCombineShader.class, new BloomCombineShader());
 		registerShader(CityShader.class, new CityShader());
+		registerShader(GlowShader.class, new GlowShader());
 	}
 
 	/**
