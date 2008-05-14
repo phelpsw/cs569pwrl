@@ -32,7 +32,7 @@ public class Player {
 	int id; // Player 1 this value == 1
 	Camera camera;
 	Vehicle vehicle;	
-	boolean humanCtl; // ai will be player too, don't want to update cam for ai
+	public boolean humanCtl; // ai will be player too, don't want to update cam for ai
 	Vector2f position; // current position
 	Vector2f direction; // direction the player is going
 	float velocity;   // distance per second
@@ -159,6 +159,9 @@ public class Player {
 	public void move(int moveType, Map map)
 	{		
 		if (alive == false)
+			return;
+		
+		if (humanCtl == false)
 			return;
 		
 		if (moveType == Player.MOVE_LEFT || moveType == Player.MOVE_RIGHT)

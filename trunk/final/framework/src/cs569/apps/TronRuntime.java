@@ -252,7 +252,10 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		
 		for (int i=0; i<player.length; i++)
 		{
-		 player[i] = new Player(i, true);		
+		 if (i==0)
+			 player[i] = new Player(i, true);
+		 else
+			 player[i] = new Player(i, false);
 		 object.addObject(player[i].getCurrentWall());
 		 object.addObject(player[i].getVehicle());
 		}
@@ -600,7 +603,11 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 			//*********************************
 			// Player 1		
 			mainCamera = player[0].getCamera();
-			gl.glViewport(0,0,viewWidth/2, viewHeight);
+			if (player[1].humanCtl)
+				gl.glViewport(viewWidth/2, 0, viewWidth/2, viewHeight);				
+			else
+				gl.glViewport(0,0,viewWidth, viewHeight);
+			
 			Vector3f eye = new Vector3f();
 			renderCamera(gl, eye);
 			gl.glMatrixMode(GL.GL_MODELVIEW);
@@ -613,17 +620,19 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 			
 			//*********************************
 			// Player 2
-			mainCamera = player[1].getCamera();
-			gl.glViewport(viewWidth/2, 0, viewWidth, viewHeight);
-			eye = new Vector3f();
-			renderCamera(gl, eye);
-			gl.glMatrixMode(GL.GL_MODELVIEW);
-			gl.glLoadIdentity();
-				
-			object.glRender(gl, glu, eye);
-			//rotationGizmo.glRender(gl, glu, eye);
-			particleSystemHandler.glRender(gl,glu,eye);
-			
+			if (player[1].humanCtl)
+			{
+				mainCamera = player[1].getCamera();
+				gl.glViewport(0,0,viewWidth/2, viewHeight);
+				eye = new Vector3f();
+				renderCamera(gl, eye);
+				gl.glMatrixMode(GL.GL_MODELVIEW);
+				gl.glLoadIdentity();
+					
+				object.glRender(gl, glu, eye);
+				//rotationGizmo.glRender(gl, glu, eye);
+				particleSystemHandler.glRender(gl,glu,eye);
+			}
 			
 			
 		} catch (GLSLErrorException e) {
@@ -868,7 +877,10 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 					textureActions(ac);
 				} else if (menuName.equals("Animation")) {
 					animationActions(ac);
-				}
+				} else if (menuName.equals("Gameplay")){
+					gameActions(ac);
+				} else
+				{ System.out.println("unrecognized menu " + menuName);}
 				return;
 			}
 		}
@@ -914,7 +926,14 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	
 	/** Geometry actions */
 	private void gameActions(String ac) {
-		new Thread(new LoadingThread(ac, this)).start();
+		if (ac.equals("gameplay1Player"))
+		{			
+		 player[1].humanCtl = false;
+		} else
+		{
+			System.out.println("2 player");
+			player[1].humanCtl = true;
+		}
 	}
 
 	/** Camera Actions */
@@ -1087,6 +1106,10 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 			default:
 				switch(e.getKeyChar()) {
 				case 'x':particleSystemHandler.explodePlayer(player[0]);break;
+				case 'a':
+					player[1].move(Player.MOVE_LEFT, (Map)object); break;
+				case 'd':
+					player[1].move(Player.MOVE_RIGHT, (Map)object); break;
 				}break;
 		}
 	}
@@ -1126,8 +1149,17 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 			//   skinned mesh
 			HierarchicalObject.unSetUpdateList();
 			
-					
-			
+			/*		
+			if (action.equals("gameplay1Player"))
+			{
+				player[1].humanCtl = false;			
+				System.out.println("1 player");
+			} else if (action.equals("gameplay2Player"))
+			{
+				player[1].humanCtl = true;				
+			}  
+			*/
+			/*
 			if (action.equals("geomDefault")) {
 				// set the default object
 				toBeLoaded = defaultSceneMaker.make();
@@ -1157,7 +1189,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 										+ filename + "\n" + exception);
 					}
 				}
-			} /*else if (action.equals("geomFile")) {
+			} else if (action.equals("geomFile")) {
 				JFileChooser chooser = new JFileChooser(ClassLoader.getSystemResource("").getPath());
 				//chooser.setFileFilter(new FileNameExtensionFilter("CS569 Scene", "xml"));
 				int returnVal = chooser.showOpenDialog(viewer);
