@@ -12,6 +12,7 @@ import javax.vecmath.Vector3f;
 
 import cs569.apps.TronRuntime;
 import cs569.camera.Camera;
+import cs569.camera.CameraConfigManager;
 import cs569.material.AnisotropicWard;
 import cs569.material.Glow;
 import cs569.material.Lambertian;
@@ -29,6 +30,7 @@ public class Player {
 	
 	public static final int MOVE_RIGHT=0;
 	public static final int MOVE_LEFT=1;
+	public static final int NEXT_CAMERA=2;
 	
 	public static final int PLAYER1=0;
 	public static final int PLAYER2=1;
@@ -48,25 +50,27 @@ public class Player {
 	Vector3f cameraObjectivePosition;
 	Vector3f cameraCurrentTargetPosition;
 	Vector3f cameraObjectiveTargetPosition;
+	float cameraObjectiveFOV;
+	float cameraCurrentFOV;
+	
+	CameraConfigManager camman = new CameraConfigManager();
 	
 	BoundingBox aiBoundingBox = null;
 	static float aiLookAheadHorizontalOffsetMin = 0.0f;
 	static float aiLookAheadHorizontalOffsetMax = 8.0f;
 	Vector3f aiLookAheadMin = new Vector3f();
 	Vector3f aiLookAheadMax = new Vector3f();
-	Vector3f bbOffset = new Vector3f();
 	
 	Random rand = new Random();
 	
 	Vector3f deltaEye = new Vector3f();
 	Vector3f deltaTarget = new Vector3f();
+	float deltaFOV = 0;
 	static float eyeDampeningConstant = 0.00125f;
 	static float targetDampeningConstant = 0.00425f;
+	static float FOVDampeningConstant = 0.00425f;
 	
 	Vector2f temp = new Vector2f();
-	static float cameraTargetHorizontalOffset = 5.0f;
-	static float cameraHorizontalOffset = 15.0f;
-	static float cameraVerticalOffset = 10.0f;	
 	
 	static Quat4f QUAT_RIGHT = new Quat4f();
 	static Quat4f QUAT_LEFT = new Quat4f();
@@ -90,6 +94,8 @@ public class Player {
 		cameraObjectiveTargetPosition = new Vector3f();		
 		cameraCurrentPosition = new Vector3f();
 		cameraObjectivePosition = new Vector3f();
+		cameraObjectiveFOV = 0;
+		cameraCurrentFOV = 0;
 		
 		resetPlayer();
 	}
@@ -104,12 +110,15 @@ public class Player {
 		position.set(id*20,id*20);
 		vehicle.setPos(position);
 		
-		cameraCurrentTargetPosition.set(position.x + direction.x * cameraTargetHorizontalOffset , 0.0f, position.y + direction.y * cameraTargetHorizontalOffset);
+		cameraCurrentTargetPosition.set(camman.getCamera().getCameraTarget(this));
 		cameraObjectiveTargetPosition.set(cameraCurrentTargetPosition);
 		camera.setTarget(cameraCurrentTargetPosition);
-		cameraCurrentPosition.set(position.x - direction.x * cameraHorizontalOffset , cameraVerticalOffset, position.y - direction.y * cameraHorizontalOffset);
+		cameraCurrentPosition.set(camman.getCamera().getCameraPosition(this));
 		cameraObjectivePosition.set(cameraCurrentPosition);
 		camera.setEye(cameraCurrentPosition);
+		cameraCurrentFOV = camman.getCamera().getCameraFOV(this);
+		cameraObjectiveFOV = cameraCurrentFOV;
+		camera.setYFOV(cameraCurrentFOV);
 
 		// Walls must be setup after vehicle is initialized
 		currentWall = new Wall(position, direction);
@@ -166,8 +175,9 @@ public class Player {
 		vehicle.setPos(position);		
 		currentWall.setEnd(position);
 		
-		cameraObjectiveTargetPosition.set(position.x + direction.x * cameraTargetHorizontalOffset , 0.0f, position.y + direction.y * cameraTargetHorizontalOffset);
-		cameraObjectivePosition.set(position.x - direction.x * cameraHorizontalOffset , cameraVerticalOffset, position.y - direction.y * cameraHorizontalOffset);
+		cameraObjectiveTargetPosition.set(camman.getCamera().getCameraTarget(this));
+		cameraObjectivePosition.set(camman.getCamera().getCameraPosition(this));
+		cameraObjectiveFOV = camman.getCamera().getCameraFOV(this);
 		
 		deltaEye.sub(camera.getEye(), cameraObjectivePosition);
 		deltaEye.scale(-eyeDampeningConstant*dt);
@@ -175,14 +185,20 @@ public class Player {
 		deltaTarget.sub(camera.getTarget(), cameraObjectiveTargetPosition);
 		deltaTarget.scale(-targetDampeningConstant*dt);
 		
+		deltaFOV = camera.getYFOV() - cameraObjectiveFOV;
+		deltaFOV *= -FOVDampeningConstant*dt;
+		
 		cameraCurrentPosition.set(camera.getEye());
 		cameraCurrentPosition.add(deltaEye);
 		
 		cameraCurrentTargetPosition.set(camera.getTarget());
 		cameraCurrentTargetPosition.add(deltaTarget);
 		
+		cameraCurrentFOV = camera.getYFOV() + deltaFOV;
+		
 		camera.setEye(cameraCurrentPosition);
 		camera.setTarget(cameraCurrentTargetPosition);
+		camera.setYFOV(cameraCurrentFOV);
 		
 		// perform AI operation if AI player
 		if(humanCtl == false)
@@ -198,10 +214,8 @@ public class Player {
 				if(rand.nextBoolean())
 				{
 					move(MOVE_RIGHT);
-					System.out.println("right");
 				} else {
 					move(MOVE_LEFT);
-					System.out.println("left");
 				}
 				System.out.println("collide");
 			}
@@ -238,9 +252,11 @@ public class Player {
 			
 			position.x += direction.x * 5;
 			position.y += direction.y * 5;
-			vehicle.setPos(position);
-			
-			
+			vehicle.setPos(position);	
+		} 
+		else if(moveType == NEXT_CAMERA)
+		{
+			camman.getNextCamera();
 		}
 	}
 	
@@ -256,6 +272,15 @@ public class Player {
 	public Wall getCurrentWall()
 	{
 		return currentWall;
+	}
+	public Vector2f getPosition()
+	{
+		return position;
+	}
+	
+	public Vector2f getDirection()
+	{
+		return direction;
 	}
 
 }
