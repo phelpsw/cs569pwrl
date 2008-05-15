@@ -55,6 +55,7 @@ public class Player {
 	private ArrayList<Wall> mywalls = new ArrayList<Wall>();
 	private int state;
 	private Material wallMaterial = null;
+	float lastdt = -1;
 	
 	Vector3f cameraCurrentPosition;
 	Vector3f cameraObjectivePosition;
@@ -119,7 +120,7 @@ public class Player {
 	public void resetPlayer()
 	{
 		state = Player.ALIVE;
-		velocity = 80.0f;
+		velocity = 60.0f;
 		vehicle = new Vehicle();
 		initVehicleColor(id);
 		direction.set(0,1);
@@ -160,6 +161,14 @@ public class Player {
 	
 	public void destroy()
 	{
+		//move player back a step
+		temp.set(direction);
+		temp.scale(velocity*(-lastdt*1.5f/1000.0f));
+		position.add(temp);					
+		vehicle.setPos(position);		
+		currentWall.setEnd(position);
+				
+		
 		cameraObjectiveTargetPosition.set(camman.getCamera("RearWideFOV").getCameraTarget(this));
 		cameraObjectivePosition.set(camman.getCamera("RearWideFOV").getCameraPosition(this));
 		cameraObjectiveFOV = camman.getCamera("RearWideFOV").getCameraFOV(this);
@@ -206,6 +215,7 @@ public class Player {
 	//called every frame
 	public void update(float time)
 	{
+		lastdt = time;
 		particleSystemHandler.update(time);
 		
 		if (lastTimeUpdated < 0) {

@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -113,7 +115,7 @@ import cs569.tron.Vehicle;
  */
 public class TronRuntime extends JFrame implements GLEventListener, ActionListener,
 		MouseListener, MouseMotionListener, MouseWheelListener, 
-		KeyListener, TreeSelectionListener, PropertyChangeListener {
+		KeyListener, TreeSelectionListener, PropertyChangeListener, KeyEventDispatcher{
 
 	// *******************CONSTANTS************************************************************
 
@@ -236,8 +238,13 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		getContentPane().add(main);
 		} else
 		{
-			getContentPane().add(createGLPanel(), BorderLayout.CENTER);
+			getContentPane().add(createGLPanel());
+//			getContentPane().requestFocus();
 		}
+		
+		// no matter the focus, read in keyboard input
+		KeyboardFocusManager key = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+		key.addKeyEventDispatcher(this);		
 
 		// Setup the menuBar
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
@@ -316,7 +323,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		//Dimension dimen = new Dimension(DEFAULT_VIEWPORT_SIZE,
 		//		DEFAULT_VIEWPORT_SIZE);
 		Dimension dimen = new Dimension(viewWidth, viewHeight);
-		glPanel.setPreferredSize(dimen);
+		glPanel.setPreferredSize(dimen);		
 		return glPanel;
 	}
 
@@ -386,8 +393,14 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		gameMenu.getPopupMenu().setLabel("Gameplay");
 		String[] gameMenuItemNames = { "1 Player", "2 Player"};
 		String[] gameMenuItemActions = { "gameplay1Player", "gameplay2Player"};
+		char[] gameMenuMnemonics = {'1', '2'};
+		KeyStroke[] keyStrokes2 = {
+				//KeyStroke.getKeyStroke("control L"),
+				//KeyStroke.getKeyStroke("control S"),
+				KeyStroke.getKeyStroke("1"),
+		KeyStroke.getKeyStroke("2")};
 		addMenuItems(gameMenu, gameMenuItemNames,
-				gameMenuItemActions, null, null);
+				gameMenuItemActions, gameMenuMnemonics, keyStrokes2);
 		menuBar.add(gameMenu);
 		
 		
@@ -611,9 +624,15 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 			// Player 1		
 			mainCamera = player[0].getCamera();
 			if (player[1].humanCtl)
-				gl.glViewport(viewWidth/2, 0, viewWidth/2, viewHeight);				
+			{
+				gl.glViewport(viewWidth/2, 0, viewWidth/2, viewHeight);
+				mainCamera.setAspect(viewWidth*.5f/viewHeight);
+			}
 			else
+			{
 				gl.glViewport(0,0,viewWidth, viewHeight);
+				mainCamera.setAspect(viewWidth/viewHeight);
+			}
 			
 			Vector3f eye = new Vector3f();
 			renderCamera(gl, eye);
@@ -629,6 +648,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 			{
 				mainCamera = player[1].getCamera();
 				gl.glViewport(0,0,viewWidth/2, viewHeight);
+				mainCamera.setAspect(viewWidth*.5f/viewHeight);
 				eye = new Vector3f();
 				renderCamera(gl, eye);
 				gl.glMatrixMode(GL.GL_MODELVIEW);
@@ -687,7 +707,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	        player[i].getCurrentWall().recursiveUpdateBoundingBoxes();
 	        player[i].getCurrentWall().setCollidable(false);
 	        if (object.recursiveCheckCollision(v.getTransformedBoundingBox()))
-	        {
+	        {	        	
 	        	player[i].destroy();
 	        	System.out.println("explode");
 	       	}
@@ -868,7 +888,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		String ac = e.getActionCommand();
 
 		// Action is the material selection popup
-		if (ac != null && ac.equalsIgnoreCase("selMat")) {
+		if (ac != null && ac.equalsIgnoreCase("selMat") && sidePanelOn ) {
 			setMatPanel(matSelectPanel);
 		}
 
@@ -893,9 +913,18 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 					gameActions(ac);
 				} else
 				{ System.out.println("unrecognized menu " + menuName);}
+				
+		
+				//this.requestFocus();
+				//KeyboardFocusManager key = KeyboardFocusManager.getCurrentKeyboardFocusManager();				
+				//System.out.println("focus owner: " + key.getFocusOwner());
+				
 				return;
 			}
 		}
+		
+		//focus owner: javax.swing.JRootPane[,5,22,800x621,invalid,layout=javax.swing.JRootPane$RootLayout,alignmentX=0.0,alignmentY=0.0,border=,flags=16777673,maximumSize=,minimumSize=,preferredSize=]
+		//focus owner: javax.swing.JRootPane[,5,22,800x621,invalid,layout=javax.swing.JRootPane$RootLayout,alignmentX=0.0,alignmentY=0.0,border=,flags=16777673,maximumSize=,minimumSize=,preferredSize=]
 
 		// Action is exit
 		if (ac != null && ac.equals("exit")) {
@@ -946,10 +975,10 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		 
 		} else
 		{		
-			player[1].humanCtl = true;
+			player[1].humanCtl = true;			
 			resetGame();
-			 gameRunning = true;
-		}
+			gameRunning = true;
+		}		
 	}
 
 	/** Camera Actions */
@@ -1107,37 +1136,14 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	public void mouseMoved(MouseEvent e) {
 	}
 
-	public void mouseClicked(MouseEvent e) {
+	public void mouseClicked(MouseEvent e) {		
 	}
 	
 	public void keyPressed(KeyEvent e) {
-		if (gameRunning)
-		{			
-			switch (e.getKeyCode()) {
-			 case KeyEvent.VK_LEFT: player[0].move(Player.MOVE_LEFT); break;
-			 case KeyEvent.VK_RIGHT: player[0].move(Player.MOVE_RIGHT); break;
-			 case KeyEvent.VK_UP: player[0].move(Player.NEXT_CAMERA); break;
-			 default:
-				 if(player[1].humanCtl)
-				 {
-					switch(e.getKeyChar()) {
-					case 'a':
-						player[1].move(Player.MOVE_LEFT); break;
-					case 'd':
-						player[1].move(Player.MOVE_RIGHT); break;
-					}
-				 }
-			}
-		}
-		
+	
 	}
 
-	public void keyReleased(KeyEvent e) {				
-		switch(e.getKeyChar()) {
-		case 'x':
-			player[0].destroy();
-			break;				
-		}		
+	public void keyReleased(KeyEvent e) {					
 	}
 
 	public void keyTyped(KeyEvent e) {
@@ -1363,5 +1369,55 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 				return out;
 			}
 		}
+	}
+
+	public boolean dispatchKeyEvent(KeyEvent e) {
+		
+		//KeyboardFocusManager.getCurrentKeyboardFocusManager().redispatchEvent(canvas, e);
+		
+		if (sidePanelOn)
+			return false;
+		
+		
+		if (e.getID() == KeyEvent.KEY_PRESSED)
+		{
+			
+			switch (e.getKeyCode()) {
+			 case KeyEvent.VK_LEFT: 
+				 if (gameRunning)
+					 player[0].move(Player.MOVE_LEFT); 
+				 break;
+			 case KeyEvent.VK_RIGHT:
+				 if (gameRunning)
+					 player[0].move(Player.MOVE_RIGHT); 
+				 break;
+			 case KeyEvent.VK_UP: player[0].move(Player.NEXT_CAMERA); break;
+			 case KeyEvent.VK_SPACE:
+				 resetGame();
+				 gameRunning = true;
+				 break;
+			 default:				 
+					switch(e.getKeyChar()) {
+					case 'a':
+						if (gameRunning && player[1].humanCtl)						 
+							player[1].move(Player.MOVE_LEFT); 
+						break;
+					case 'd':
+						if (gameRunning && player[1].humanCtl)
+							player[1].move(Player.MOVE_RIGHT); 
+						break;
+					default:
+					
+						// not any of these keys, so pass event along
+						return false;
+										
+				 }
+			  
+			}			
+		}
+			
+		e.consume();
+		return true;
+		
 	}
 }
