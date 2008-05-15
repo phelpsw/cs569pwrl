@@ -1135,7 +1135,8 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		{			
 			switch (e.getKeyCode()) {
 			 case KeyEvent.VK_LEFT: player[0].move(Player.MOVE_LEFT); break;
-			 case KeyEvent.VK_RIGHT: player[0].move(Player.MOVE_RIGHT); break;		
+			 case KeyEvent.VK_RIGHT: player[0].move(Player.MOVE_RIGHT); break;
+			 case KeyEvent.VK_UP: player[0].move(Player.NEXT_CAMERA); break;
 			 default:
 				 if(player[1].humanCtl)
 				 {

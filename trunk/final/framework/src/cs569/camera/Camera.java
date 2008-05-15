@@ -366,4 +366,8 @@ public class Camera {
 	public void setYFOV(float yFOV) {
 		this.fov = yFOV;
 	}
+	
+	public float getYFOV() {
+		return this.fov;
+	}
 }
