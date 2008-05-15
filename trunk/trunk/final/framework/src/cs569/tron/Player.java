@@ -4,12 +4,15 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javax.media.opengl.GL;
+import javax.media.opengl.glu.GLU;
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Color3f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 
+import cs569.tron.TronParticleSystemHandler;
 import cs569.apps.TronRuntime;
 import cs569.camera.Camera;
 import cs569.camera.CameraConfigManager;
@@ -20,6 +23,8 @@ import cs569.material.Material;
 import cs569.material.Phong;
 import cs569.material.Reflection;
 import cs569.misc.BoundingBox;
+import cs569.misc.GLSLErrorException;
+import cs569.object.Group;
 import cs569.texture.Texture;
 
 public class Player {
@@ -32,6 +37,10 @@ public class Player {
 	public static final int MOVE_LEFT=1;
 	public static final int NEXT_CAMERA=2;
 	
+	public static final int ALIVE=0;
+	public static final int DEAD=1;
+	public static final int DYING=2;
+	
 	public static final int PLAYER1=0;
 	public static final int PLAYER2=1;
 	
@@ -43,7 +52,8 @@ public class Player {
 	Vector2f direction; // direction the player is going
 	float velocity;   // distance per second
 	private Wall currentWall;
-	public boolean alive = true;
+	private ArrayList<Wall> mywalls = new ArrayList<Wall>();
+	private int state;
 	private Material wallMaterial = null;
 	
 	Vector3f cameraCurrentPosition;
@@ -52,6 +62,16 @@ public class Player {
 	Vector3f cameraObjectiveTargetPosition;
 	float cameraObjectiveFOV;
 	float cameraCurrentFOV;
+	
+	// Length of death in ms
+	static float deathSequencePeriod = 2500.0f;
+	float deathSequencePosition = 0f;
+	Vector3f deathWallScale = new Vector3f();
+	Group deathTriangles;
+	
+	float lastTimeUpdated = -1.0f;
+	
+	TronParticleSystemHandler particleSystemHandler;
 	
 	CameraConfigManager camman = new CameraConfigManager();
 	
@@ -78,8 +98,6 @@ public class Player {
 		QUAT_LEFT.set(new AxisAngle4f(0,1,0,(float)Math.PI/2.0f));
 	}
 	
-	// TODO: Add easing into position functionality for both the target and the camera position
-	
 	public Player(int id, boolean human)
 	{
 		this.camera = new Camera();
@@ -100,7 +118,7 @@ public class Player {
 	
 	public void resetPlayer()
 	{
-		alive = true;
+		state = Player.ALIVE;
 		velocity = 80.0f;
 		vehicle = new Vehicle();
 		initVehicleColor(id);
@@ -121,6 +139,12 @@ public class Player {
 		// Walls must be setup after vehicle is initialized
 		currentWall = new Wall(position, direction);
 		currentWall.setMaterial(this.wallMaterial);
+		mywalls.clear();
+		mywalls.add(currentWall);
+		
+		deathTriangles = new Group();
+		((Map)TronRuntime.getRootObject()).addObject(deathTriangles);
+		particleSystemHandler = new TronParticleSystemHandler(this, deathTriangles);
 		
 		// perform AI operation if AI player
 		if(humanCtl == false)
@@ -133,10 +157,13 @@ public class Player {
 	{
 		return camera;
 	}
-		
-	public void setVisible(boolean val)
+	
+	public void destroy()
 	{
-		vehicle.setVisible(val);
+		velocity = 0.0f;
+		state = Player.DYING;
+		deathSequencePosition = 0.0f;
+		particleSystemHandler.explodePlayer(this);
 	}
 	
 	private void initVehicleColor(int id)
@@ -163,10 +190,45 @@ public class Player {
 	}
 	
 	
-	//called every frame
-	// dt is in milliseconds
-	public void update(float dt)
+	public void scaleMyWalls(Vector3f scale)
 	{
+		for(int i=0; i<mywalls.size(); i++)
+		{
+			mywalls.get(i).setScale(scale);
+		}
+	}
+	
+	//called every frame
+	public void update(float time)
+	{
+		particleSystemHandler.update(time);
+		
+		if (lastTimeUpdated < 0) {
+			lastTimeUpdated = time;
+			return;
+		}
+		// dt is in ms
+		float dt = (time - lastTimeUpdated)*1000.0f;
+		
+		if(state == Player.DYING)
+		{
+			deathSequencePosition += dt;
+			float deathSequenceRatio = deathSequencePosition / deathSequencePeriod;
+			deathWallScale.set(1, (1.0f - deathSequenceRatio), 1);
+			scaleMyWalls(deathWallScale);
+			if(deathSequenceRatio > 1.0)
+			{
+				for(int i=0; i<mywalls.size(); i++)
+				{
+					mywalls.get(i).removeFromParent();
+				}
+				vehicle.removeFromParent();
+				deathTriangles.removeFromParent();
+				state = Player.DEAD;
+				return;
+			}
+		}
+		
 		temp.set(direction);
 		temp.scale(velocity*(dt/1000.0f));
 		position.add(temp);					
@@ -218,12 +280,14 @@ public class Player {
 				System.out.println("collide");
 			}
 		}
+		
+		lastTimeUpdated = time;
 	}
 	
 	// modify camera and vehicle positions
 	public void move(int moveType)
-	{		
-		if (alive == false)
+	{
+		if(state == Player.DEAD)
 			return;
 		
 		if (moveType == Player.MOVE_LEFT || moveType == Player.MOVE_RIGHT)
@@ -247,6 +311,7 @@ public class Player {
 			currentWall = new Wall(position, direction);
 			currentWall.setMaterial(this.wallMaterial);
 			((Map)TronRuntime.getRootObject()).addWall(currentWall);
+			mywalls.add(currentWall);
 			
 			position.x += direction.x * 5;
 			position.y += direction.y * 5;
@@ -256,6 +321,11 @@ public class Player {
 		{
 			camman.getNextCamera();
 		}
+	}
+	
+	public void renderParticles(GL gl, GLU glu, Vector3f eye) throws GLSLErrorException
+	{
+		particleSystemHandler.glRender(gl, glu, eye);
 	}
 	
 	public Vehicle getVehicle()
@@ -279,6 +349,10 @@ public class Player {
 	public Vector2f getDirection()
 	{
 		return direction;
+	}
+	public int getState()
+	{
+		return state;
 	}
 
 }
