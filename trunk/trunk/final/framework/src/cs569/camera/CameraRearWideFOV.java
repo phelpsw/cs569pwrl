@@ -13,6 +13,10 @@ public class CameraRearWideFOV extends CameraConfig {
 	float cameraVerticalOffset = 10.0f;
 	float FOV = 85.0f;
 	
+	float eyeDampeningConstant = 0.00125f;
+	float targetDampeningConstant = 0.00425f;
+	float FOVDampeningConstant = 0.00425f;
+	
 	public CameraRearWideFOV()
 	{
 		
@@ -33,6 +37,21 @@ public class CameraRearWideFOV extends CameraConfig {
 	public Vector3f getCameraTarget(Player player) {
 		target.set(player.getPosition().x + player.getDirection().x * cameraTargetHorizontalOffset , 0.0f, player.getPosition().y + player.getDirection().y * cameraTargetHorizontalOffset);
 		return target;
+	}
+	
+	@Override
+	public float getEyeDampening() {
+		return eyeDampeningConstant;
+	}
+
+	@Override
+	public float getFOVDampening() {
+		return FOVDampeningConstant;
+	}
+
+	@Override
+	public float getTargetDampening() {
+		return targetDampeningConstant;
 	}
 
 }
