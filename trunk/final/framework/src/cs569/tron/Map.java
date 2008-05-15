@@ -23,11 +23,12 @@ import cs569.texture.Texture;
 public class Map extends HierarchicalObject {
 	private MeshObject ground;
 	
+	public static final float groundLevel = 0;
+	
 	public Map()
 	{	
 		float wallHeight = 20;
-		float mapWidth = 200;
-		float groundLevel = -1;
+		float mapWidth = 200;		
 		int wallTiles = 8;
 		
 		ground = PrimitiveFactory.makePlane("Ground", 100, 100);

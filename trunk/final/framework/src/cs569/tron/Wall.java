@@ -101,7 +101,7 @@ public class Wall extends HierarchicalObject {
 		}
 		
 		magnitude.scale(0.5f);		
-		box.setTranslate(start.x + magnitude.x, 0, start.y + magnitude.y);
+		box.setTranslate(start.x + magnitude.x, Map.groundLevel + 1, start.y + magnitude.y);
 		
 		if(Math.abs(magnitude.x) <= 0.001f)
 			magnitude.x = width;
