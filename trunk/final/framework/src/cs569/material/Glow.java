@@ -55,7 +55,9 @@ public class Glow extends ShaderMaterial {
 
 	@Override
 	protected void writeLocalData(PrintStream out, int indent) {
-		WritingUtils.writeColor(out, baseColor, "diffuseColor", indent);
+		WritingUtils.writeColor(out, baseColor, "baseColor", indent);
+		WritingUtils.writeColor(out, glowColor, "glowColor", indent);
+		WritingUtils.writeDouble(out, glowFactor, "glowFactor", indent);
 	}
 	
 	/**
@@ -76,5 +78,16 @@ public class Glow extends ShaderMaterial {
 	public void setBaseColor(Color3f color) {
 		baseColor.set(color);
 	}
-
+	public void setGlowColor(Color3f glowColor) {
+		this.glowColor = glowColor;
+	}
+	public Color3f getGlowColor() {
+		return glowColor;
+	}
+	public void setGlowFactor(float glowFactor) {
+		this.glowFactor = glowFactor;
+	}
+	public float getGlowFactor() {
+		return glowFactor;
+	}
 }

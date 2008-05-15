@@ -286,7 +286,9 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 	 *            Material to set
 	 */
 	public void setMaterial(Material in) {
-		material = in.copy();
+		// TODO: This seems highly suspecious, I would suspect problems in doing this.
+		//material = in.copy();
+		material = in;
 		for (HierarchicalObject currChild : children) {
 			currChild.setMaterial(in);
 		}
