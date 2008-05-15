@@ -120,11 +120,26 @@ public class Player {
 	public void resetPlayer()
 	{
 		state = Player.ALIVE;
-		velocity = 60.0f;
+		velocity = 45.0f;
 		vehicle = new Vehicle();
 		initVehicleColor(id);
-		direction.set(0,1);
-		position.set(id*20,id*20);
+		
+		position.x = (id/2)*80;
+		if (id%2 == 0)
+		{
+		 position.y = -Map.mapWidth + 20;
+		 direction.set(0,1);
+				 
+		} else
+		{
+		 position.y = Map.mapWidth - 20;
+		 
+		 // face other direction
+		 direction.set(0,-1);
+		 vehicle.addRotate(QUAT_LEFT);
+		 vehicle.addRotate(QUAT_LEFT);
+		}
+		 
 		vehicle.setPos(position);
 		
 		cameraCurrentTargetPosition.set(camman.getCamera().getCameraTarget(this));
@@ -182,7 +197,7 @@ public class Player {
 	
 	private void initVehicleColor(int id)
 	{
-		switch(id)
+		switch(id%2)
 		{
 		case PLAYER1:
 			vehicle.setBodyMaterial(new AnisotropicWard(new Color3f(0.2f, 1.0f, 0.1f),

@@ -20,7 +20,7 @@ public class Wall extends HierarchicalObject {
 	Vector2f start = new Vector2f();
 	Vector2f end = new Vector2f();
 	Vector2f dir = new Vector2f();
-	static float height = 1;
+	static float height = 1.5f;
 	static float width = .05f;
 	Material material;
 	MeshObject box;
@@ -101,7 +101,7 @@ public class Wall extends HierarchicalObject {
 		}
 		
 		magnitude.scale(0.5f);		
-		box.setTranslate(start.x + magnitude.x, Map.groundLevel + 1, start.y + magnitude.y);
+		box.setTranslate(start.x + magnitude.x, Map.groundLevel + height, start.y + magnitude.y);
 		
 		if(Math.abs(magnitude.x) <= 0.001f)
 			magnitude.x = width;

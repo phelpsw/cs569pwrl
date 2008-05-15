@@ -162,7 +162,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	private static final boolean sidePanelOn = false;
 	
 	
-	private Player[] player = new Player[2];	
+	private Player[] player = new Player[4];	
 	private long lastTime = -1; // negative to identify first timestep
 
 	private boolean gameRunning = false;
