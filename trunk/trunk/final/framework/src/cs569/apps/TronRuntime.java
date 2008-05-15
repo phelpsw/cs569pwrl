@@ -1,5 +1,6 @@
 package cs569.apps;
 
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -62,6 +63,7 @@ import cs569.animation.Animated;
 import cs569.animation.Animation;
 import cs569.animation.AnimationTrack;
 import cs569.camera.Camera;
+import cs569.glowmods.GlowModifierManager;
 import cs569.material.AnisotropicWard;
 import cs569.material.CookTorrance;
 import cs569.material.FinishedWood;
@@ -197,6 +199,8 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	protected final GLU glu = new GLU();
 	private final MaterialSelectionPanel matSelectPanel = new MaterialSelectionPanel();
 
+	public static GlowModifierManager glowmodman = new GlowModifierManager();
+	
 	/* Gizmos */
 	private RotationGizmo rotationGizmo = new RotationGizmo(this);
 
@@ -287,12 +291,12 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	
 	public void resetGame()
 	{
-		object = new Map();	
+		object = new Map();
+		glowmodman.clear(); // clear any old glow modifiers
 		
 		for (int i=0; i<player.length; i++)
 		{
 		 player[i].resetPlayer();
-		 object.addObject(player[i].getCurrentWall());
 		 object.addObject(player[i].getVehicle());
 		}
 	}
@@ -593,6 +597,9 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 			for (Animated animated : animatedObjects) {
 				animated.update((System.currentTimeMillis() - startTime) / 1000.0f);
 			}
+			
+			/* Update all glowmodifiers */
+			glowmodman.update((System.currentTimeMillis() - startTime) / 1000.0f);
 
 			/* Update the hierarchy of bounding spheres */
 			object.recursiveUpdateBoundingBoxes();
