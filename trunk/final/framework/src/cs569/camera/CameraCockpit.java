@@ -19,7 +19,7 @@ public class CameraCockpit extends CameraConfig {
 	
 	public CameraCockpit()
 	{
-		
+		super("Cockpit");
 	}
 	
 	@Override

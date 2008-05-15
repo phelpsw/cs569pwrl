@@ -19,6 +19,7 @@ import cs569.particles.FireEmitter;
 import cs569.particles.FireUpdater;
 import cs569.particles.Gravity;
 import cs569.particles.ParticleColorAttenuator;
+import cs569.particles.ParticleEmitter;
 import cs569.particles.ParticleSystem;
 import cs569.texture.Texture;
 
@@ -26,32 +27,41 @@ public class TronParticleSystemHandler {
 	ParticleSystem playerExplosionTriangleParticles = null;
 	ParticleSystem playerExplosionBillboardBeams = null;
 	ParticleSystem playerExplosionBillboardRings = null;
-	ExplosionTriangleUpdater triupdater = null;
+	
 	MeshObject triDebris = null;
 	
-	static final int particleCount = 100;
+	static final int particleCount = 300;
 	
 	boolean exploded;
 	
+	ExplosionParticleEmitter particleEmitter;
+	ExplosionBillboardEmitter ringEmitter;
+	ExplosionBillboardEmitter beamEmitter;
+	ExplosionTriangleUpdater triupdater = null;
+	
 	public TronParticleSystemHandler(Player player, HierarchicalObject renderGroup)
 	{
-		triDebris = generateRandomTriangles(player.getVehicle().getTranslate(), particleCount, 0.5f);
+		triDebris = generateRandomTriangles(particleCount, 1f);
 		triDebris.setMaterial(player.vehicle.getBodyMaterial());
+		triDebris.setScale(0,0,0);
 		renderGroup.addObject(triDebris);
 		
 		playerExplosionTriangleParticles = new ParticleSystem(particleCount);
-		triupdater = new ExplosionTriangleUpdater(triDebris, playerExplosionTriangleParticles, particleCount, player.getVehicle().getTranslate());
-		playerExplosionTriangleParticles.addForce(new Gravity(new Vector3f(0, -50, 0)));
-		playerExplosionTriangleParticles.addEmitter(new ExplosionParticleEmitter(particleCount, 150f, player.getVehicle().getTranslate()));
+		triupdater = new ExplosionTriangleUpdater(triDebris, playerExplosionTriangleParticles, particleCount);
+		playerExplosionTriangleParticles.addForce(new Gravity(new Vector3f(0, -800, 0)));
+		particleEmitter = new ExplosionParticleEmitter(particleCount, 5000f);
+		playerExplosionTriangleParticles.addEmitter(particleEmitter);
 		playerExplosionTriangleParticles.addUpdater(new ParticleColorAttenuator(8.0f, new Color4f(1,1,0.5f,1), new Color4f(1, 0, 0, 0)));
 		
 		playerExplosionBillboardRings = new BillboardParticleSystem(Texture.getTexture("src/textures/tron/explode_rings.png"), true, 1);
-		playerExplosionBillboardRings.addEmitter(new ExplosionBillboardEmitter(1f, player.getVehicle().getTranslate(), 1));
+		ringEmitter = new ExplosionBillboardEmitter(1f, 1);
+		playerExplosionBillboardRings.addEmitter(ringEmitter);
 		playerExplosionBillboardRings.addUpdater(new ParticleColorAttenuator(2.0f, new Color4f(1,0.3f,0.3f,1), new Color4f(1, 0, 0, 0)));
 		playerExplosionBillboardRings.addUpdater(new ExplosionBillboardUpdater());
 		
 		playerExplosionBillboardBeams = new BillboardParticleSystem(Texture.getTexture("src/textures/tron/explode_beams.png"), true, 1);
-		playerExplosionBillboardBeams.addEmitter(new ExplosionBillboardEmitter(1f, player.getVehicle().getTranslate(), 1));
+		beamEmitter = new ExplosionBillboardEmitter(1f, 1);
+		playerExplosionBillboardBeams.addEmitter(beamEmitter);
 		playerExplosionBillboardBeams.addUpdater(new ParticleColorAttenuator(1.0f, new Color4f(1,1,0.0f,1), new Color4f(1, 1, 1, 0)));
 		playerExplosionBillboardBeams.addUpdater(new ExplosionBillboardUpdater());
 		
@@ -60,10 +70,15 @@ public class TronParticleSystemHandler {
 	
 	public void explodePlayer(Player player)
 	{
+		particleEmitter.setPosition(player.vehicle.getTranslate());
+		ringEmitter.setPosition(player.vehicle.getTranslate());
+		beamEmitter.setPosition(player.vehicle.getTranslate());
+		triupdater.setPosition(player.vehicle.getTranslate());
+		triDebris.setScale(1,1,1);
 		exploded = true;
 	}
 	
-	public MeshObject generateRandomTriangles(Vector3f pos, int count, float size)
+	public MeshObject generateRandomTriangles(int count, float size)
 	{
 		float[] verts = new float[9*count];
 		int[] tris = new int[3*count];
@@ -137,10 +152,6 @@ public class TronParticleSystemHandler {
 	
 	public void glRender(GL gl, GLU glu, Vector3f eye) throws GLSLErrorException
 	{
-		/*
-		if(playerExplosionTriangleParticles != null)
-			playerExplosionTriangleParticles.glRender(gl, glu, eye);
-		*/
 		if(playerExplosionBillboardBeams != null)
 			playerExplosionBillboardBeams.glRender(gl, glu, eye);
 		

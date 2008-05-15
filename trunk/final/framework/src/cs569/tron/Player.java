@@ -77,7 +77,7 @@ public class Player {
 	
 	BoundingBox aiBoundingBox = null;
 	static float aiLookAheadHorizontalOffsetMin = 0.0f;
-	static float aiLookAheadHorizontalOffsetMax = 8.0f;
+	static float aiLookAheadHorizontalOffsetMax = 10.0f;
 	Vector3f aiLookAheadMin = new Vector3f();
 	Vector3f aiLookAheadMax = new Vector3f();
 	
@@ -160,8 +160,13 @@ public class Player {
 	
 	public void destroy()
 	{
+		cameraObjectiveTargetPosition.set(camman.getCamera("RearWideFOV").getCameraTarget(this));
+		cameraObjectivePosition.set(camman.getCamera("RearWideFOV").getCameraPosition(this));
+		cameraObjectiveFOV = camman.getCamera("RearWideFOV").getCameraFOV(this);
+		
 		velocity = 0.0f;
 		state = Player.DYING;
+		vehicle.removeFromParent();
 		deathSequencePosition = 0.0f;
 		particleSystemHandler.explodePlayer(this);
 	}
@@ -222,7 +227,7 @@ public class Player {
 				{
 					mywalls.get(i).removeFromParent();
 				}
-				vehicle.removeFromParent();
+				
 				deathTriangles.removeFromParent();
 				state = Player.DEAD;
 				return;
@@ -266,9 +271,10 @@ public class Player {
 			
 			aiBoundingBox.reset();
 			aiLookAheadMin.set(position.x + direction.x * aiLookAheadHorizontalOffsetMin , 0.0f, position.y + direction.y * aiLookAheadHorizontalOffsetMin);
-			aiLookAheadMax.set(position.x + direction.x * aiLookAheadHorizontalOffsetMax , 0.0f, position.y + direction.y * aiLookAheadHorizontalOffsetMax);
+			aiLookAheadMax.set(position.x + direction.x * aiLookAheadHorizontalOffsetMax , 20.0f, position.y + direction.y * aiLookAheadHorizontalOffsetMax);
 			aiBoundingBox.expandBy(aiLookAheadMin);
 			aiBoundingBox.expandBy(aiLookAheadMax);
+			
 			if(TronRuntime.getRootObject().recursiveCheckCollision(aiBoundingBox))
 			{
 				if(rand.nextBoolean())

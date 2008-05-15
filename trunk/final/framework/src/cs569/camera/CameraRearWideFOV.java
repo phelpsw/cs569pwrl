@@ -19,7 +19,7 @@ public class CameraRearWideFOV extends CameraConfig {
 	
 	public CameraRearWideFOV()
 	{
-		
+		super("RearWideFOV");
 	}
 	
 	@Override

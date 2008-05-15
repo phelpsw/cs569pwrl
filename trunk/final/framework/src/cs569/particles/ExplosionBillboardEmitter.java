@@ -12,7 +12,7 @@ public class ExplosionBillboardEmitter implements ParticleEmitter {
 	float emitRate;
 	float emitAccum;
 	float spread;
-	Vector3f pos;
+	Vector3f pos = new Vector3f();
 	int currentCount;
 	int totalCount;
 	
@@ -21,10 +21,9 @@ public class ExplosionBillboardEmitter implements ParticleEmitter {
 	 * @param emitRate The rate at which to emit particles, in particles per second
 	 * @param spread The radius of the cone of emission
 	 */
-	public ExplosionBillboardEmitter(float spread, Vector3f pos, int nParticles) {
+	public ExplosionBillboardEmitter(float spread, int nParticles) {
 		this.random = new Random();
 		this.spread = spread;
-		this.pos = pos;
 		this.totalCount = nParticles;
 		this.currentCount = 0;
 	}
@@ -52,6 +51,11 @@ public class ExplosionBillboardEmitter implements ParticleEmitter {
 			particleSystem.emit(pos, vel, color, 1, time, rotation, rotationVel, size);
 			currentCount++;
 		}
+	}
+	
+	public void setPosition(Vector3f pos)
+	{
+		this.pos = pos;
 	}
 
 }

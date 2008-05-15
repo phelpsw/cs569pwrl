@@ -19,7 +19,7 @@ public class CameraHoodWideFOV extends CameraConfig {
 	
 	public CameraHoodWideFOV()
 	{
-		
+		super("HoodWideFOV");
 	}
 	
 	@Override

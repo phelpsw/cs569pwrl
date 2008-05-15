@@ -19,7 +19,7 @@ public class CameraOverhead extends CameraConfig {
 	
 	public CameraOverhead()
 	{
-		
+		super("Overhead");
 	}
 	
 	@Override

@@ -19,7 +19,7 @@ public class CameraHoodNarrowFOV extends CameraConfig {
 	
 	public CameraHoodNarrowFOV()
 	{
-		
+		super("HoodNarrowFOV");
 	}
 	
 	@Override

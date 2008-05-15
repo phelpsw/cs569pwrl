@@ -19,7 +19,7 @@ public class CameraCloseRear extends CameraConfig {
 	
 	public CameraCloseRear()
 	{
-		
+		super("CloseRear");
 	}
 	
 	@Override

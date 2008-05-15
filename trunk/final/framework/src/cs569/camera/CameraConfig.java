@@ -6,10 +6,17 @@ import cs569.tron.Player;
 
 public abstract class CameraConfig {
 
+	
 	public CameraConfig()
 	{
-		
 	}
+	
+	public CameraConfig(String name)
+	{
+		this.name = name;
+	}
+	
+	public String name;
 	
 	public abstract Vector3f getCameraTarget(Player player);
 	public abstract Vector3f getCameraPosition(Player player);
