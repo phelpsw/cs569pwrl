@@ -55,6 +55,7 @@ public class ExplosionTriangleUpdater
 			verts.put(9*i+7, verts.get(9*i+7)+ scaleFactor*velocity.y);
 			verts.put(9*i+8, verts.get(9*i+8)+ scaleFactor*velocity.z);
 		}
+		lastTimeUpdated = time;
 	}
 
 }

@@ -100,7 +100,6 @@ import cs569.texture.Texture;
 import cs569.texture.TextureGUI;
 import cs569.tron.Map;
 import cs569.tron.Player;
-import cs569.tron.TronParticleSystemHandler;
 import cs569.tron.Vehicle;
 
 /**
@@ -175,7 +174,6 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	// Current state of the GUI
 	static HierarchicalObject object;
 	HierarchicalObject toBeLoaded = null;
-	TronParticleSystemHandler particleSystemHandler = new TronParticleSystemHandler();
 	protected int cameraViewMode = CAMERA_MAIN;
 	protected int cameraOrbitMode = CAMERA_MAIN;
 	
@@ -549,14 +547,6 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		return rotationGizmo;
 	}
 	
-	/**
-	 * Return the TronParticleSystemHandler
-	 */
-	public TronParticleSystemHandler getParticleSystemHandler()
-	{
-		return particleSystemHandler;
-	}
-	
 	
 	// //////////////////////////////////////////////////////////////////////////////////////////////////
 	// Display methods
@@ -590,7 +580,6 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 			for (Animated animated : animatedObjects) {
 				animated.update((System.currentTimeMillis() - startTime) / 1000.0f);
 			}
-			particleSystemHandler.update((System.currentTimeMillis() - startTime) / 1000.0f);
 
 			/* Update the hierarchy of bounding spheres */
 			object.recursiveUpdateBoundingBoxes();
@@ -632,9 +621,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 			gl.glLoadIdentity();
 				
 			object.glRender(gl, glu, eye);
-			//rotationGizmo.glRender(gl, glu, eye);
-			particleSystemHandler.glRender(gl,glu,eye);
-			
+			player[0].renderParticles(gl, glu, eye);
 			
 			//*********************************
 			// Player 2
@@ -648,8 +635,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 				gl.glLoadIdentity();
 					
 				object.glRender(gl, glu, eye);
-				//rotationGizmo.glRender(gl, glu, eye);
-				particleSystemHandler.glRender(gl,glu,eye);
+				player[1].renderParticles(gl, glu, eye);
 			}
 			
 			
@@ -689,14 +675,12 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 			return;
 		}
 		
-		float dt = System.currentTimeMillis() - lastTime;
-		
 		for (int i=0; i<player.length; i++)
 		{
-			if (player[i].alive == false)
-				continue; // skip player
+			player[i].update((System.currentTimeMillis() - startTime) / 1000.0f);
 			
-			player[i].update(dt);
+			if (player[i].getState() != Player.ALIVE)
+				continue; // skip player
 					
 	        Vehicle v = player[i].getVehicle();
 	        v.recursiveUpdateBoundingBoxes(); // Just moved vehicle, but is this needed?
@@ -704,15 +688,11 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	        player[i].getCurrentWall().setCollidable(false);
 	        if (object.recursiveCheckCollision(v.getTransformedBoundingBox()))
 	        {
-	        	player[i].alive = false;
-	        	particleSystemHandler.explodePlayer(player[i]);
+	        	player[i].destroy();
 	        	System.out.println("explode");
 	       	}
 	        player[i].getCurrentWall().setCollidable(true);
 		}
-		
-				
-		lastTime = System.currentTimeMillis();
 	}
 	
 	/**
@@ -1155,7 +1135,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	public void keyReleased(KeyEvent e) {				
 		switch(e.getKeyChar()) {
 		case 'x':
-			particleSystemHandler.explodePlayer(player[0]);
+			player[0].destroy();
 			break;				
 		}		
 	}

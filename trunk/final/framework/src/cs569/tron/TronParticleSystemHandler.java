@@ -2,12 +2,14 @@ package cs569.tron;
 
 import java.util.Random;
 
+import javax.media.j3d.HiResCoord;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 import javax.vecmath.Color4f;
 import javax.vecmath.Vector3f;
 
 import cs569.misc.GLSLErrorException;
+import cs569.object.HierarchicalObject;
 import cs569.object.MeshObject;
 import cs569.particles.BillboardParticleSystem;
 import cs569.particles.ExplosionBillboardEmitter;
@@ -30,38 +32,36 @@ public class TronParticleSystemHandler {
 	
 	static final int particleCount = 100;
 	
-	public TronParticleSystemHandler()
-	{
-		
-	}
+	boolean exploded;
 	
-	public void explodePlayer(Player player)
+	public TronParticleSystemHandler(Player player, HierarchicalObject renderGroup)
 	{
-		player.velocity = 0.0f;
-		player.setVisible(false);
-		
 		triDebris = generateRandomTriangles(player.getVehicle().getTranslate(), particleCount, 0.5f);
 		triDebris.setMaterial(player.vehicle.getBodyMaterial());
-		player.vehicle.addObject(triDebris);
+		renderGroup.addObject(triDebris);
 		
 		playerExplosionTriangleParticles = new ParticleSystem(particleCount);
 		triupdater = new ExplosionTriangleUpdater(triDebris, playerExplosionTriangleParticles, particleCount, player.getVehicle().getTranslate());
-		playerExplosionTriangleParticles.addForce(new Gravity(new Vector3f(0, 8, 0)));
-		playerExplosionTriangleParticles.addEmitter(new ExplosionParticleEmitter(particleCount, 10f, player.getVehicle().getTranslate()));
+		playerExplosionTriangleParticles.addForce(new Gravity(new Vector3f(0, -50, 0)));
+		playerExplosionTriangleParticles.addEmitter(new ExplosionParticleEmitter(particleCount, 150f, player.getVehicle().getTranslate()));
 		playerExplosionTriangleParticles.addUpdater(new ParticleColorAttenuator(8.0f, new Color4f(1,1,0.5f,1), new Color4f(1, 0, 0, 0)));
 		
 		playerExplosionBillboardRings = new BillboardParticleSystem(Texture.getTexture("src/textures/tron/explode_rings.png"), true, 1);
 		playerExplosionBillboardRings.addEmitter(new ExplosionBillboardEmitter(1f, player.getVehicle().getTranslate(), 1));
-		playerExplosionBillboardRings.addUpdater(new ParticleColorAttenuator(1.0f, new Color4f(1,0.3f,0.3f,1), new Color4f(1, 0, 0, 0)));
+		playerExplosionBillboardRings.addUpdater(new ParticleColorAttenuator(2.0f, new Color4f(1,0.3f,0.3f,1), new Color4f(1, 0, 0, 0)));
 		playerExplosionBillboardRings.addUpdater(new ExplosionBillboardUpdater());
 		
 		playerExplosionBillboardBeams = new BillboardParticleSystem(Texture.getTexture("src/textures/tron/explode_beams.png"), true, 1);
 		playerExplosionBillboardBeams.addEmitter(new ExplosionBillboardEmitter(1f, player.getVehicle().getTranslate(), 1));
-		playerExplosionBillboardBeams.addUpdater(new ParticleColorAttenuator(1.0f, new Color4f(1,1,0.2f,1), new Color4f(1, 1, 1, 0)));
+		playerExplosionBillboardBeams.addUpdater(new ParticleColorAttenuator(1.0f, new Color4f(1,1,0.0f,1), new Color4f(1, 1, 1, 0)));
 		playerExplosionBillboardBeams.addUpdater(new ExplosionBillboardUpdater());
 		
-		
-
+		exploded = false;
+	}
+	
+	public void explodePlayer(Player player)
+	{
+		exploded = true;
 	}
 	
 	public MeshObject generateRandomTriangles(Vector3f pos, int count, float size)
@@ -120,6 +120,9 @@ public class TronParticleSystemHandler {
 	
 	public void update(float time)
 	{
+		if(exploded == false)
+			return;
+		
 		if(playerExplosionTriangleParticles != null)
 			playerExplosionTriangleParticles.update(time);
 		
