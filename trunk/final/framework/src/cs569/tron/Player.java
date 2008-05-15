@@ -1,5 +1,6 @@
 package cs569.tron;
 
+
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Random;
@@ -16,6 +17,7 @@ import cs569.tron.TronParticleSystemHandler;
 import cs569.apps.TronRuntime;
 import cs569.camera.Camera;
 import cs569.camera.CameraConfigManager;
+import cs569.glowmods.GlowModifierTrails;
 import cs569.material.AnisotropicWard;
 import cs569.material.Glow;
 import cs569.material.Lambertian;
@@ -52,7 +54,7 @@ public class Player {
 	Vector2f direction; // direction the player is going
 	float velocity;   // distance per second
 	private Wall currentWall;
-	private ArrayList<Wall> mywalls = new ArrayList<Wall>();
+	private Group mywallgroup;
 	private int state;
 	private Material wallMaterial = null;
 	float lastdt = -1;
@@ -154,9 +156,12 @@ public class Player {
 
 		// Walls must be setup after vehicle is initialized
 		currentWall = new Wall(position, direction);
+		mywallgroup = new Group();
 		currentWall.setMaterial(this.wallMaterial);
-		mywalls.clear();
-		mywalls.add(currentWall);
+		((Map)TronRuntime.getRootObject()).addObject(mywallgroup);
+		mywallgroup.addObject(currentWall);
+		
+		TronRuntime.glowmodman.add(new GlowModifierTrails(this.wallMaterial));
 		
 		deathTriangles = new Group();
 		((Map)TronRuntime.getRootObject()).addObject(deathTriangles);
@@ -221,10 +226,7 @@ public class Player {
 	
 	public void scaleMyWalls(Vector3f scale)
 	{
-		for(int i=0; i<mywalls.size(); i++)
-		{
-			mywalls.get(i).setScale(scale);
-		}
+		mywallgroup.setScale(scale);
 	}
 	
 	//called every frame
@@ -248,11 +250,7 @@ public class Player {
 			scaleMyWalls(deathWallScale);
 			if(deathSequenceRatio > 1.0)
 			{
-				for(int i=0; i<mywalls.size(); i++)
-				{
-					mywalls.get(i).removeFromParent();
-				}
-				
+				mywallgroup.removeFromParent();
 				deathTriangles.removeFromParent();
 				state = Player.DEAD;
 				return;
@@ -341,8 +339,7 @@ public class Player {
 			currentWall.completeWall(position);
 			currentWall = new Wall(position, direction);
 			currentWall.setMaterial(this.wallMaterial);
-			((Map)TronRuntime.getRootObject()).addWall(currentWall);
-			mywalls.add(currentWall);
+			mywallgroup.addObject(currentWall);
 			
 			position.x += direction.x * 5;
 			position.y += direction.y * 5;
