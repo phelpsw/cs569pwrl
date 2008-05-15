@@ -4,20 +4,20 @@ import javax.vecmath.Vector3f;
 
 import cs569.tron.Player;
 
-public class CameraRearNarrowFOV extends CameraConfig {
+public class CameraCockpit extends CameraConfig {
 
 	Vector3f target = new Vector3f();
 	Vector3f pos = new Vector3f();
-	float cameraTargetHorizontalOffset = 5.0f;
-	float cameraHorizontalOffset = 15.0f;
-	float cameraVerticalOffset = 10.0f;
-	float FOV = 45.0f;
+	float cameraTargetHorizontalOffset = 25.0f;
+	float cameraHorizontalOffset = 0.0f;
+	float cameraVerticalOffset = 2.0f;
+	float FOV = 25.0f;
 	
-	float eyeDampeningConstant = 0.00125f;
-	float targetDampeningConstant = 0.00425f;
+	float eyeDampeningConstant = 0.04f;
+	float targetDampeningConstant = 0.01f;
 	float FOVDampeningConstant = 0.00425f;
 	
-	public CameraRearNarrowFOV()
+	public CameraCockpit()
 	{
 		
 	}
@@ -38,7 +38,7 @@ public class CameraRearNarrowFOV extends CameraConfig {
 		target.set(player.getPosition().x + player.getDirection().x * cameraTargetHorizontalOffset , 0.0f, player.getPosition().y + player.getDirection().y * cameraTargetHorizontalOffset);
 		return target;
 	}
-
+	
 	@Override
 	public float getEyeDampening() {
 		return eyeDampeningConstant;

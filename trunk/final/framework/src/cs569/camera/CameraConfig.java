@@ -15,4 +15,7 @@ public abstract class CameraConfig {
 	public abstract Vector3f getCameraPosition(Player player);
 	public abstract float getCameraFOV(Player player);
 	
+	public abstract float getEyeDampening();
+	public abstract float getTargetDampening();
+	public abstract float getFOVDampening();
 }

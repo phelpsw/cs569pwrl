@@ -66,9 +66,7 @@ public class Player {
 	Vector3f deltaEye = new Vector3f();
 	Vector3f deltaTarget = new Vector3f();
 	float deltaFOV = 0;
-	static float eyeDampeningConstant = 0.00125f;
-	static float targetDampeningConstant = 0.00425f;
-	static float FOVDampeningConstant = 0.00425f;
+	
 	
 	Vector2f temp = new Vector2f();
 	
@@ -180,13 +178,13 @@ public class Player {
 		cameraObjectiveFOV = camman.getCamera().getCameraFOV(this);
 		
 		deltaEye.sub(camera.getEye(), cameraObjectivePosition);
-		deltaEye.scale(-eyeDampeningConstant*dt);
+		deltaEye.scale(-camman.getCamera().getEyeDampening()*dt);
 		
 		deltaTarget.sub(camera.getTarget(), cameraObjectiveTargetPosition);
-		deltaTarget.scale(-targetDampeningConstant*dt);
+		deltaTarget.scale(-camman.getCamera().getTargetDampening()*dt);
 		
 		deltaFOV = camera.getYFOV() - cameraObjectiveFOV;
-		deltaFOV *= -FOVDampeningConstant*dt;
+		deltaFOV *= -camman.getCamera().getFOVDampening()*dt;
 		
 		cameraCurrentPosition.set(camera.getEye());
 		cameraCurrentPosition.add(deltaEye);

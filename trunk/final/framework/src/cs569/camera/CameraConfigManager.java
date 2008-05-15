@@ -9,7 +9,13 @@ public class CameraConfigManager {
 	public CameraConfigManager()
 	{
 		addCameraConfig(new CameraRearNarrowFOV());
-		addCameraConfig(new CameraRearWideFOV());
+		//addCameraConfig(new CameraRearWideFOV());
+		addCameraConfig(new CameraOverhead());
+		//addCameraConfig(new CameraHoodNarrowFOV());
+		addCameraConfig(new CameraHoodWideFOV());
+		//addCameraConfig(new CameraCloseRear());
+		addCameraConfig(new CameraCockpit());
+		addCameraConfig(new CameraWheel());
 	}
 	
 	public CameraConfig getNextCamera()
