@@ -1,5 +1,6 @@
 package cs569.tron;
 
+import java.io.IOException;
 import java.io.PrintStream;
 
 import javax.media.opengl.GL;
@@ -12,6 +13,7 @@ import javax.vecmath.Vector3f;
 import cs569.material.Lambertian;
 import cs569.material.Material;
 import cs569.misc.GLSLErrorException;
+import cs569.misc.OBJLoaderException;
 import cs569.object.Group;
 import cs569.object.HierarchicalObject;
 import cs569.object.MeshObject;
@@ -24,7 +26,7 @@ public class Vehicle extends HierarchicalObject {
 	private Group bike_hub;
 	private Group bike_wheel;
 	
-	private static final float LIGHT_CYCLE_SCALE = 4.0f;
+	private static final float LIGHT_CYCLE_SCALE = .01f;
 	
 	public Vehicle()
 	{
@@ -32,26 +34,34 @@ public class Vehicle extends HierarchicalObject {
 		
 		this.addObject(bike);
 		
-		this.setRotationAxisAngle(-90.0f, 0.0f, 1.0f, 0.0f);
-		this.setScale(LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE);
+		//this.setRotationAxisAngle(90.0f, 0.0f, 1.0f, 0.0f);
+		this.setScale(LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE);		
 		
 		bike_body = new Group("LightCycle_Body");
 		bike_window = new Group("LightCycle_Window");
 		bike_hub = new Group("LightCycle_Hub");
 		bike_wheel = new Group("LightCycle_Wheel");
 		
-		/*
-		bike_body.setTranslate(2,0,0);
-		bike_window.setTranslate(2,0,0);
-		bike_hub.setTranslate(2,0,0);
-		bike_wheel.setTranslate(2,0,0);
-		*/
-		
+				
 		bike.addObject(bike_body);
 		bike.addObject(bike_window);
 		bike.addObject(bike_hub);
 		bike.addObject(bike_wheel);
 		
+		
+		try {			
+			bike_body.addObject(MeshObject.loadFromOBJ("models/bodyColor.obj", false));	
+			bike_window.addObject(MeshObject.loadFromOBJ("models/windows.obj", false));
+			bike_hub.addObject(MeshObject.loadFromOBJ("models/bodyFrame.obj", false));			
+			bike_wheel.addObject(MeshObject.loadFromOBJ("models/wheelwells.obj", false));								
+		} catch (Exception e)
+		{
+			System.out.println("Unable to load bike object");
+		}
+		
+		
+		
+		/*
 		float shift = 0;
 		
 		MeshObject cylinder_body = PrimitiveFactory.makeCylinder(10, 30, "Body");
@@ -113,6 +123,7 @@ public class Vehicle extends HierarchicalObject {
 		sphere_twindow.setMaterial(new Lambertian(new Color3f(0.2f, 0.2f, 0.2f)));
 		bike_window.addObject(sphere_twindow);
 		
+		*/
 	}
 	
 	@Override
@@ -166,6 +177,7 @@ public class Vehicle extends HierarchicalObject {
 	
 	public void setVisible(boolean val)
 	{
+		/*
 		if(val)
 		{
 			//this.setScale(LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE);
@@ -180,5 +192,6 @@ public class Vehicle extends HierarchicalObject {
 			bike_hub.setScale(0,0,0);
 			bike_wheel.setScale(0,0,0);
 		}
+		*/
 	}
 }

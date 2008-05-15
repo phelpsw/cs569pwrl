@@ -2,7 +2,6 @@ package cs569.tron;
 
 import java.util.Random;
 
-import javax.media.j3d.HiResCoord;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 import javax.vecmath.Color4f;
