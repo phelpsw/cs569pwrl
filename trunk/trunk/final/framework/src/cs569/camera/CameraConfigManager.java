@@ -9,7 +9,7 @@ public class CameraConfigManager {
 	public CameraConfigManager()
 	{
 		addCameraConfig(new CameraRearNarrowFOV());
-		//addCameraConfig(new CameraRearWideFOV());
+		addCameraConfig(new CameraRearWideFOV());
 		addCameraConfig(new CameraOverhead());
 		//addCameraConfig(new CameraHoodNarrowFOV());
 		addCameraConfig(new CameraHoodWideFOV());
@@ -33,7 +33,21 @@ public class CameraConfigManager {
 	
 	public CameraConfig getCamera(int index)
 	{
+		i = index;
 		return cameras.get(index);
+	}
+	
+	public CameraConfig getCamera(String name)
+	{
+		for(int index=0; index<cameras.size(); index++)
+		{
+			if(cameras.get(index).name == name)
+			{
+				i = index;
+				return cameras.get(index);
+			}
+		}
+		return cameras.get(0); //default
 	}
 	
 	public void addCameraConfig(CameraConfig cam)

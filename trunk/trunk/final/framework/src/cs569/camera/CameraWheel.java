@@ -20,7 +20,7 @@ public class CameraWheel extends CameraConfig {
 	
 	public CameraWheel()
 	{
-		
+		super("Wheel");
 	}
 	
 	@Override

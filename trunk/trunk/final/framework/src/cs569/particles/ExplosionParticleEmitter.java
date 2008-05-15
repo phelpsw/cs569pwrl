@@ -12,19 +12,18 @@ public class ExplosionParticleEmitter implements ParticleEmitter {
 	int totalCount;
 	float emitAccum;
 	float spread;
-	Vector3f pos;
+	Vector3f pos = new Vector3f();
 	
 	/**
 	 * FountainEmitter constructor
 	 * @param emitRate The rate at which to emit particles, in particles per second
 	 * @param spread The radius of the cone of emission
 	 */
-	public ExplosionParticleEmitter(int totalCount, float spread, Vector3f pos) {
+	public ExplosionParticleEmitter(int totalCount, float spread) {
 		this.totalCount = totalCount;
 		this.currentCount = 0;
 		this.random = new Random();
 		this.spread = spread;
-		this.pos = pos;
 	}
 	
 	public void emitParticles(ParticleSystem particleSystem, float time, float dt) 
@@ -43,6 +42,11 @@ public class ExplosionParticleEmitter implements ParticleEmitter {
 			particleSystem.emit(pos, vel, color, 1, time);
 			currentCount++;
 		}
+	}
+	
+	public void setPosition(Vector3f pos)
+	{
+		this.pos = pos;
 	}
 }
 
