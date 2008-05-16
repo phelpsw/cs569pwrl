@@ -26,6 +26,8 @@ public class GlowModifierVehicleWheel extends GlowModifier {
 	
 	@Override
 	public void update(float time) {
+		if(mymaterial instanceof Glow == false)
+			return;
 		if (lastTimeUpdated < 0) {
 			lastTimeUpdated = time;
 			return;

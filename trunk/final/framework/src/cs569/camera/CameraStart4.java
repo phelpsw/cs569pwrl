@@ -9,10 +9,10 @@ public class CameraStart4 extends CameraConfig {
 	Vector3f target = new Vector3f();
 	Vector3f pos = new Vector3f();
 	float cameraTargetHorizontalOffset = 0.0f;
-	float cameraSideOffset = 7.0f;
-	float cameraForwardOffset = -8.0f;
+	float cameraSideOffset = 12.0f;
+	float cameraForwardOffset = -15.0f;
 	float cameraVerticalOffset = 0.0f;
-	float FOV = 60.0f;
+	float FOV = 80.0f;
 	
 	float eyeDampeningConstant = 0.0002f;
 	float targetDampeningConstant = 0.005f;
