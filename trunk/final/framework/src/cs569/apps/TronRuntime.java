@@ -168,7 +168,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	private static final boolean mouseControlEnabled = false;
 	
 	private Player[] player = new Player[6];
-	private int numPlayers = 3;
+	private int numPlayers = 2;
 	private long lastTime = -1; // negative to identify first timestep
 
 	private boolean gameRunning = false;
@@ -459,7 +459,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		 group.add(AIPlayerMenu[i]);
 		 AIMenu.add(AIPlayerMenu[i]);
 		}
-		AIPlayerMenu[2].setSelected(true);
+		AIPlayerMenu[1].setSelected(true);
 						
 		menuBar.add(AIMenu);
 		
@@ -772,7 +772,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	        if (object.recursiveCheckCollision(v.getTransformedBoundingBox()))
 	        {	        	
 	        	player[i].destroy();
-	        	System.out.println("explode");
+	        	//System.out.println("explode");
 	       	}
 	        player[i].getCurrentWall().setCollidable(true);
 		}
