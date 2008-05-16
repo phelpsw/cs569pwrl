@@ -68,7 +68,7 @@ public class Player {
 	
 	// Length of death in ms
 	static float deathSequencePeriod = 2500.0f;
-	float deathSequencePosition = 0f;
+	float sequencePosition = 0f;
 	Vector3f deathWallScale = new Vector3f();
 	Group deathTriangles;
 	
@@ -108,7 +108,9 @@ public class Player {
 		this.humanCtl = human;	
 		this.id = id;
 		direction = new Vector2f();
-		position = new Vector2f();		
+		position = new Vector2f();
+		vehicle = new Vehicle();
+		
 
 		cameraCurrentTargetPosition = new Vector3f();
 		cameraObjectiveTargetPosition = new Vector3f();		
@@ -122,17 +124,17 @@ public class Player {
 	
 	public void resetPlayer()
 	{
-		state = Player.ALIVE;
-		velocity = 45.0f;
-		vehicle = new Vehicle();
+		state = Player.ALIVE;		
+		vehicle.resetRotate();
+		stop(false); // not stopped
+		
 		initVehicleColor(id);
 		
 		position.x = (id/2)*80;
 		if (id%2 == 0)
 		{
 		 position.y = -Map.mapWidth + 20;
-		 direction.set(0,1);
-				 
+		 direction.set(0,1);				 
 		} else
 		{
 		 position.y = Map.mapWidth - 20;
@@ -142,13 +144,13 @@ public class Player {
 		 vehicle.addRotate(QUAT_LEFT);
 		 vehicle.addRotate(QUAT_LEFT);
 		}
+		vehicle.setPos(position);
+		sequencePosition = 0;
 		
 		// reset to default camera
 		cameraObjectiveTargetPosition.set(camman.getCamera("RearNarrowFOV").getCameraTarget(this));
 		cameraObjectivePosition.set(camman.getCamera("RearNarrowFOV").getCameraPosition(this));
 		cameraObjectiveFOV = camman.getCamera("RearNarrowFOV").getCameraFOV(this);
-		
-		vehicle.setPos(position);
 		
 		cameraCurrentTargetPosition.set(camman.getCamera().getCameraTarget(this));
 		cameraObjectiveTargetPosition.set(cameraCurrentTargetPosition);
@@ -180,6 +182,12 @@ public class Player {
 		}
 	}
 	
+	public void killPlayer()
+	{
+		state=DEAD;
+		stop(true);
+	}
+	
 	public Camera getCamera()
 	{
 		return camera;
@@ -199,10 +207,10 @@ public class Player {
 		cameraObjectivePosition.set(camman.getCamera("RearWideLowFOV").getCameraPosition(this));
 		cameraObjectiveFOV = camman.getCamera("RearWideLowFOV").getCameraFOV(this);
 		
-		velocity = 0.0f;
+		stop(true);
 		state = Player.DYING;
 		vehicle.removeFromParent();
-		deathSequencePosition = 0.0f;
+		sequencePosition = 0.0f;
 		particleSystemHandler.explodePlayer(this);
 	}
 	
@@ -234,6 +242,15 @@ public class Player {
 		mywallgroup.setScale(scale);
 	}
 	
+	public void stop(boolean s)
+	{
+		if (s)
+			velocity = 0f;
+		else
+			velocity = 45f;
+			
+	}
+	
 	//called every frame
 	public void update(float time)
 	{
@@ -246,11 +263,11 @@ public class Player {
 		}
 		// dt is in ms
 		float dt = (time - lastTimeUpdated)*1000.0f;
+		sequencePosition += dt;
 		
 		if(state == Player.DYING)
-		{
-			deathSequencePosition += dt;
-			float deathSequenceRatio = deathSequencePosition / deathSequencePeriod;
+		{			
+			float deathSequenceRatio = sequencePosition / deathSequencePeriod;
 			deathWallScale.set(1, (1.0f - deathSequenceRatio), 1);
 			scaleMyWalls(deathWallScale);
 			if(deathSequenceRatio > 1.0)
@@ -258,8 +275,14 @@ public class Player {
 				mywallgroup.removeFromParent();
 				deathTriangles.removeFromParent();
 				state = Player.DEAD;
+				sequencePosition = 0;
 				return;
 			}
+		} else if (state == Player.DEAD)
+		{
+			//float introSequenceRatio = sequencePosition / SequencePeriod;
+			//TODO cool intro camera work
+			
 		}
 		
 		temp.set(direction);
@@ -294,7 +317,7 @@ public class Player {
 		camera.setYFOV(cameraCurrentFOV);
 		
 		// perform AI operation if AI player
-		if(humanCtl == false)
+		if(humanCtl == false && state == ALIVE)
 		{
 			
 			aiBoundingBox.reset();

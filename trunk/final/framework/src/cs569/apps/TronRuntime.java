@@ -164,12 +164,11 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	private static final boolean sidePanelOn = false;
 	
 	
-	private Player[] player = new Player[4];	
+	private Player[] player = new Player[3];	
 	private long lastTime = -1; // negative to identify first timestep
 
 	private boolean gameRunning = false;
-	
-	
+		
 
 	// the current size of GL viewport
 	protected int viewWidth = 800; //DEFAULT_VIEWPORT_SIZE;
@@ -271,6 +270,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 			 player[i] = new Player(i, true);
 		 else
 			 player[i] = new Player(i, false);
+		 player[i].killPlayer(); // start the game stopped
 		 object.addObject(player[i].getCurrentWall());
 		 object.addObject(player[i].getVehicle());
 		}
@@ -307,6 +307,8 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		 player[i].resetPlayer();
 		 object.addObject(player[i].getVehicle());
 		}
+		
+		gameRunning = true;
 	}
 
 	/**
@@ -631,8 +633,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 				sfqTexture.initializeTexture(gl);
 				sfqTexture.blit(gl);
 			}
-	
-			if (gameRunning)
+				
 				gamePlay();
 			
 			//*********************************
@@ -690,20 +691,34 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	}
 
 	private void gamePlay()
-	{
+	{		
+		float time;
 		// handle initial value
 		if(lastTime < 0)
 		{
 			lastTime = System.currentTimeMillis();
+
+			((Map)(object)).setGroundMaterial(
+					new ShadowedGlow(
+							new Color3f(0.1f,0.1f,0.1f), 
+							new Color3f(0.8f,0.8f,0.8f), 
+							1.0f, 
+							Texture.getTexture("/textures/tron/floor.png"), 
+							Texture.getTexture("Shadow map")));
+
+			
 			return;
 		}
 		
 		for (int i=0; i<player.length; i++)
 		{
-			player[i].update((System.currentTimeMillis() - startTime) / 1000.0f);
+			time = (System.currentTimeMillis() - startTime) / 1000.0f;						
+			player[i].update(time); // call even if game isn't running to update cameras
 			
-			if (player[i].getState() != Player.ALIVE)
+			if (player[i].getState() != Player.ALIVE || gameRunning == false)
 				continue; // skip player
+			
+			
 					
 	        Vehicle v = player[i].getVehicle();
 	        v.recursiveUpdateBoundingBoxes(); // Just moved vehicle, but is this needed?
@@ -974,13 +989,10 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		{			
 		 player[1].humanCtl = false;
 		 resetGame();
-		 gameRunning = true;
-		 
 		} else
 		{		
 			player[1].humanCtl = true;			
-			resetGame();
-			gameRunning = true;
+			resetGame();			
 		}		
 	}
 
@@ -1396,8 +1408,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 				 break;
 			 case KeyEvent.VK_UP: player[0].move(Player.NEXT_CAMERA); break;
 			 case KeyEvent.VK_SPACE:
-				 resetGame();
-				 gameRunning = true;
+				 resetGame();				 
 				 break;
 			 default:				 
 					switch(e.getKeyChar()) {
@@ -1409,6 +1420,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 						if (gameRunning && player[1].humanCtl)
 							player[1].move(Player.MOVE_RIGHT); 
 						break;
+					case 'w': player[1].move(Player.NEXT_CAMERA); break;
 					default:
 					
 						// not any of these keys, so pass event along
