@@ -10,6 +10,10 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 
+import cs569.apps.TronRuntime;
+import cs569.glowmods.GlowModifierTrails;
+import cs569.glowmods.GlowModifierVehicleBody;
+import cs569.glowmods.GlowModifierVehicleWheel;
 import cs569.material.Lambertian;
 import cs569.material.Material;
 import cs569.misc.GLSLErrorException;
@@ -152,6 +156,7 @@ public class Vehicle extends HierarchicalObject {
 	public void setHubMaterial(Material in)
 	{
 		bike_hub.setMaterial(in);
+		TronRuntime.glowmodman.add(new GlowModifierVehicleWheel(in));
 	}
 	
 	public void setWheelMaterial(Material in)
@@ -168,6 +173,7 @@ public class Vehicle extends HierarchicalObject {
 	public void setBodyMaterial(Material in)
 	{
 		bike_body.setMaterial(in);
+		TronRuntime.glowmodman.add(new GlowModifierVehicleBody(in));
 	}
 	
 	public Material getBodyMaterial()
