@@ -187,6 +187,8 @@ public class Player {
 
 		// Walls must be setup after vehicle is initialized
 		currentWall = new Wall(position, direction);
+		if(mywallgroup != null)
+			mywallgroup.removeFromParent();
 		mywallgroup = new Group();
 		currentWall.setMaterial(this.wallMaterial);
 		((Map)TronRuntime.getRootObject()).addObject(mywallgroup);
