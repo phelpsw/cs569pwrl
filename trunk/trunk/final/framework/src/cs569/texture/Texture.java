@@ -202,6 +202,12 @@ public class Texture {
 		gl.glActiveTexture(GL.GL_TEXTURE0 + textureUnit);
 		gl.glEnable(mode);
 		gl.glBindTexture(mode, textureID);
+		
+		float max[] = new float[1];
+		gl.glGetFloatv( GL.GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, max, 0 );
+	    gl.glTexParameterf( GL.GL_TEXTURE_2D, 
+	                        GL.GL_TEXTURE_MAX_ANISOTROPY_EXT, 
+	                        max[0] );
 	}
 
 	/**
