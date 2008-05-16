@@ -153,6 +153,11 @@ public class Vehicle extends HierarchicalObject {
 		this.setRotation(rot);
 	}
 	
+	public void resetRotate()
+	{
+		this.setRotationAxisAngle(0, 1, 0, 0);
+	}
+	
 	public void setHubMaterial(Material in)
 	{
 		bike_hub.setMaterial(in);
