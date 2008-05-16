@@ -25,4 +25,9 @@ public abstract class CameraConfig {
 	public abstract float getEyeDampening();
 	public abstract float getTargetDampening();
 	public abstract float getFOVDampening();
+	
+	public String toString()
+	{
+		return name;
+	}
 }

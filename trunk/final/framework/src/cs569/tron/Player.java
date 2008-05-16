@@ -17,6 +17,10 @@ import cs569.tron.TronParticleSystemHandler;
 import cs569.apps.TronRuntime;
 import cs569.camera.Camera;
 import cs569.camera.CameraConfigManager;
+import cs569.camera.CameraStart1;
+import cs569.camera.CameraStart2;
+import cs569.camera.CameraStart3;
+import cs569.camera.CameraStart4;
 import cs569.glowmods.GlowModifierTrails;
 import cs569.material.AnisotropicWard;
 import cs569.material.Glow;
@@ -66,9 +70,15 @@ public class Player {
 	float cameraObjectiveFOV;
 	float cameraCurrentFOV;
 	
+	// Length of birth in counts
+	static int birthSequencePeriod = 200;
+	static int birthSequenceComponentPeriod;
+	static int birthSequenceComponents = 4;
+	int birthSequencePosition = 0;
+	
 	// Length of death in ms
 	static float deathSequencePeriod = 2500.0f;
-	float sequencePosition = 0f;
+	float deathSequencePosition = 0f;
 	Vector3f deathWallScale = new Vector3f();
 	Group deathTriangles;
 	
@@ -77,6 +87,7 @@ public class Player {
 	TronParticleSystemHandler particleSystemHandler;
 	
 	CameraConfigManager camman = new CameraConfigManager();
+	CameraConfigManager special_camman; // user inaccessible cameras
 	
 	BoundingBox aiBoundingBox = null;
 	static float aiLookAheadHorizontalOffsetMin = 0.0f;
@@ -111,7 +122,15 @@ public class Player {
 		position = new Vector2f();
 		vehicle = new Vehicle();
 		
-
+		special_camman = new CameraConfigManager();
+		special_camman.clearCameraConfig();
+		special_camman.addCameraConfig(new CameraStart1());
+		special_camman.addCameraConfig(new CameraStart2());
+		special_camman.addCameraConfig(new CameraStart3());
+		special_camman.addCameraConfig(new CameraStart4());
+		
+		birthSequenceComponentPeriod = birthSequencePeriod / birthSequenceComponents;
+		
 		cameraCurrentTargetPosition = new Vector3f();
 		cameraObjectiveTargetPosition = new Vector3f();		
 		cameraCurrentPosition = new Vector3f();
@@ -145,7 +164,7 @@ public class Player {
 		 vehicle.addRotate(QUAT_LEFT);
 		}
 		vehicle.setPos(position);
-		sequencePosition = 0;
+		deathSequencePosition = 0;
 		
 		// reset to default camera
 		cameraObjectiveTargetPosition.set(camman.getCamera("RearNarrowFOV").getCameraTarget(this));
@@ -210,7 +229,7 @@ public class Player {
 		stop(true);
 		state = Player.DYING;
 		vehicle.removeFromParent();
-		sequencePosition = 0.0f;
+		deathSequencePosition = 0.0f;
 		particleSystemHandler.explodePlayer(this);
 	}
 	
@@ -254,6 +273,7 @@ public class Player {
 	//called every frame
 	public void update(float time)
 	{
+		CameraConfigManager cameraManager;
 		lastdt = time;
 		particleSystemHandler.update(time);
 		
@@ -263,11 +283,18 @@ public class Player {
 		}
 		// dt is in ms
 		float dt = (time - lastTimeUpdated)*1000.0f;
-		sequencePosition += dt;
+		deathSequencePosition += dt;
+		
+		if(state == Player.DEAD)
+		{
+			cameraManager = special_camman;
+		} else {
+			cameraManager = camman;
+		}
 		
 		if(state == Player.DYING)
 		{			
-			float deathSequenceRatio = sequencePosition / deathSequencePeriod;
+			float deathSequenceRatio = deathSequencePosition / deathSequencePeriod;
 			deathWallScale.set(1, (1.0f - deathSequenceRatio), 1);
 			scaleMyWalls(deathWallScale);
 			if(deathSequenceRatio > 1.0)
@@ -275,14 +302,30 @@ public class Player {
 				mywallgroup.removeFromParent();
 				deathTriangles.removeFromParent();
 				state = Player.DEAD;
-				sequencePosition = 0;
+				deathSequencePosition = 0;
 				return;
 			}
 		} else if (state == Player.DEAD)
 		{
-			//float introSequenceRatio = sequencePosition / SequencePeriod;
-			//TODO cool intro camera work
-			
+			birthSequencePosition++;
+			birthSequencePosition = birthSequencePosition % birthSequencePeriod;
+			if(birthSequencePosition == 0) {
+				cameraObjectiveTargetPosition.set(cameraManager.getNextCamera().getCameraTarget(this));
+				cameraObjectivePosition.set(cameraManager.getNextCamera().getCameraPosition(this));
+				cameraObjectiveFOV = cameraManager.getNextCamera().getCameraFOV(this);
+			} else if (birthSequencePosition == birthSequenceComponentPeriod) {
+				cameraObjectiveTargetPosition.set(cameraManager.getNextCamera().getCameraTarget(this));
+				cameraObjectivePosition.set(cameraManager.getNextCamera().getCameraPosition(this));
+				cameraObjectiveFOV = cameraManager.getNextCamera().getCameraFOV(this);
+			} else if (birthSequencePosition == 2*birthSequenceComponentPeriod) {
+				cameraObjectiveTargetPosition.set(cameraManager.getNextCamera().getCameraTarget(this));
+				cameraObjectivePosition.set(cameraManager.getNextCamera().getCameraPosition(this));
+				cameraObjectiveFOV = cameraManager.getNextCamera().getCameraFOV(this);
+			} else if (birthSequencePosition == 3*birthSequenceComponentPeriod) {
+				cameraObjectiveTargetPosition.set(cameraManager.getNextCamera().getCameraTarget(this));
+				cameraObjectivePosition.set(cameraManager.getNextCamera().getCameraPosition(this));
+				cameraObjectiveFOV = cameraManager.getNextCamera().getCameraFOV(this);
+			}
 		}
 		
 		temp.set(direction);
@@ -290,19 +333,19 @@ public class Player {
 		position.add(temp);					
 		vehicle.setPos(position);		
 		currentWall.setEnd(position);
-		
-		cameraObjectiveTargetPosition.set(camman.getCamera().getCameraTarget(this));
-		cameraObjectivePosition.set(camman.getCamera().getCameraPosition(this));
-		cameraObjectiveFOV = camman.getCamera().getCameraFOV(this);
+
+		cameraObjectiveTargetPosition.set(cameraManager.getCamera().getCameraTarget(this));
+		cameraObjectivePosition.set(cameraManager.getCamera().getCameraPosition(this));
+		cameraObjectiveFOV = cameraManager.getCamera().getCameraFOV(this);
 		
 		deltaEye.sub(camera.getEye(), cameraObjectivePosition);
-		deltaEye.scale(-camman.getCamera().getEyeDampening()*dt);
+		deltaEye.scale(-cameraManager.getCamera().getEyeDampening()*dt);
 		
 		deltaTarget.sub(camera.getTarget(), cameraObjectiveTargetPosition);
-		deltaTarget.scale(-camman.getCamera().getTargetDampening()*dt);
+		deltaTarget.scale(-cameraManager.getCamera().getTargetDampening()*dt);
 		
 		deltaFOV = camera.getYFOV() - cameraObjectiveFOV;
-		deltaFOV *= -camman.getCamera().getFOVDampening()*dt;
+		deltaFOV *= -cameraManager.getCamera().getFOVDampening()*dt;
 		
 		cameraCurrentPosition.set(camera.getEye());
 		cameraCurrentPosition.add(deltaEye);

@@ -54,4 +54,9 @@ public class CameraConfigManager {
 	{
 		cameras.add(cam);
 	}
+	
+	public void clearCameraConfig()
+	{
+		cameras.clear();
+	}
 }
