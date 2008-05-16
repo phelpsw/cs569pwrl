@@ -8,6 +8,9 @@ import javax.media.opengl.glu.GLU;
 import javax.vecmath.Color3f;
 import javax.vecmath.Vector3f;
 
+import cs569.apps.TronRuntime;
+import cs569.glowmods.GlowModifierGround;
+import cs569.glowmods.GlowModifierTrails;
 import cs569.material.AnisotropicWard;
 import cs569.material.Lambertian;
 import cs569.material.Material;
@@ -34,7 +37,6 @@ public class Map extends HierarchicalObject {
 		ground = PrimitiveFactory.makePlane("Ground", 100, 100);
 		ground.collidable = false;
 		ground.setTranslate(0, groundLevel, 0);
-		ground.setMaterial(new TexturedPhong("/textures/tron/floor.png"));
 		ground.setScale(mapWidth, 1, mapWidth);
 		this.addObject(ground);		
 				
@@ -88,6 +90,7 @@ public class Map extends HierarchicalObject {
 	public void setGroundMaterial(Material in)
 	{
 		ground.setMaterial(in);
+		TronRuntime.glowmodman.add(new GlowModifierGround(in));
 	}
 	
 	
