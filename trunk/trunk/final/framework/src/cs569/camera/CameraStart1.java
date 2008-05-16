@@ -11,8 +11,8 @@ public class CameraStart1 extends CameraConfig {
 	float cameraTargetHorizontalOffset = 0.0f;
 	float cameraSideOffset = 7.0f;
 	float cameraForwardOffset = 8.0f;
-	float cameraVerticalOffset = 15.0f;
-	float FOV = 60.0f;
+	float cameraVerticalOffset = 12.0f;
+	float FOV = 80.0f;
 	
 	float eyeDampeningConstant = 0.0002f;
 	float targetDampeningConstant = 0.005f;

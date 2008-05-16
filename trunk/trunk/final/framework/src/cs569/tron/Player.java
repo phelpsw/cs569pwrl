@@ -49,6 +49,10 @@ public class Player {
 	
 	public static final int PLAYER1=0;
 	public static final int PLAYER2=1;
+	public static final int PLAYER3=2;
+	public static final int PLAYER4=3;
+	public static final int PLAYER5=4;
+	public static final int PLAYER6=5;
 	
 	int id; // Player 1 this value == 0
 	Camera camera;
@@ -236,23 +240,55 @@ public class Player {
 	// Body and hub must be Glow shaders
 	private void initVehicleColor(int id)
 	{
-		switch(id%2)
+		switch(id%6)
 		{
-		case PLAYER1:
-			vehicle.setBodyMaterial(new Glow(new Color3f(0.2f, 1.0f, 0.1f), new Color3f(0.2f, 1.0f, 0.1f), 1.0f, Texture.getTexture("/textures/tron/white.png")));
+		case PLAYER1: // Blue
+			vehicle.setBodyMaterial(new Glow(new Color3f(0.0f, 0.0f, 0.8f), new Color3f(0.0f, 0.0f, 0.8f), 1.0f, Texture.getTexture("/textures/tron/white.png")));
 			vehicle.setHubMaterial(new Glow(new Color3f(0.6f, 0.6f, 0.6f), new Color3f(0.6f, 0.6f, 0.6f), 0.7f, Texture.getTexture("/textures/tron/white.png")));
-			vehicle.setWheelFlashMaterial(new Glow(new Color3f(0.8f, 0.8f, 0.8f), new Color3f(0.8f, 0.8f, 0.8f), 1.0f, Texture.getTexture("/textures/tron/white.png")));
+			vehicle.setWheelFlashMaterial(new Lambertian(new Color3f(0.1f, 0.1f, 0.1f)));
 			vehicle.setWindowMaterial(new Phong(new Color3f(0.1f, 0.1f, 0.1f),new Color3f(1.0f, 1.0f, 1.0f),50.0f));
 			vehicle.setWheelMaterial(new Lambertian(new Color3f(0.1f, 0.1f, 0.1f)));
-			wallMaterial = new Glow(new Color3f(0.2f, 1.0f, 0.1f), new Color3f(0.2f, 1.0f, 0.1f), 1.0f, Texture.getTexture("/textures/tron/white.png"));
+			wallMaterial = new Glow(new Color3f(0.0f, 0.0f, 0.8f), new Color3f(0.0f, 0.0f, 0.8f), 1.0f, Texture.getTexture("/textures/tron/white.png"));
 			break;
-		case PLAYER2:
-			vehicle.setBodyMaterial(new Glow(new Color3f(1.0f, 0.2f, 0.1f), new Color3f(1.0f, 0.2f, 0.1f), 1.0f, Texture.getTexture("/textures/tron/white.png")));
+		case PLAYER2: // Red
+			vehicle.setBodyMaterial(new Glow(new Color3f(0.8f, 0.0f, 0.0f), new Color3f(0.8f, 0.0f, 0.0f), 1.0f, Texture.getTexture("/textures/tron/white.png")));
 			vehicle.setHubMaterial(new Glow(new Color3f(0.6f, 0.6f, 0.6f), new Color3f(0.6f, 0.6f, 0.6f), 0.7f, Texture.getTexture("/textures/tron/white.png")));
-			vehicle.setWheelFlashMaterial(new Glow(new Color3f(0.8f, 0.8f, 0.8f), new Color3f(0.8f, 0.8f, 0.8f), 1.0f, Texture.getTexture("/textures/tron/white.png")));
+			vehicle.setWheelFlashMaterial(new Lambertian(new Color3f(0.1f, 0.1f, 0.1f)));
 			vehicle.setWindowMaterial(new Phong(new Color3f(0.1f, 0.1f, 0.1f),new Color3f(1.0f, 1.0f, 1.0f),50.0f));
 			vehicle.setWheelMaterial(new Lambertian(new Color3f(0.1f, 0.1f, 0.1f)));
-			wallMaterial = new Glow(new Color3f(1.0f, 0.2f, 0.1f), new Color3f(1.0f, 0.2f, 0.1f), 1.0f, Texture.getTexture("/textures/tron/white.png"));
+			wallMaterial = new Glow(new Color3f(0.8f, 0.0f, 0.0f), new Color3f(0.8f, 0.0f, 0.0f), 1.0f, Texture.getTexture("/textures/tron/white.png"));
+			break;
+		case PLAYER3: // Green
+			vehicle.setBodyMaterial(new Glow(new Color3f(0.1f, 0.8f, 0.1f), new Color3f(0.1f, 0.8f, 0.1f), 1.0f, Texture.getTexture("/textures/tron/white.png")));
+			vehicle.setHubMaterial(new Glow(new Color3f(0.6f, 0.6f, 0.6f), new Color3f(0.6f, 0.6f, 0.6f), 0.7f, Texture.getTexture("/textures/tron/white.png")));
+			vehicle.setWheelFlashMaterial(new Lambertian(new Color3f(0.1f, 0.1f, 0.1f)));
+			vehicle.setWindowMaterial(new Phong(new Color3f(0.1f, 0.1f, 0.1f),new Color3f(1.0f, 1.0f, 1.0f),50.0f));
+			vehicle.setWheelMaterial(new Lambertian(new Color3f(0.1f, 0.1f, 0.1f)));
+			wallMaterial = new Glow(new Color3f(0.1f, 0.8f, 0.1f), new Color3f(0.1f, 0.8f, 0.1f), 1.0f, Texture.getTexture("/textures/tron/white.png"));
+			break;
+		case PLAYER4: // Yellow
+			vehicle.setBodyMaterial(new Glow(new Color3f(0.8f, 0.8f, 0.1f), new Color3f(0.8f, 0.8f, 0.1f), 1.0f, Texture.getTexture("/textures/tron/white.png")));
+			vehicle.setHubMaterial(new Glow(new Color3f(0.6f, 0.6f, 0.6f), new Color3f(0.6f, 0.6f, 0.6f), 0.7f, Texture.getTexture("/textures/tron/white.png")));
+			vehicle.setWheelFlashMaterial(new Lambertian(new Color3f(0.1f, 0.1f, 0.1f)));
+			vehicle.setWindowMaterial(new Phong(new Color3f(0.1f, 0.1f, 0.1f),new Color3f(1.0f, 1.0f, 1.0f),50.0f));
+			vehicle.setWheelMaterial(new Lambertian(new Color3f(0.1f, 0.1f, 0.1f)));
+			wallMaterial = new Glow(new Color3f(0.8f, 0.8f, 0.1f), new Color3f(0.8f, 0.8f, 0.1f), 1.0f, Texture.getTexture("/textures/tron/white.png"));
+			break;
+		case PLAYER5: // Black
+			vehicle.setBodyMaterial(new Glow(new Color3f(0.1f, 0.1f, 0.1f), new Color3f(0.1f, 0.1f, 0.1f), 1.0f, Texture.getTexture("/textures/tron/white.png")));
+			vehicle.setHubMaterial(new Glow(new Color3f(0.6f, 0.6f, 0.6f), new Color3f(0.6f, 0.6f, 0.6f), 0.7f, Texture.getTexture("/textures/tron/white.png")));
+			vehicle.setWheelFlashMaterial(new Lambertian(new Color3f(0.1f, 0.1f, 0.1f)));
+			vehicle.setWindowMaterial(new Phong(new Color3f(0.1f, 0.1f, 0.1f),new Color3f(1.0f, 1.0f, 1.0f),50.0f));
+			vehicle.setWheelMaterial(new Lambertian(new Color3f(0.1f, 0.1f, 0.1f)));
+			wallMaterial = new Glow(new Color3f(0.1f, 0.1f, 0.1f), new Color3f(0.1f, 0.1f, 0.1f), 1.0f, Texture.getTexture("/textures/tron/white.png"));
+			break;
+		case PLAYER6: // Pink
+			vehicle.setBodyMaterial(new Glow(new Color3f(1.0f, 0.43f, 0.71f), new Color3f(1.0f, 0.43f, 0.71f), 1.0f, Texture.getTexture("/textures/tron/white.png")));
+			vehicle.setHubMaterial(new Glow(new Color3f(0.6f, 0.6f, 0.6f), new Color3f(0.6f, 0.6f, 0.6f), 0.7f, Texture.getTexture("/textures/tron/white.png")));
+			vehicle.setWheelFlashMaterial(new Lambertian(new Color3f(0.1f, 0.1f, 0.1f)));
+			vehicle.setWindowMaterial(new Phong(new Color3f(0.1f, 0.1f, 0.1f),new Color3f(1.0f, 1.0f, 1.0f),50.0f));
+			vehicle.setWheelMaterial(new Lambertian(new Color3f(0.1f, 0.1f, 0.1f)));
+			wallMaterial = new Glow(new Color3f(1.0f, 0.43f, 0.71f), new Color3f(1.0f, 0.43f, 0.71f), 1.0f, Texture.getTexture("/textures/tron/white.png"));
 			break;
 		}
 		
@@ -268,9 +304,15 @@ public class Player {
 	public void stop(boolean s)
 	{
 		if (s)
+		{
 			velocity = 0f;
+			vehicle.setWheelFlashMaterial(new Lambertian(new Color3f(0.1f, 0.1f, 0.1f)));
+		}
 		else
+		{
 			velocity = 45f;
+			vehicle.setWheelFlashMaterial(new Glow(new Color3f(0.8f, 0.8f, 0.8f), new Color3f(0.8f, 0.8f, 0.8f), 1.0f, Texture.getTexture("/textures/tron/white.png")));
+		}
 			
 	}
 	

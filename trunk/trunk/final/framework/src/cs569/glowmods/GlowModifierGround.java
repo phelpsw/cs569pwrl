@@ -11,7 +11,7 @@ public class GlowModifierGround extends GlowModifier {
 
 	float lastTimeUpdated = -1.0f;
 	Random rand;
-	float segmentLength = 1000.0f;
+	float segmentLength = 5000.0f;
 	float cycleLength;
 	float cycleProgress;
 	float segmentProgress;
