@@ -81,6 +81,7 @@ public class Player {
 	BoundingBox aiBoundingBox = null;
 	static float aiLookAheadHorizontalOffsetMin = 0.0f;
 	static float aiLookAheadHorizontalOffsetMax = 10.0f;
+	static float aiRandomTurnFactor = 0.01f;
 	Vector3f aiLookAheadMin = new Vector3f();
 	Vector3f aiLookAheadMax = new Vector3f();
 	
@@ -302,7 +303,7 @@ public class Player {
 			aiBoundingBox.expandBy(aiLookAheadMin);
 			aiBoundingBox.expandBy(aiLookAheadMax);
 			
-			if(TronRuntime.getRootObject().recursiveCheckCollision(aiBoundingBox))
+			if(TronRuntime.getRootObject().recursiveCheckCollision(aiBoundingBox) || rand.nextFloat() < aiRandomTurnFactor)
 			{
 				if(rand.nextBoolean())
 				{

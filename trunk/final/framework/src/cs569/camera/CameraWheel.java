@@ -10,8 +10,8 @@ public class CameraWheel extends CameraConfig {
 	Vector3f pos = new Vector3f();
 	float cameraTargetHorizontalOffset = 10.0f;
 	float cameraSideOffset = 7.0f;
-	float cameraForwardOffset = 10.0f;
-	float cameraVerticalOffset = 0.5f;
+	float cameraForwardOffset = 8.0f;
+	float cameraVerticalOffset = 1.5f;
 	float FOV = 60.0f;
 	
 	float eyeDampeningConstant = 0.005f;
