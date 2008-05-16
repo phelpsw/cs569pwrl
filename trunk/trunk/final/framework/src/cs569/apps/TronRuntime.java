@@ -634,7 +634,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 				sfqTexture.blit(gl);
 			}
 				
-				gamePlay();
+			gamePlay();
 			
 			//*********************************
 			// Player 1		
