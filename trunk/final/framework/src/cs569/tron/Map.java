@@ -81,7 +81,7 @@ public class Map extends HierarchicalObject {
 		sky.collidable = false;
 		sky.flipNormals();
 		sky.setScale(600, 600, 600);
-		sky.setMaterial(new Lambertian(new Color3f(.3f,.3f,1)));
+		sky.setMaterial(new Lambertian(new Color3f(0,0,0.5f)));
 		this.addObject(sky);
 		
 				

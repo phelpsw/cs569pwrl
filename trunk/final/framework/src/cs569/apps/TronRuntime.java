@@ -165,7 +165,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	
 	
 	private static final boolean sidePanelOn = false;
-	
+	private static final boolean mouseControlEnabled = false;
 	
 	private Player[] player = new Player[6];
 	private int numPlayers = 3;
@@ -326,7 +326,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		
 		((Map)(object)).setGroundMaterial(
 				new ShadowedGlow(
-						new Color3f(0.1f,0.1f,0.1f), 
+						new Color3f(0.1f,0.1f,0.2f), 
 						new Color3f(0.8f,0.8f,0.8f), 
 						1.0f, 
 						Texture.getTexture("/textures/tron/floor.png"), 
@@ -358,9 +358,12 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	private JPanel createGLPanel() {
 		canvas = new GLCanvas();
 		canvas.addGLEventListener(this);
-		canvas.addMouseListener(this);
-		canvas.addMouseWheelListener(this);
-		canvas.addMouseMotionListener(this);
+		if(mouseControlEnabled)
+		{
+			canvas.addMouseListener(this);
+			canvas.addMouseWheelListener(this);
+			canvas.addMouseMotionListener(this);
+		}
 		canvas.addKeyListener(this);
 		JPanel glPanel = new JPanel(new BorderLayout());
 		glPanel.add(canvas, BorderLayout.CENTER);
@@ -742,7 +745,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 
 			((Map)(object)).setGroundMaterial(
 					new ShadowedGlow(
-							new Color3f(0.1f,0.1f,0.1f), 
+							new Color3f(0.1f,0.1f,0.2f), 
 							new Color3f(0.8f,0.8f,0.8f), 
 							1.0f, 
 							Texture.getTexture("/textures/tron/floor.png"), 
