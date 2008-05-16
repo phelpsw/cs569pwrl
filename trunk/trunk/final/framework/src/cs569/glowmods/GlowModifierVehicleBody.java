@@ -9,7 +9,7 @@ public class GlowModifierVehicleBody extends GlowModifier {
 
 	float lastTimeUpdated = -1.0f;
 	Random rand;
-	float segmentLength = 600.0f;
+	float segmentLength = 4000.0f;
 	float cycleLength;
 	float cycleProgress;
 	float segmentProgress;
