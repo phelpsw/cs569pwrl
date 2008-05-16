@@ -32,6 +32,8 @@ import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -42,6 +44,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
@@ -164,7 +167,8 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	private static final boolean sidePanelOn = false;
 	
 	
-	private Player[] player = new Player[3];	
+	private Player[] player = new Player[6];
+	private int numPlayers = 3;
 	private long lastTime = -1; // negative to identify first timestep
 
 	private boolean gameRunning = false;
@@ -197,6 +201,8 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	private Animator animator;
 	protected final GLU glu = new GLU();
 	private final MaterialSelectionPanel matSelectPanel = new MaterialSelectionPanel();
+	
+	private JRadioButtonMenuItem[] AIPlayerMenu = new JRadioButtonMenuItem[5]; // 0-4 computer players
 
 	public static GlowModifierManager glowmodman = new GlowModifierManager();
 	
@@ -271,6 +277,10 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		 else
 			 player[i] = new Player(i, false);
 		 player[i].killPlayer(); // start the game stopped
+		}
+		
+		for (int i=0; i<numPlayers; i++)
+		{
 		 object.addObject(player[i].getCurrentWall());
 		 object.addObject(player[i].getVehicle());
 		}
@@ -291,6 +301,26 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	
 	public void resetGame()
 	{
+		numPlayers = 3;
+		for (int i=0; i<AIPlayerMenu.length; i++)
+		{
+			if (AIPlayerMenu[i].isSelected())
+			{
+				numPlayers = i+1; // assume 1 human for now
+				break;
+			}
+		}
+		if (player[1].humanCtl)
+			numPlayers++;
+		
+		for (int i=numPlayers; i<player.length; i++)
+		{
+		 object.remove(player[i].getCurrentWall());
+		 object.remove(player[i].getVehicle());
+		 player[i].killPlayer();
+		}
+		
+		
 		object = new Map();
 		glowmodman.clear(); // clear any old glow modifiers
 		
@@ -302,7 +332,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 						Texture.getTexture("/textures/tron/floor.png"), 
 						Texture.getTexture("Shadow map")));
 		
-		for (int i=0; i<player.length; i++)
+		for (int i=0; i<numPlayers; i++)
 		{
 		 player[i].resetPlayer();
 		 object.addObject(player[i].getVehicle());
@@ -403,8 +433,8 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 
 		
 		// first the geometry menu
-		JMenu gameMenu = new JMenu("Gameplay");
-		gameMenu.getPopupMenu().setLabel("Gameplay");
+		JMenu gameMenu = new JMenu("Start Game");
+		gameMenu.getPopupMenu().setLabel("Start Game");
 		String[] gameMenuItemNames = { "1 Player", "2 Player"};
 		String[] gameMenuItemActions = { "gameplay1Player", "gameplay2Player"};
 		char[] gameMenuMnemonics = {'1', '2'};
@@ -417,6 +447,18 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 				gameMenuItemActions, gameMenuMnemonics, keyStrokes2);
 		menuBar.add(gameMenu);
 		
+		JMenu AIMenu = new JMenu("Computer Players");
+		ButtonGroup group = new ButtonGroup();
+				
+		for (int i=0; i<AIPlayerMenu.length; i++)
+		{
+		 AIPlayerMenu[i] = new JRadioButtonMenuItem(i + " Computer");		
+		 group.add(AIPlayerMenu[i]);
+		 AIMenu.add(AIPlayerMenu[i]);
+		}
+		AIPlayerMenu[2].setSelected(true);
+						
+		menuBar.add(AIMenu);
 		
 		/*
 		
@@ -710,7 +752,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 			return;
 		}
 		
-		for (int i=0; i<player.length; i++)
+		for (int i=0; i<numPlayers; i++)
 		{
 			time = (System.currentTimeMillis() - startTime) / 1000.0f;						
 			player[i].update(time); // call even if game isn't running to update cameras
@@ -927,7 +969,7 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 					textureActions(ac);
 				} else if (menuName.equals("Animation")) {
 					animationActions(ac);
-				} else if (menuName.equals("Gameplay")){
+				} else if (menuName.equals("Start Game")){
 					gameActions(ac);
 				} else
 				{ System.out.println("unrecognized menu " + menuName);}
@@ -985,13 +1027,14 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 	
 	/** Geometry actions */
 	private void gameActions(String ac) {
+		
 		if (ac.equals("gameplay1Player"))
 		{			
-		 player[1].humanCtl = false;
+		 player[1].humanCtl = false;		 
 		 resetGame();
 		} else
 		{		
-			player[1].humanCtl = true;			
+			player[1].humanCtl = true;		
 			resetGame();			
 		}		
 	}
