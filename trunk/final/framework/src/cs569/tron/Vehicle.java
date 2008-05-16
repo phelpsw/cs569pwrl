@@ -165,14 +165,12 @@ public class Vehicle extends HierarchicalObject {
 	public void setHubMaterial(Material in)
 	{
 		bike_hub.setMaterial(in);
-		TronRuntime.glowmodman.add(new GlowModifierVehicleWheel(in));
 	}
 	
 	public void setWheelMaterial(Material in)
 	{
 		bike_wheel.setMaterial(in);
 	}
-	
 	
 	public void setWindowMaterial(Material in)
 	{
@@ -182,9 +180,8 @@ public class Vehicle extends HierarchicalObject {
 	public void setWheelFlashMaterial(Material in)
 	{
 		bike_wheelFlash.setMaterial(in);
+		TronRuntime.glowmodman.add(new GlowModifierVehicleWheel(in));
 	}
-	
-	
 	
 	public void setBodyMaterial(Material in)
 	{
@@ -196,24 +193,5 @@ public class Vehicle extends HierarchicalObject {
 	{
 		return bike_body.getMaterial();
 	}
-	
-	public void setVisible(boolean val)
-	{
-		/*
-		if(val)
-		{
-			//this.setScale(LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE);
-			bike_body.setScale(LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE);
-			bike_window.setScale(LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE);
-			bike_hub.setScale(LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE);
-			bike_wheel.setScale(LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE, LIGHT_CYCLE_SCALE);
-		} else {
-			//this.setScale(0,0,0);
-			bike_body.setScale(0,0,0);
-			bike_window.setScale(0,0,0);
-			bike_hub.setScale(0,0,0);
-			bike_wheel.setScale(0,0,0);
-		}
-		*/
-	}
+
 }

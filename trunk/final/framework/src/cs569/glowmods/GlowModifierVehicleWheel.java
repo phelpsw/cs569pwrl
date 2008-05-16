@@ -8,20 +8,20 @@ import cs569.material.Material;
 public class GlowModifierVehicleWheel extends GlowModifier {
 
 	float lastTimeUpdated = -1.0f;
-	Random rand;
-	float segmentLength = 600.0f;
-	float cycleLength;
-	float cycleProgress;
-	float segmentProgress;
+	Random rand = new Random();
+	
+	// Length of birth in counts
+	static int sequencePeriod = 2;
+	static int sequenceComponentPeriod;
+	static int sequenceComponents = 2;
+	int sequencePosition = 0;
 	
 	public GlowModifierVehicleWheel(Material mymaterial)
 	{
 		super("VehicleWheel");
 		this.mymaterial = mymaterial;
-		rand = new Random();
-		segmentLength *= rand.nextFloat();
-		cycleLength = 2*segmentLength;
-		cycleProgress = 0;
+
+		sequenceComponentPeriod = sequencePeriod / sequenceComponents;
 	}
 	
 	@Override
@@ -33,17 +33,14 @@ public class GlowModifierVehicleWheel extends GlowModifier {
 		// dt is in ms
 		float dt = (time - lastTimeUpdated)*1000.0f;
 		
-		cycleProgress += dt;
-		cycleProgress = cycleProgress % cycleLength;
+		sequencePosition++;
+		sequencePosition = sequencePosition % sequencePeriod;
 		
-		segmentProgress = (cycleProgress % segmentLength) / segmentLength;
+		if(sequencePosition == 0) 
+			((Glow)mymaterial).setGlowFactor(1);
+		else if (sequencePosition == sequenceComponentPeriod)
+			((Glow)mymaterial).setGlowFactor(0);
 		
-		if(cycleProgress > segmentLength)
-		{
-			((Glow)mymaterial).setGlowFactor(1-(segmentProgress));
-		} else {
-			((Glow)mymaterial).setGlowFactor(segmentProgress);
-		}
 		
 		lastTimeUpdated = time;
 	}
