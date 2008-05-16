@@ -150,7 +150,7 @@ public abstract class HierarchicalObject implements MutableTreeNode,
 				return false;
 			} else
 			{
-				System.out.println("Collided with " + name + ", vehicle:" + vehicleBox + ", "+name + ":" + getTransformedBoundingBox());
+				//System.out.println("Collided with " + name + ", vehicle:" + vehicleBox + ", "+name + ":" + getTransformedBoundingBox());
 				
 				return true;
 			}

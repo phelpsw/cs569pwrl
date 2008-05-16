@@ -425,7 +425,7 @@ public class Player {
 				} else {
 					move(MOVE_LEFT);
 				}
-				System.out.println("collide");
+				//System.out.println("collide");
 			}
 		}
 		
