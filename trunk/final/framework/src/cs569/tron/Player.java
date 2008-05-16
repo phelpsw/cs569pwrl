@@ -141,7 +141,12 @@ public class Player {
 		 vehicle.addRotate(QUAT_LEFT);
 		 vehicle.addRotate(QUAT_LEFT);
 		}
-		 
+		
+		// reset to default camera
+		cameraObjectiveTargetPosition.set(camman.getCamera("RearNarrowFOV").getCameraTarget(this));
+		cameraObjectivePosition.set(camman.getCamera("RearNarrowFOV").getCameraPosition(this));
+		cameraObjectiveFOV = camman.getCamera("RearNarrowFOV").getCameraFOV(this);
+		
 		vehicle.setPos(position);
 		
 		cameraCurrentTargetPosition.set(camman.getCamera().getCameraTarget(this));
@@ -189,9 +194,9 @@ public class Player {
 		currentWall.setEnd(position);
 				
 		
-		cameraObjectiveTargetPosition.set(camman.getCamera("RearWideFOV").getCameraTarget(this));
-		cameraObjectivePosition.set(camman.getCamera("RearWideFOV").getCameraPosition(this));
-		cameraObjectiveFOV = camman.getCamera("RearWideFOV").getCameraFOV(this);
+		cameraObjectiveTargetPosition.set(camman.getCamera("RearWideLowFOV").getCameraTarget(this));
+		cameraObjectivePosition.set(camman.getCamera("RearWideLowFOV").getCameraPosition(this));
+		cameraObjectiveFOV = camman.getCamera("RearWideLowFOV").getCameraFOV(this);
 		
 		velocity = 0.0f;
 		state = Player.DYING;

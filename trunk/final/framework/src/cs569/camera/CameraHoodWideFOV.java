@@ -10,7 +10,7 @@ public class CameraHoodWideFOV extends CameraConfig {
 	Vector3f pos = new Vector3f();
 	float cameraTargetHorizontalOffset = 25.0f;
 	float cameraHorizontalOffset = 0.0f;
-	float cameraVerticalOffset = 2.0f;
+	float cameraVerticalOffset = 5.0f;
 	float FOV = 65.0f;
 	
 	float eyeDampeningConstant = 0.01f;
