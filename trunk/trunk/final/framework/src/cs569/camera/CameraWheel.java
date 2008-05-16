@@ -14,8 +14,8 @@ public class CameraWheel extends CameraConfig {
 	float cameraVerticalOffset = 0.5f;
 	float FOV = 60.0f;
 	
-	float eyeDampeningConstant = 0.01f;
-	float targetDampeningConstant = 0.01f;
+	float eyeDampeningConstant = 0.005f;
+	float targetDampeningConstant = 0.005f;
 	float FOVDampeningConstant = 0.00425f;
 	
 	public CameraWheel()

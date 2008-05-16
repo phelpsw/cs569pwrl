@@ -294,6 +294,14 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		object = new Map();
 		glowmodman.clear(); // clear any old glow modifiers
 		
+		((Map)(object)).setGroundMaterial(
+				new ShadowedGlow(
+						new Color3f(0.1f,0.1f,0.1f), 
+						new Color3f(0.8f,0.8f,0.8f), 
+						1.0f, 
+						Texture.getTexture("/textures/tron/floor.png"), 
+						Texture.getTexture("Shadow map")));
+		
 		for (int i=0; i<player.length; i++)
 		{
 		 player[i].resetPlayer();
@@ -686,18 +694,6 @@ public class TronRuntime extends JFrame implements GLEventListener, ActionListen
 		// handle initial value
 		if(lastTime < 0)
 		{
-			/*
-			((Map)(object)).setGroundMaterial(
-					new ShadowedPhong());
-			*/
-			((Map)(object)).setGroundMaterial(
-					new ShadowedGlow(
-							new Color3f(0.1f,0.1f,0.1f), 
-							new Color3f(0.8f,0.8f,0.8f), 
-							1.0f, 
-							Texture.getTexture("/textures/tron/floor.png"), 
-							Texture.getTexture("Shadow map")));
-			
 			lastTime = System.currentTimeMillis();
 			return;
 		}

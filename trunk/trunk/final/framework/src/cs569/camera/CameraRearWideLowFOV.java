@@ -4,22 +4,22 @@ import javax.vecmath.Vector3f;
 
 import cs569.tron.Player;
 
-public class CameraRearWideFOV extends CameraConfig {
+public class CameraRearWideLowFOV extends CameraConfig {
 
 	Vector3f target = new Vector3f();
 	Vector3f pos = new Vector3f();
 	float cameraTargetHorizontalOffset = 5.0f;
 	float cameraHorizontalOffset = 15.0f;
-	float cameraVerticalOffset = 10.0f;
-	float FOV = 85.0f;
+	float cameraVerticalOffset = 1.0f;
+	float FOV = 75.0f;
 	
 	float eyeDampeningConstant = 0.00125f;
 	float targetDampeningConstant = 0.00425f;
 	float FOVDampeningConstant = 0.00425f;
 	
-	public CameraRearWideFOV()
+	public CameraRearWideLowFOV()
 	{
-		super("RearWideFOV");
+		super("RearWideLowFOV");
 	}
 	
 	@Override
