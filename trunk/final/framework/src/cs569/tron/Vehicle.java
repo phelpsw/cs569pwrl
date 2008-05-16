@@ -29,6 +29,7 @@ public class Vehicle extends HierarchicalObject {
 	private Group bike_window;
 	private Group bike_hub;
 	private Group bike_wheel;
+	private Group bike_wheelFlash;
 	
 	private static final float LIGHT_CYCLE_SCALE = .01f;
 	
@@ -45,12 +46,14 @@ public class Vehicle extends HierarchicalObject {
 		bike_window = new Group("LightCycle_Window");
 		bike_hub = new Group("LightCycle_Hub");
 		bike_wheel = new Group("LightCycle_Wheel");
+		bike_wheelFlash = new Group("LightCycle_WheelFlash");
 		
 				
 		bike.addObject(bike_body);
 		bike.addObject(bike_window);
 		bike.addObject(bike_hub);
 		bike.addObject(bike_wheel);
+		bike.addObject(bike_wheelFlash);
 		
 		
 		try {			
@@ -58,6 +61,7 @@ public class Vehicle extends HierarchicalObject {
 			bike_window.addObject(MeshObject.loadFromOBJ("models/windows.obj", false));
 			bike_hub.addObject(MeshObject.loadFromOBJ("models/bodyFrame.obj", false));			
 			bike_wheel.addObject(MeshObject.loadFromOBJ("models/wheelwells.obj", false));								
+			bike_wheelFlash.addObject(MeshObject.loadFromOBJ("models/wheelflash.obj", false));
 		} catch (Exception e)
 		{
 			System.out.println("Unable to load bike object");
@@ -143,7 +147,7 @@ public class Vehicle extends HierarchicalObject {
 
 	public void setPos(Vector2f pos)
 	{
-		this.setTranslate(pos.x, 0, pos.y);	
+		this.setTranslate(pos.x, -.1f, pos.y);	
 	}
 	
 	public void addRotate(Quat4f q)
@@ -174,6 +178,13 @@ public class Vehicle extends HierarchicalObject {
 	{
 		bike_window.setMaterial(in);
 	}
+	
+	public void setWheelFlashMaterial(Material in)
+	{
+		bike_wheelFlash.setMaterial(in);
+	}
+	
+	
 	
 	public void setBodyMaterial(Material in)
 	{
